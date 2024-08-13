@@ -1,3 +1,3 @@
 # Craftan
 
-Plugin for minecract
+Plugin for minecraft
