@@ -1,4 +1,6 @@
 root = true
+[*]
+end_of_line = lf
 [*.{kt,kts}]
 ktlint_standard_no-wildcard-imports=disabled
 ktlint_standard_property-naming=disabled
