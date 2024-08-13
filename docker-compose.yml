@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  paper-server:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: "./Dockerfile"
+    ports:
+      - "25565:25565"
+      - "5005:5005"
+    volumes:
+      - craftan-server:/app/server
+volumes:
+  craftan-server:
