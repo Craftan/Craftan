@@ -1,5 +1,6 @@
 package de.craftan
 
+import de.craftan.util.SystemManager
 import net.axay.kspigot.main.KSpigot
 
 class InternalMain : KSpigot() {
@@ -13,7 +14,9 @@ class InternalMain : KSpigot() {
     }
 
     override fun startup() {
+        Craftan.configure()
+        SystemManager.loadSystems()
     }
 }
 
-val Manager by lazy { InternalMain.INSTANCE }
+val PluginManager by lazy { InternalMain.INSTANCE }

@@ -9,6 +9,7 @@ val githubToken: String by project
 plugins {
     kotlin("jvm") version "1.9.21"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
+    id("com.gradleup.shadow") version "8.3.0"
     id("io.papermc.paperweight.userdev") version "1.7.2"
     id("co.uzzu.dotenv.gradle") version "4.0.0"
 }
@@ -20,20 +21,17 @@ repositories {
     gradlePluginPortal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
-
-    maven {
-        url = uri("https://maven.pkg.github.com/StaticFX/KIA")
-        credentials {
-            username = env.fetch("GITHUB_USER")
-            password = env.fetch("GITHUB_TOKEN")
-        }
-    }
+    maven("https://jitpack.io")
 }
 
 dependencies {
     paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
+
     implementation("net.axay:kspigot:$kspigotVersion")
-    api("de.staticred.kia:kia:1.1.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.10")
+    implementation("com.uchuhimo:konf:1.1.2")
+
+    compileOnly("com.github.StaticFX:kia:1.1.3")
 }
 
 paperweight {
@@ -52,6 +50,7 @@ bukkit {
     apiVersion = "1.19"
 
     libraries = listOf("net.axay:kspigot:$kspigotVersion")
+    depend = listOf("KIA-Kotlin-Inventory-API")
 }
 
 tasks.test {
@@ -67,5 +66,12 @@ tasks {
     withType<KotlinCompile> {
         println("User: $githubUser")
         compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+    }
+
+    shadowJar {
+    }
+
+    build {
+        dependsOn(shadowJar)
     }
 }

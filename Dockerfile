@@ -15,8 +15,9 @@ RUN chmod +x /app/entrypoint.sh
 
 ADD https://api.papermc.io/v2/projects/paper/versions/1.21.1/builds/13/downloads/paper-1.21.1-13.jar server/paper.jar
 RUN echo 'eula=true' > server/eula.txt
+COPY server-template /app/tmp/server-template
 
-COPY --from=build /app/build/libs/Craftan-*.jar /app/tmp/app.jar
+COPY --from=build /app/build/libs/Craftan-*-all.jar /app/tmp/app.jar
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 
