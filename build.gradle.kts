@@ -31,7 +31,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.10")
     implementation("com.uchuhimo:konf:1.1.2")
 
-    compileOnly("com.github.StaticFX:kia:1.1.3")
+    api("com.github.StaticFX:kia:1.1.4")
 }
 
 paperweight {
@@ -50,7 +50,6 @@ bukkit {
     apiVersion = "1.19"
 
     libraries = listOf("net.axay:kspigot:$kspigotVersion")
-    depend = listOf("KIA-Kotlin-Inventory-API")
 }
 
 tasks.test {

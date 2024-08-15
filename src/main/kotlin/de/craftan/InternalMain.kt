@@ -1,6 +1,7 @@
 package de.craftan
 
 import de.craftan.util.SystemManager
+import de.staticred.kia.KIA
 import net.axay.kspigot.main.KSpigot
 
 class InternalMain : KSpigot() {
@@ -14,6 +15,7 @@ class InternalMain : KSpigot() {
     }
 
     override fun startup() {
+        KIA.create(this, true)
         Craftan.configure()
         SystemManager.loadSystems()
     }
