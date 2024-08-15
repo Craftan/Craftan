@@ -6,4 +6,5 @@ import com.sk89q.worldedit.world.World
 data class CraftanLobby(
     val world: World,
     val center: BlockVector3,
+    val spacing: Int,
 )

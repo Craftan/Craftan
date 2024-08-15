@@ -5,7 +5,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
-import de.craftan.structures.hexagonStructure
+import de.craftan.game.lobby.CraftanLobby
+import de.craftan.game.map.maps.DefaultMapLayout
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
 import net.axay.kspigot.commands.*
@@ -42,24 +43,16 @@ val structureCommand =
         }
 
         literal("hexgrid") {
-            argument("spacing", IntegerArgumentType.integer(0))
-            argument("rings", IntegerArgumentType.integer(0))
-            runs {
-                val spacing = getArgument<Int>("spacing")
-                val rings = getArgument<Int>("rings")
+            argument("spacing", IntegerArgumentType.integer(0)) {
+                runs {
+                    val spacing = getArgument<Int>("spacing")
 
-                val world = FaweAPI.getWorld(player.world.name)
-                val location = player.location
-                val center = BlockVector3.at(location.x, location.y, location.z)
-
-                placeStructure(center, world, hexagonStructure)
-
-                val hexSize = 35
-                val hexToSide = 18
-
-                val lines = rings * 2 + 1
-
-                for (currentLine in 0..lines) {
+                    val location = player.location
+                    val world = FaweAPI.getWorld(player.world.name)
+                    val center = BlockVector3.at(location.x, location.y, location.z)
+                    val lobby = CraftanLobby(world, center, spacing)
+                    player.sendMessage("Building map...")
+                    DefaultMapLayout().build(lobby)
                 }
             }
         }

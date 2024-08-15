@@ -1,8 +1,6 @@
 package de.craftan.game.map
 
 import de.craftan.game.lobby.CraftanLobby
-import kotlin.math.max
-import kotlin.math.min
 
 interface CraftanMapLayout {
     val tiles: List<LayoutRow<GameTile>>
@@ -15,7 +13,7 @@ interface CraftanMapLayout {
      *
      * ^x (minecraft)
      * |
-     * |----> y (minecraft)
+     * |----> z (minecraft)
      *
      * so in the x coordinate is actually up in the map,
      * and y is left and right.
@@ -30,18 +28,6 @@ interface CraftanMapLayout {
         }
 
         val hexSize = 35
-        val hexToSide = 18
-        val spacing = 3
-
-        val centerRowIndex = tiles.size / 2 + 1
-
-        for ((rowIndex, row) in tiles.withIndex()) {
-            val tiles = row.tiles
-
-            val deltaToCenter = max(rowIndex, centerRowIndex) - min(rowIndex, centerRowIndex)
-            val isAboveCenter = rowIndex < centerRowIndex
-
-            val xOffset = (hexSize + spacing) * deltaToCenter
-        }
+        val spacing = lobby.spacing
     }
 }

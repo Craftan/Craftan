@@ -6,6 +6,7 @@ import de.craftan.util.CraftanSystem
 import de.craftan.util.SystemManager
 import java.io.File
 import java.nio.file.Files
+import kotlin.io.path.exists
 
 object Craftan {
     val schematicsFolder = File("${PluginManager.dataFolder.absolutePath}/schematics")
@@ -27,7 +28,12 @@ object Craftan {
         schematicsFolder.mkdirs()
 
         val stream = PluginManager.getResource("schematics/hexagon.schem") ?: return
-        Files.copy(stream, File(schematicsFolder, "hexagon.schem").toPath())
+
+        val hexFile = File(schematicsFolder, "hexagon.schem")
+
+        if (!hexFile.exists()) {
+            Files.copy(stream, hexFile.toPath())
+        }
     }
 
     private fun addSystem(system: CraftanSystem) {
