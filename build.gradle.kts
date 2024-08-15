@@ -21,6 +21,7 @@ repositories {
     gradlePluginPortal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven { url = uri("https://maven.enginehub.org/repo/") }
     maven("https://jitpack.io")
 }
 
@@ -30,6 +31,10 @@ dependencies {
     implementation("net.axay:kspigot:$kspigotVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.10")
     implementation("com.uchuhimo:konf:1.1.2")
+
+    implementation(platform("com.intellectualsites.bom:bom-newest:1.48")) // Ref: https://github.com/IntellectualSites/bom
+    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
+    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
     api("com.github.StaticFX:kia:1.1.4")
 }
@@ -50,6 +55,7 @@ bukkit {
     apiVersion = "1.19"
 
     libraries = listOf("net.axay:kspigot:$kspigotVersion")
+    depend = listOf("FastAsyncWorldEdit")
 }
 
 tasks.test {
