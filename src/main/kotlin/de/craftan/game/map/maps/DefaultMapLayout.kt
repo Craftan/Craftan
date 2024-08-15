@@ -3,7 +3,7 @@ package de.craftan.game.map.maps
 import de.craftan.game.map.*
 
 class DefaultMapLayout : CraftanMapLayout {
-    override val tiles: List<LayoutRow<GameTile>> =
+    override val rows: List<LayoutRow<GameTile>> =
         listOf(
             layoutRow(
                 GameTile(MaterialType.WHEAT, DiceNumber.FOUR),

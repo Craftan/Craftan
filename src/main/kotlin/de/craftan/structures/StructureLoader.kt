@@ -37,6 +37,7 @@ fun placeStructure(
         val operation =
             ClipboardHolder(structure)
                 .createPaste(it)
+                .ignoreAirBlocks(true)
                 .to(location)
                 .build()
         Operations.complete(operation)
