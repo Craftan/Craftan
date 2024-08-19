@@ -5,36 +5,36 @@ import de.staticred.kia.inventory.item.KItem
 /**
  * Models a game and the current game state inside a Craftan lobby
  */
-interface CraftanGame {
+abstract class CraftanGame : CraftanGameEvents() {
     /**
      * The config of this game
      */
-    val config: CraftanGameConfig
+    abstract val config: CraftanGameConfig
 
     /**
      * The current round of the game
      */
-    val round: CraftanGameRound
+    abstract val round: CraftanGameRound
 
     /**
      * All participating players
      */
-    val players: List<CraftanPlayer>
+    abstract val players: List<CraftanPlayer>
 
     /**
      * The state the game is at currently
      */
-    val state: CraftanGameState
+    abstract val state: CraftanGameState
 
     /**
      * Starts the next round
      */
-    fun nextRound()
+    abstract fun nextRound()
 
     /**
      * Starts the game
      */
-    fun start()
+    abstract fun start()
 }
 
 /**

@@ -1,18 +1,21 @@
 package de.craftan.events
 
-abstract class GenericEventHandler<T, Param> {
-    private val eventMapping = mutableMapOf<String, T.(p: Param?) -> Unit>()
+/**
+ *
+ */
+class GenericEventHandler<E, P : EventParameters> {
+    private val eventMapping = mutableMapOf<String, E.(p: P?) -> Unit>()
 
-    fun <P : Param> registerEvent(
+    fun registerEvent(
         key: String,
-        block: T.(p: P?) -> Unit,
+        block: E.(p: P?) -> Unit,
     ) {
         eventMapping[key] = block
     }
 
-    protected fun triggerEvent(
+    fun triggerEvent(
         key: String,
-        eventObject: T,
+        eventObject: E,
         eventParameters: P? = null,
     ) {
         eventMapping[key]?.invoke(eventObject, eventParameters)
