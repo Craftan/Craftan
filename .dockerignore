@@ -1,0 +1,10 @@
+.git
+.idea
+.editorconfig
+.env
+.env.template
+.gitattributes
+.gitignore
+docker-compose.yml
+Dockerfile
+readme.md
