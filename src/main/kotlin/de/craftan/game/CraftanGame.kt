@@ -1,20 +1,25 @@
 package de.craftan.game
 
 import de.staticred.kia.inventory.item.KItem
+import net.ormr.eventbus.EventBus
 
 /**
  * Models a game and the current game state inside a Craftan lobby
  */
-abstract class CraftanGame : CraftanGameEvents() {
+abstract class CraftanGame {
+    val eventBus: EventBus<Any, CraftanEvent> = EventBus()
+
     /**
      * The config of this game
      */
     abstract val config: CraftanGameConfig
 
+    var roundIndex = 0
+
     /**
      * The current round of the game
      */
-    abstract val round: CraftanGameRound
+    abstract var round: CraftanGameRound
 
     /**
      * All participating players
@@ -22,9 +27,20 @@ abstract class CraftanGame : CraftanGameEvents() {
     abstract val players: List<CraftanPlayer>
 
     /**
+     * Sequence of players in the rounds
+     * e.g. player2 -> player1 -> player4 -> player3 -> loop
+     */
+    abstract val playerSequence: Sequence<CraftanPlayer>
+
+    /**
      * The state the game is at currently
      */
-    abstract val state: CraftanGameState
+    abstract var state: CraftanGameState
+
+    /**
+     * Starts the game to its pre phase
+     */
+    abstract fun startGame()
 
     /**
      * Starts the next round
@@ -52,6 +68,11 @@ interface CraftanGameRound {
     val player: CraftanPlayer
 
     /**
+     *
+     */
+    val states: List<CraftanRoundState>
+
+    /**
      * The current state the game is at
      */
     val state: CraftanRoundState
@@ -68,6 +89,8 @@ interface CraftanGameRound {
 interface CraftanRoundState {
     /**
      * Abstract name of the state
+     *
+     * Will be shown ingame
      */
     val name: String
 
@@ -79,7 +102,7 @@ interface CraftanRoundState {
     /**
      * A list of all possible actions for a player
      */
-    val actions: List<CraftanGameAction>
+    val actions: List<CraftanGameAction<*>>
 
     /**
      * Gets the next state of the game
@@ -96,9 +119,16 @@ interface CraftanRoundState {
 
 /**
  * Models an interaction between the player and the game
+ * @param R is the expected result of the action
  */
-interface CraftanGameAction {
+interface CraftanGameAction<R> {
     val game: CraftanGame
+
+    /**
+     * Outcome of the action
+     * set by [invoke]
+     */
+    var result: R?
 
     /**
      * Executes this given action with the given player
@@ -115,7 +145,7 @@ interface CraftanGameAction {
      * @see KItem
      * @return the item which can be placed inside the players inventory
      */
-    fun asItem(): KItem
+    fun asItem(): CraftanActionItem<R>
 }
 
 enum class CraftanGameState {
@@ -123,6 +153,11 @@ enum class CraftanGameState {
      * Game is in lobby and waiting to be started
      */
     WAITING,
+
+    /**
+     * Before the actual game runs in its usual rounds, to determine the sequence of players
+     */
+    PRE_GAME,
 
     /**
      * Game is currently running
