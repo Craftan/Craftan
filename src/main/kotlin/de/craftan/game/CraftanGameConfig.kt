@@ -10,6 +10,8 @@ interface CraftanGameConfig {
      */
     val extensions: List<CraftanGameExtension>
 
+    val availableResources: List<CraftanResource>
+
     /**
      * Victory points a player needs, to win a game
      */
