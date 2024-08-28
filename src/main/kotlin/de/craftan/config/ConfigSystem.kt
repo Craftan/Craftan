@@ -1,29 +1,36 @@
 package de.craftan.config
 
-import com.uchuhimo.konf.Config
-import com.uchuhimo.konf.source.toml
-import com.uchuhimo.konf.source.toml.toToml
-import de.craftan.PluginManager
+import com.sksamuel.hoplite.ConfigLoaderBuilder
+import com.sksamuel.hoplite.addResourceSource
 import de.craftan.util.CraftanSystem
-import java.io.File
 
 object ConfigSystem : CraftanSystem {
     /**
      * Use this as global config for craftan
      */
-    lateinit var config: Config
+
+    var config =
+        ConfigLoaderBuilder
+            .default()
+            .addResourceSource("/config.toml")
+            .build()
+            .loadConfigOrThrow<CraftanConfig>()
 
     override fun load() {
-        val file = File(PluginManager.dataFolder, "config.toml")
+        println(config.singleLobby)
 
-        if (!file.exists()) {
-            file.parentFile.mkdirs()
-            val defaultConfig = Config { addSpec(CraftanConfig) }
-            file.createNewFile()
+        /**
+         val file = File(PluginManager.dataFolder, "config.toml")
 
-            defaultConfig.toToml.toFile(file)
-        }
+         if (!file.exists()) {
+         file.parentFile.mkdirs()
+         val defaultConfig = Config { addSpec(CraftanConfig) }
+         file.createNewFile()
 
-        config = Config { addSpec(CraftanConfig) }.from.toml.watchFile(file)
+         defaultConfig.toToml.toFile(file)
+         }
+
+         config = Config { addSpec(CraftanConfig) }.from.toml.watchFile(file)
+         **/
     }
 }

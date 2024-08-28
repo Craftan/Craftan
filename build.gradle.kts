@@ -31,6 +31,7 @@ dependencies {
     implementation("net.axay:kspigot:$kspigotVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.10")
     implementation("com.uchuhimo:konf:1.1.2")
+    implementation("com.sksamuel.hoplite:hoplite-core:2.7.5")
 
     implementation(platform("com.intellectualsites.bom:bom-newest:1.48")) // Ref: https://github.com/IntellectualSites/bom
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
