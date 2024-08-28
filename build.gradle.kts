@@ -53,7 +53,7 @@ bukkit {
     authors = listOf("StaticFX")
 
     generateLibrariesJson = true
-    apiVersion = "1.19"
+    apiVersion = "1.21"
 
     libraries = listOf("net.axay:kspigot:$kspigotVersion")
     depend = listOf("FastAsyncWorldEdit")
