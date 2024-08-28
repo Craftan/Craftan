@@ -68,14 +68,9 @@ interface CraftanGameRound {
     val player: CraftanPlayer
 
     /**
-     *
+     * the flow of this round
      */
-    val states: List<CraftanRoundState>
-
-    /**
-     * The current state the game is at
-     */
-    val state: CraftanRoundState
+    val flow: CraftanRoundFlow
 }
 
 /**
@@ -105,16 +100,21 @@ interface CraftanRoundState {
     val actions: List<CraftanGameAction<*>>
 
     /**
-     * Gets the next state of the game
-     * @return next state
+     * Called by the flow, when this state is now in the turn
      */
-    fun nextState(): CraftanRoundState
+    fun setup()
 
     /**
-     * Checks if the current state can proceed to the next state
-     * @return true if so
+     * Called by the flow, when this state is finished
      */
-    fun canProceed(): Boolean
+    fun cleanUp() {}
+
+    /**
+     * Called when this state is finished, and the game can move on
+     */
+    fun finish() {
+        game.round.flow.nextState()
+    }
 }
 
 /**
