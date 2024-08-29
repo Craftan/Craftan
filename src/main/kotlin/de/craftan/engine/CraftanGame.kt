@@ -1,5 +1,6 @@
 package de.craftan.engine
 
+import de.craftan.TurnSequence
 import net.ormr.eventbus.EventBus
 
 /**
@@ -28,9 +29,8 @@ abstract class CraftanGame {
     /**
      * Sequence of players in the rounds
      * e.g. player2 -> player1 -> player4 -> player3 -> loop
-     * TODO Replace with custom sequence class wrapper
      */
-    lateinit var playerSequence: Sequence<CraftanPlayer>
+    lateinit var playerSequence: TurnSequence
 
     /**
      * The state the game is at currently
