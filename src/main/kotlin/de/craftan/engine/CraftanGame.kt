@@ -1,6 +1,5 @@
 package de.craftan.engine
 
-import de.craftan.TurnSequence
 import net.ormr.eventbus.EventBus
 
 /**
