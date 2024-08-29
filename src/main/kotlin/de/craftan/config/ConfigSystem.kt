@@ -2,16 +2,17 @@ package de.craftan.config
 
 import com.sksamuel.hoplite.ConfigLoaderBuilder
 import com.sksamuel.hoplite.addResourceSource
+import de.craftan.PluginManager
 import de.craftan.util.CraftanSystem
 
 object ConfigSystem : CraftanSystem {
     /**
      * Use this as global config for craftan
      */
-
     var config =
         ConfigLoaderBuilder
             .default()
+            .withClassLoader(PluginManager.javaClass.classLoader)
             .addResourceSource("/config.toml")
             .build()
             .loadConfigOrThrow<CraftanConfig>()
