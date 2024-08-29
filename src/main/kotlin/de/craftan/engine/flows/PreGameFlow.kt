@@ -30,5 +30,6 @@ class PreGameFlow(
 
     override fun finishFlow() {
         game.playerSequence = TurnSequence(playerResult.keys.sortedBy { playerResult[it]?.value })
+        TODO("Missing in game flow")
     }
 }
