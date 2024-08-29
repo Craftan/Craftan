@@ -1,9 +1,9 @@
 package de.craftan.engine.flows
 
-import de.craftan.TurnSequence
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.RoundFlow
+import de.craftan.engine.TurnSequence
 import de.craftan.engine.events.actions.RolledDiceEvent
 import de.craftan.engine.map.DiceNumber
 import de.craftan.engine.states.AwaitingDiceState
@@ -29,7 +29,6 @@ class PreGameFlow(
     }
 
     override fun finishFlow() {
-        val playerSequence = TurnSequence(playerResult.keys.sortedBy { playerResult[it]?.value })
-        game.playerSequence = playerSequence
+        game.playerSequence = TurnSequence(playerResult.keys.sortedBy { playerResult[it]?.value })
     }
 }
