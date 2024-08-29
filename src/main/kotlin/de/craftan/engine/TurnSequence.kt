@@ -2,23 +2,23 @@ package de.craftan.engine
 
 /**
  * Models the sequence the players play in
- * @param players An list ordered by the turn order
+ * @param players A list ordered by the turn order
  * @see CraftanGame
  */
 class TurnSequence(
     private val players: List<CraftanPlayer>,
 ) {
-    private var currentPlayerIndex: Int = 0
+    private var currentPlayerIndex: Int = -1
 
     /**
-     * Returns the next player to have his turn
+     * Returns the next player to have his turn. Starting with the first one
      */
     fun getNextPlayer(): CraftanPlayer {
-        if (currentPlayerIndex < players.size - 1) {
-            currentPlayerIndex++
-            return players[currentPlayerIndex]
+        currentPlayerIndex++
+        if (currentPlayerIndex > players.size - 1) {
+            currentPlayerIndex = 0
         }
-        currentPlayerIndex = 0
-        return players[0]
+
+        return players[currentPlayerIndex]
     }
 }
