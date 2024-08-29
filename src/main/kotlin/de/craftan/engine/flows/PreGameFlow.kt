@@ -1,5 +1,6 @@
 package de.craftan.engine.flows
 
+import de.craftan.TurnSequence
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.RoundFlow
@@ -28,7 +29,7 @@ class PreGameFlow(
     }
 
     override fun finishFlow() {
-        val playerSequence = playerResult.keys.sortedBy { playerResult[it]?.value }
-        TODO("Create player sequence class")
+        val playerSequence = TurnSequence(playerResult.keys.sortedBy { playerResult[it]?.value })
+        game.playerSequence = playerSequence
     }
 }
