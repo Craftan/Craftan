@@ -3,8 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val kspigotVersion: String by project
 val paperVersion: String by project
-val githubUser: String by project
-val githubToken: String by project
 
 plugins {
     kotlin("jvm") version "1.9.21"
@@ -69,7 +67,6 @@ tasks {
     }
 
     withType<KotlinCompile> {
-        println("User: $githubUser")
         compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
     }
 
