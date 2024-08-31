@@ -1,4 +1,4 @@
-FROM gradle:8.8-alpine AS build
+FROM gradle:8.10-alpine AS build
 
 ARG PAPERMC_VERSION="1.21.1"
 
