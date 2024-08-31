@@ -1,13 +1,11 @@
-version: "3.9"
-
 volumes:
   craftan-server:
 
 services:
   paper-server:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: ./deployment/Dockerfile
     restart: unless-stopped
     ports:
       - "25565:25565"

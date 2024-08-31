@@ -1,4 +1,4 @@
-FROM gradle:8.8-alpine AS build
+FROM gradle:8.10-alpine AS build
 
 ARG PAPERMC_VERSION="1.21.1"
 
@@ -19,13 +19,13 @@ FROM openjdk:21-slim
 
 WORKDIR /app
 
-COPY server-template /tmp/server-template
+COPY lib /tmp/lib
 COPY --from=build /app/build/libs/Craftan-*-all.jar /tmp/app.jar
 COPY --from=build /app/paper.jar /app/paper.jar
 
 RUN mkdir -p /app/plugins \
   ; cp /tmp/app.jar /app/plugins/craftan.jar \
-  ; cp -r /tmp/server-template/plugins/* /app/plugins
+  ; cp -r /tmp/lib/plugins/* /app/plugins
 
 RUN echo "eula=true" > /app/eula.txt
 
