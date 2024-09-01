@@ -21,15 +21,31 @@ class CraftanMap(
 ) {
     private val tiles = mutableListOf<MapTile>()
 
+    private val coordinatesToTile = mutableMapOf<TileCoordinate, MapTile>()
+
+    fun initTiles() {
+        val rows = usedLayout.rows
+
+        for (row in rows) {
+        }
+    }
+
+    fun createTile() {
+    }
+
     fun addTile(tile: MapTile) {
         tiles += tile
     }
 }
 
-data class MapTile(
+data class TileCoordinate(
     val i: Int,
     val j: Int,
     val k: Int,
+)
+
+data class MapTile(
+    val coordinate: TileCoordinate,
     val size: HexagonSize,
     val center: BlockVector3,
     val world: World,
