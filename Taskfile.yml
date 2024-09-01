@@ -1,0 +1,12 @@
+version: "3"
+
+tasks:
+  docker:build:
+    cmds:
+      - docker build -f ./deployment/Dockerfile -t craftan-local:latest .
+  docker-compose:start:
+    cmds:
+      - docker compose --file ./deployment/docker-compose.yml up --build --detach
+  docker-compose:stop:
+    cmds:
+      - docker compose --file ./deployment/docker-compose.yml down
