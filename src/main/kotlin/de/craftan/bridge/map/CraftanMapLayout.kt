@@ -10,10 +10,9 @@ import de.craftan.structures.placeStructure
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.attribute.Attribute
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Display
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Interaction
 import org.bukkit.entity.TextDisplay
 import org.bukkit.util.Transformation
 import org.joml.AxisAngle4f
@@ -112,7 +111,7 @@ interface CraftanMapLayout {
         val textDisplay = bukkitWorld.spawnEntity(location, EntityType.TEXT_DISPLAY) as TextDisplay
 
         textDisplay.text(Component.text("${tile.gameTile.type} - ${tile.gameTile.type} I: ${tile.i}; J: ${tile.j}; K: ${tile.k}"))
-        textDisplay.transformation = Transformation(Vector3f(), AxisAngle4f(), Vector3f(10F, 10F, 10F), AxisAngle4f())
+        textDisplay.transformation = Transformation(Vector3f(), AxisAngle4f(), Vector3f(3F, 3F, 3F), AxisAngle4f())
         textDisplay.billboard = Display.Billboard.CENTER
     }
 
@@ -121,25 +120,27 @@ interface CraftanMapLayout {
         spacing: Int,
     ) {
         val width = tile.size.zSize
-        val z0Offset = (width / 2 + 1) + (spacing / 2 + 1)
+        val z0Offset = (width / 2 + 1) + (spacing / 2)
 
         val leftLocation = tile.center.subtract(0, 0, z0Offset)
         val rightLocation = tile.center.add(0, 0, z0Offset)
 
         val locations = listOf(leftLocation, rightLocation)
 
-        locations.forEach { spawnHitBox(Location(tile.world, it.x().toDouble(), it.y().toDouble(), it.z().toDouble())) }
+        locations.forEach { spawnHitBox(Location(tile.world, it.x().toDouble() + 0.5, it.y().toDouble(), it.z().toDouble() + 0.5)) }
     }
 
     private fun spawnHitBox(location: Location) {
         val world = location.world
 
-        val hitBox = world.spawnEntity(location, EntityType.ARMOR_STAND) as ArmorStand
+        println("Spawning hitbox at $location")
+
+        val hitBox = world.spawnEntity(location, EntityType.INTERACTION) as Interaction
         hitBox.setNoPhysics(true)
-        hitBox.isVisible = false
-        val scale = hitBox.getAttribute(Attribute.GENERIC_SCALE) ?: error("Error occurred while trying to modify scale of entity")
-        scale.baseValue = 3.0
-        hitBox.registerAttribute(scale.attribute)
+        hitBox.setGravity(false)
+
+        hitBox.interactionWidth = 3.0f
+        hitBox.interactionHeight = 1.0f
     }
 }
 
