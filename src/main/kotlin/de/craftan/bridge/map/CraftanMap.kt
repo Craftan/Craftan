@@ -14,8 +14,8 @@ import org.bukkit.World
  * =Center tile of the center row.
  *
  * @see CraftanMapLayout
- * @see de.craftan.engine.CraftanGame
- */
+* @see de.craftan.engine.CraftanGame
+*/
 class CraftanMap(
     val usedLayout: CraftanMapLayout,
 ) {

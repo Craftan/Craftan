@@ -1,13 +1,11 @@
-package de.craftan.engine.implementations
+package de.craftan.engine.rounds
 
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.GameRound
 import de.craftan.engine.RoundFlow
 
-class PreGameRound(
+class PlacementRound(
+    override val index: Int = -1,
     override val player: CraftanPlayer,
     override val flow: RoundFlow,
-) : GameRound {
-    var diceResult: Int = 0
-    override val index: Int = -1
-}
+) : GameRound
