@@ -1,7 +1,7 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: 'Feature: '
+name: Pull Request
+about: Submit a pull request to contribute improvements
+title: 'PR: '
 labels: ''
 assignees: ''
 ---
