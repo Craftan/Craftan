@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
-import de.craftan.engine.lobby.CraftanLobby
+import de.craftan.bridge.lobby.CraftanLobby
 import de.craftan.engine.map.maps.DefaultMapLayout
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure

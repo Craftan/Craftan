@@ -1,8 +1,11 @@
 package de.craftan.engine.map.maps
 
+import de.craftan.bridge.map.CraftanMapLayout
 import de.craftan.engine.map.*
 
-class DefaultMapLayout : CraftanMapLayout {
+class DefaultMapLayout(
+    override val name: String = "Default",
+) : CraftanMapLayout {
     override val rows: List<LayoutRow<GameTile>> =
         listOf(
             layoutRow(
