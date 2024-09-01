@@ -4,7 +4,6 @@ import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.world.World
 import de.craftan.bridge.lobby.CraftanLobby
 import de.craftan.engine.map.GameTile
-import de.craftan.engine.map.LayoutRow
 import de.craftan.structures.hexagonStructure
 import de.craftan.structures.placeStructure
 import net.kyori.adventure.text.Component
@@ -27,7 +26,7 @@ interface CraftanMapLayout {
      */
     val name: String
 
-    val rows: List<LayoutRow<GameTile>>
+    val rows: List<List<GameTile>>
     val includesWater: Boolean
 
     /**
@@ -56,10 +55,10 @@ interface CraftanMapLayout {
 
         var location = center
         val centerRowIndex = rows.size / 2 + 1
-        val centerTileIndex = rows[centerRowIndex].tiles.size / 2 + 1
+        val centerTileIndex = rows[centerRowIndex].size / 2 + 1
 
         for ((index, row) in rows.withIndex()) {
-            val tiles = buildRow(location, index, row.tiles, hexagonSize, lobby, TileLocation(centerRowIndex, centerTileIndex))
+            val tiles = buildRow(location, index, row, hexagonSize, lobby, TileLocation(centerRowIndex, centerTileIndex))
 
             val isAboveCenter = index + 2 > centerRowIndex
 
@@ -87,7 +86,8 @@ interface CraftanMapLayout {
 
         for (tile in tiles) {
             val bukkitWorld = Bukkit.getWorld(lobby.world.name)!!
-            val mapTile = MapTile(0, 0, 0, size, center, bukkitWorld, tile)
+            val coordinate = TileCoordinate(0, 0, 0)
+            val mapTile = MapTile(coordinate, size, center, bukkitWorld, tile)
 
             placeTile(mapTile, lobby.world)
             generateHitBoxes(mapTile, lobby.spacing)
@@ -110,7 +110,7 @@ interface CraftanMapLayout {
         val location = Location(bukkitWorld, position.x().toDouble(), position.y() + 2.0, position.z().toDouble())
         val textDisplay = bukkitWorld.spawnEntity(location, EntityType.TEXT_DISPLAY) as TextDisplay
 
-        textDisplay.text(Component.text("${tile.gameTile.type} - ${tile.gameTile.type} I: ${tile.i}; J: ${tile.j}; K: ${tile.k}"))
+        textDisplay.text(Component.text("${tile.gameTile.type} - ${tile.gameTile.type} I: ${tile.coordinate.i}; J: ${tile.coordinate.j}; K: ${tile.coordinate.k}"))
         textDisplay.transformation = Transformation(Vector3f(), AxisAngle4f(), Vector3f(3F, 3F, 3F), AxisAngle4f())
         textDisplay.billboard = Display.Billboard.CENTER
     }
