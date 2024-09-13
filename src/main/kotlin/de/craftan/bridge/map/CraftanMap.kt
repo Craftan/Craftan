@@ -32,11 +32,18 @@ class CraftanMap(
     val usedLayout: CraftanMapLayout,
     lobby: CraftanLobby,
 ) {
-    var center: BlockVector3 = lobby.center
-    var bukkitWorld: World = Bukkit.getWorld(lobby.worldEditWorld.name)!!
-    var worldEditWorld: com.sk89q.worldedit.world.World = FaweAPI.getWorld(bukkitWorld.name)!!
-    var hexagonSize: HexagonSize = HexagonSize()
-    var spacing = lobby.spacing
+    /**
+     * center coordinate of the created map
+     */
+    val center: BlockVector3 = lobby.center
+
+    /**
+     * bukkitWorld the map is in
+     */
+    val bukkitWorld: World = Bukkit.getWorld(lobby.worldEditWorld.name)!!
+    private val worldEditWorld: com.sk89q.worldedit.world.World = FaweAPI.getWorld(bukkitWorld.name)!!
+    private val hexagonSize: HexagonSize = HexagonSize()
+    private val spacing = lobby.spacing
 
     /**
      * Builds the map
@@ -122,6 +129,10 @@ class CraftanMap(
     }
 }
 
+/**
+ * A MapTile adds the minecraft specific infos to the GameTile.
+ * Adds the popsition of the tile in Minecraft, through its size, center and world
+ */
 data class MapTile(
     val size: HexagonSize,
     val center: BlockVector3,

@@ -22,7 +22,7 @@ data class TileCoordinate(
 ) {
     init {
         if (q + r + s != 0) {
-            throw IllegalStateException("A coordinate contains a contradiction: Expected q + r + s = 0, got q = $q, got r = $r, got s = $s ")
+            throw IllegalArgumentException("A coordinate contains a contradiction: Expected q + r + s = 0, got q = $q, got r = $r, got s = $s ")
         }
     }
 
@@ -43,6 +43,10 @@ data class TileCoordinate(
     }
 }
 
+/**
+ * Contains the catan relevant attributes a tile can have.
+ * Meaning the type of material you can get and the DiceNumber you get it at
+ */
 data class TileInfo(
     val type: MaterialType,
     val chance: DiceNumber,
@@ -57,6 +61,7 @@ data class GameTile(
  * Converts a list of rows of TileInformation to GameTile`s.
  * Earlier in the outer List means the row is more up in the board.
  * Earlier in the inner List means more to the left on the game board
+ * @param tilesInfo a list of rows of TileInformation
  * @see CraftanMap
  */
 fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
@@ -66,8 +71,8 @@ fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
 
     for ((rowIndex, row) in tilesInfo.withIndex()) {
         val rowCoordinate = rowIndex - rowCenter
-        for ((columnIndex, tileInfo) in tilesInfo[rowIndex].withIndex()) {
-            val columnmidel = tilesInfo[rowIndex].size / 2
+        for ((columnIndex, tileInfo) in row.withIndex()) {
+            val columnmidel = row.size / 2
             val columnCoordinate = columnIndex - columnmidel
 
             val coordinate = TileCoordinate.fromOffsetCoordinates(rowCoordinate, columnCoordinate)
@@ -81,10 +86,11 @@ fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
  * Converts a list of rows of TileInformation to a map from the coordinate to the corresponding GameTile.
  * Earlier in the outer List means the row is more up in the board.
  * Earlier in the inner List means more to the left on the game board
+ * @param tilesInfo list of rows of TileInformation
  */
 fun toCoordinateToGameTileMap(tilesInfo: List<List<TileInfo>>): MutableMap<TileCoordinate, GameTile> {
-    var gameTiles = toGameTiles(tilesInfo)
-    var map: MutableMap<TileCoordinate, GameTile> = mutableMapOf()
+    val gameTiles = toGameTiles(tilesInfo)
+    val map: MutableMap<TileCoordinate, GameTile> = mutableMapOf()
     gameTiles.forEach { map.put(it.coordinate, it) }
     return map
 }
