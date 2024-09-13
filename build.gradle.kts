@@ -10,6 +10,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.0"
     id("io.papermc.paperweight.userdev") version "1.7.2"
     id("co.uzzu.dotenv.gradle") version "4.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "de.craftan"
