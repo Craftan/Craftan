@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
 import de.craftan.bridge.lobby.CraftanLobby
+import de.craftan.bridge.map.CraftanMap
 import de.craftan.engine.map.maps.DefaultMapLayout
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
@@ -52,7 +53,7 @@ val structureCommand =
                     val center = BlockVector3.at(location.x, location.y, location.z)
                     val lobby = CraftanLobby(world, center, spacing)
                     player.sendMessage("Building map...")
-                    DefaultMapLayout().build(lobby)
+                    CraftanMap(DefaultMapLayout(), lobby).build()
                 }
             }
         }
