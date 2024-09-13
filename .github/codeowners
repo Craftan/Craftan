@@ -1,0 +1,10 @@
+# Team Owner
+* @craftan/owner
+
+# Team DevOps
+.github     @craftan/devops
+deployment  @craftan/devops
+
+# Team Development
+lib @craftan/development
+src @craftan/development

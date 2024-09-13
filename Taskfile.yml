@@ -1,0 +1,36 @@
+version: "3"
+
+tasks:
+  # code
+  format:
+    cmds:
+      - ./gradlew ktlintFormat
+
+  # build
+  build:
+    cmds:
+      - ./gradlew build --parallel
+
+  # docker
+  docker:build:
+    cmds:
+      - >
+        docker build
+        --file ./deployment/Dockerfile
+        --tag craftan-local:latest
+        .
+  docker-compose:up:
+    cmds:
+      - >
+        docker compose
+        --file ./deployment/docker-compose.yml
+        up
+        --build
+        --detach
+  docker-compose:down:
+    cmds:
+      - >
+        docker compose
+        --file ./deployment/docker-compose.yml
+        down
+        --remove-orphans
