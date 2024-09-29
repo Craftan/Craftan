@@ -9,7 +9,9 @@ tasks:
   # build
   build:
     cmds:
-      - ./gradlew build --parallel
+      - ./gradlew clean build --parallel
+      - mkdir -p ./deployment/build
+      - cp ./build/libs/Craftan-*-all.jar ./deployment/build/craftan.jar
 
   # docker
   docker:build:
@@ -21,6 +23,7 @@ tasks:
         .
   docker-compose:up:
     cmds:
+      - task: build
       - >
         docker compose
         --file ./deployment/docker-compose.yml
