@@ -1,6 +1,7 @@
 package de.craftan.engine.map
 
 import de.craftan.bridge.map.CraftanMap
+import de.craftan.engine.map.graph.*
 
 /**
  * The coordinates of a tile.
@@ -11,6 +12,11 @@ import de.craftan.bridge.map.CraftanMap
  * r represents the horizontal axis
  * q the top left to bottom right axis
  * s the top right to bottom left axis
+ *
+ *  r = 0, corresponds to the middle of the map. Going north, decreases the r coordinate, south increases it.
+ *  q = 0, corresponds to the middle of the map. Going west, decreases the q coordinate, east increases it.
+ *  s = 0, corresponds to the middle of the map. Going east, decreases the s coordinate, west increases it.
+ *
  *
  * Since we have 3 variables for a 2-dimensional plane they are dependent on each other
  * Thus the constraint of: r + s + q = 0
@@ -41,6 +47,28 @@ data class TileCoordinate(
             return TileCoordinate(q, r, s)
         }
     }
+
+    operator fun plus(coordinate: TileCoordinate): TileCoordinate = TileCoordinate(q + coordinate.q, r + coordinate.r, s + coordinate.s)
+
+    operator fun minus(coordinate: TileCoordinate): TileCoordinate = TileCoordinate(q - coordinate.q, r - coordinate.r, s - coordinate.s)
+
+    operator fun times(scalar: Int): TileCoordinate = TileCoordinate(q * scalar, r * scalar, s * scalar)
+}
+
+/**
+ * The directions to the neighboring tiles, with the corresponding coordinate change.
+ *
+ * @param tileCoordinate the corresponding coordinate change
+ */
+enum class TileDirection(
+    val tileCoordinate: TileCoordinate,
+) {
+    NORTH_EAST(TileCoordinate(1, -1, 0)),
+    NORTH_WEST(TileCoordinate(0, -1, 1)),
+    SOUTH_EAST(TileCoordinate(0, 1, -1)),
+    SOUTH_WEST(TileCoordinate(-1, 1, 0)),
+    WEST(TileCoordinate(-1, 0, 1)),
+    EAST(TileCoordinate(1, 0, -1)),
 }
 
 /**
@@ -55,6 +83,8 @@ data class TileInfo(
 data class GameTile(
     val coordinate: TileCoordinate,
     val tileInfo: TileInfo,
+    val nodes: MutableMap<NodeDirection, Node> = mutableMapOf(),
+    val edges: MutableMap<EdgeDirection, Edge> = mutableMapOf(),
 )
 
 /**
@@ -79,6 +109,11 @@ fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
             gametiles.add(GameTile(coordinate, tileInfo))
         }
     }
+
+    generateNodes(gametiles)
+
+    generateEdges(gametiles)
+
     return gametiles
 }
 
