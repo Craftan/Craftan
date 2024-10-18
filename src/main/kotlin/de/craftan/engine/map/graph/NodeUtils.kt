@@ -1,46 +1,51 @@
 package de.craftan.engine.map.graph
 
-import de.craftan.engine.map.GameTile
+import de.craftan.engine.map.TileCoordinate
 import de.craftan.engine.map.TileDirection
 
 /**
  * Generates empty nodes for all tiles
  */
-fun generateNodes(tiles: List<GameTile>) {
+fun generateNodes(tiles: Set<TileCoordinate>): MutableMap<TileCoordinate, MutableMap<NodeDirection, Node>> {
+    val cordToNodeMap = mutableMapOf<TileCoordinate, MutableMap<NodeDirection, Node>>()
+    tiles.forEach { cordToNodeMap[it] = mutableMapOf() }
+
     for (tile in tiles) {
         for (nodeDirection in NodeDirection.entries) {
-            if (!tile.nodes.keys.contains(nodeDirection)) {
+            if (!cordToNodeMap[tile]!!.contains(nodeDirection)) {
                 val node = Node(StructureInfo())
                 node.tiles.add(tile)
-                tile.nodes[nodeDirection] = node
-                appendNodeToNeigbours(tile, node, tiles, nodeDirection)
+                cordToNodeMap[tile]!![nodeDirection] = node
+                appendNodeToNeigbours(tile, node, tiles, nodeDirection, cordToNodeMap)
             }
         }
     }
+    return cordToNodeMap
 }
 
 private fun appendNodeToNeigbours(
-    tile: GameTile,
+    tile: TileCoordinate,
     node: Node,
-    tiles: List<GameTile>,
+    tiles: Set<TileCoordinate>,
     nodeDirection: NodeDirection,
+    cordToNodeMap: MutableMap<TileCoordinate, MutableMap<NodeDirection, Node>>,
 ) {
     val neighbours = getNeighbours(tile, tiles, nodeDirection)
     for (neighbour in neighbours) {
-        val neighbourDirection = TileDirection.entries.find { it.tileCoordinate == neighbour.coordinate - tile.coordinate }
+        val neighbourDirection = TileDirection.entries.find { it.tileCoordinate == neighbour - tile }
         val neighbourNodeDirection = neighborsNodeDirection[nodeDirection]!![neighbourDirection]!!
-        neighbour.nodes[neighbourNodeDirection] = node
+        cordToNodeMap[neighbour]!![neighbourNodeDirection] = node
     }
 }
 
 private fun getNeighbours(
-    tile: GameTile,
-    tiles: List<GameTile>,
+    tile: TileCoordinate,
+    tiles: Set<TileCoordinate>,
     nodeDirection: NodeDirection,
-): Set<GameTile> {
-    val neighbours = mutableSetOf<GameTile>()
+): Set<TileCoordinate> {
+    val neighbours = mutableSetOf<TileCoordinate>()
     for (tileDirection in nodeDirection.otherTileDirections.toList()) {
-        val neighbour = tiles.find { it.coordinate == tile.coordinate + tileDirection.tileCoordinate }
+        val neighbour = tiles.find { it == tile + tileDirection.tileCoordinate }
         if (neighbour != null) {
             neighbours.add(neighbour)
         }

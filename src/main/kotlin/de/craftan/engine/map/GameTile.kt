@@ -83,8 +83,8 @@ data class TileInfo(
 data class GameTile(
     val coordinate: TileCoordinate,
     val tileInfo: TileInfo,
-    val nodes: MutableMap<NodeDirection, Node> = mutableMapOf(),
-    val edges: MutableMap<EdgeDirection, Edge> = mutableMapOf(),
+    val nodes: Map<NodeDirection, Node>,
+    val edges: Map<EdgeDirection, Edge>,
 )
 
 /**
@@ -96,6 +96,8 @@ data class GameTile(
  */
 fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
     val gametiles = mutableListOf<GameTile>()
+    val tileCoordinates: MutableSet<TileCoordinate> = mutableSetOf()
+    val cordToTileInfo: MutableMap<TileCoordinate, TileInfo> = mutableMapOf()
 
     val rowCenter = tilesInfo.size / 2
 
@@ -106,13 +108,17 @@ fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
             val columnCoordinate = columnIndex - columnmidel
 
             val coordinate = TileCoordinate.fromOffsetCoordinates(rowCoordinate, columnCoordinate)
-            gametiles.add(GameTile(coordinate, tileInfo))
+            tileCoordinates.add(coordinate)
+            cordToTileInfo[coordinate] = tileInfo
         }
     }
 
-    generateNodes(gametiles)
+    val cordToNodes = generateNodes(tileCoordinates)
+    val cordToEdges = generateEdges(tileCoordinates, cordToNodes)
 
-    generateEdges(gametiles)
+    for (tile in tileCoordinates) {
+        gametiles.add(GameTile(tile, cordToTileInfo[tile]!!, cordToNodes[tile]!!, cordToEdges[tile]!!))
+    }
 
     return gametiles
 }

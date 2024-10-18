@@ -1,7 +1,7 @@
 package de.craftan.engine.map.graph
 
 import de.craftan.engine.CraftanStructure
-import de.craftan.engine.map.GameTile
+import de.craftan.engine.map.TileCoordinate
 import de.craftan.engine.map.TileDirection
 
 /**
@@ -10,7 +10,7 @@ import de.craftan.engine.map.TileDirection
  */
 data class Node(
     val structureInfo: StructureInfo,
-    val tiles: MutableSet<GameTile> = mutableSetOf(),
+    val tiles: MutableSet<TileCoordinate> = mutableSetOf(),
     val edges: MutableSet<Edge> = mutableSetOf(),
 )
 
