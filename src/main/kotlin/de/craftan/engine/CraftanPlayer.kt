@@ -1,5 +1,6 @@
 package de.craftan.engine
 
+import de.craftan.engine.structures.CraftanStructure
 import org.bukkit.entity.Player
 
 /**

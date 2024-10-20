@@ -1,4 +1,6 @@
-package de.craftan.engine
+package de.craftan.engine.gameflow
+
+import de.craftan.engine.CraftanPlayer
 
 /**
  * Models the sequence the players play in

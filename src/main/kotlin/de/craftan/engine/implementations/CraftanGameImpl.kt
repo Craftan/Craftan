@@ -2,8 +2,9 @@ package de.craftan.engine.implementations
 
 import de.craftan.engine.*
 import de.craftan.engine.events.GameStartEvent
-import de.craftan.engine.flows.PreGameFlow
-import de.craftan.engine.rounds.PreGameRound
+import de.craftan.engine.gameflow.GameRound
+import de.craftan.engine.gameflow.flows.PreGameFlow
+import de.craftan.engine.gameflow.rounds.PreGameRound
 
 class CraftanGameImpl(
     override val players: List<CraftanPlayer>,

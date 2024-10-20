@@ -1,8 +1,8 @@
-package de.craftan.engine.rounds
+package de.craftan.engine.gameflow.rounds
 
 import de.craftan.engine.CraftanGame
-import de.craftan.engine.GlobalGameRound
-import de.craftan.engine.RoundFlow
+import de.craftan.engine.gameflow.GlobalGameRound
+import de.craftan.engine.gameflow.RoundFlow
 
 class PreGameRound(
     override val flow: RoundFlow,

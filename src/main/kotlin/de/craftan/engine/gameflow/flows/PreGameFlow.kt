@@ -1,12 +1,12 @@
-package de.craftan.engine.flows
+package de.craftan.engine.gameflow.flows
 
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanPlayer
-import de.craftan.engine.RoundFlow
-import de.craftan.engine.TurnSequence
 import de.craftan.engine.events.actions.RolledDiceEvent
+import de.craftan.engine.gameflow.RoundFlow
+import de.craftan.engine.gameflow.TurnSequence
+import de.craftan.engine.gameflow.states.AwaitingDiceState
 import de.craftan.engine.map.DiceNumber
-import de.craftan.engine.states.AwaitingDiceState
 
 class PreGameFlow(
     game: CraftanGame,

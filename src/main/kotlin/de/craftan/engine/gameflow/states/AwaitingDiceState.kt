@@ -1,10 +1,10 @@
-package de.craftan.engine.states
+package de.craftan.engine.gameflow.states
 
 import de.craftan.CraftanGameAction
 import de.craftan.engine.CraftanGame
-import de.craftan.engine.RoundState
 import de.craftan.engine.actions.RollDiceAction
 import de.craftan.engine.events.actions.RolledDiceEvent
+import de.craftan.engine.gameflow.RoundState
 
 class AwaitingDiceState(
     game: CraftanGame,
