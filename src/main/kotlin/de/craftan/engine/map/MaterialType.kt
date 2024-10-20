@@ -1,4 +1,4 @@
-package de.craftan.game.map
+package de.craftan.engine.map
 
 enum class MaterialType {
     WHEAT,
