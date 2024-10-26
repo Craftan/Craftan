@@ -1,10 +1,9 @@
 package de.craftan.engine.implementations
 
 import de.craftan.engine.*
-import de.craftan.engine.events.GameStartEvent
 import de.craftan.engine.gameflow.GameRound
-import de.craftan.engine.gameflow.flows.PreGameFlow
-import de.craftan.engine.gameflow.rounds.PreGameRound
+import de.craftan.engine.gameflow.events.GameStartEvent
+import de.craftan.engine.gameflow.rounds.PreGameGlobalRound
 
 class CraftanGameImpl(
     override val players: List<CraftanPlayer>,
@@ -13,7 +12,7 @@ class CraftanGameImpl(
     var hasFinishedPreGame = false
     var hasFinishedPlacing = false
 
-    override var round: GameRound = PreGameRound(players[0], PreGameFlow(this))
+    override var round: GameRound = PreGameGlobalRound(this)
 
     override var state: CraftanGameState = CraftanGameState.WAITING
 
@@ -28,7 +27,7 @@ class CraftanGameImpl(
     }
 
     override fun nextRound() {
-        if (round is PreGameRound) {
+        if (round is PreGameGlobalRound) {
             hasFinishedPreGame = true
         }
 
