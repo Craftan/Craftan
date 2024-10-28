@@ -1,11 +1,15 @@
 package de.craftan.engine
 
+import de.craftan.bridge.lobby.CraftanSettings
 import net.ormr.eventbus.EventBus
 
 /**
  * Models a game and the current game state inside a Craftan lobby
+ * @param settings the settings the game is using
  */
-abstract class CraftanGame {
+abstract class CraftanGame(
+    val settings: CraftanSettings,
+) {
     val eventBus: EventBus<Any, CraftanEvent> = EventBus()
 
     /**
