@@ -1,14 +1,16 @@
 package de.craftan.engine.implementations
 
+import de.craftan.bridge.lobby.CraftanSettings
 import de.craftan.engine.*
-import de.craftan.engine.events.GameStartEvent
-import de.craftan.engine.flows.PreGameFlow
-import de.craftan.engine.rounds.PreGameRound
+import de.craftan.engine.gameflow.GameRound
+import de.craftan.engine.gameflow.events.GameStartEvent
+import de.craftan.engine.gameflow.rounds.PreGameGlobalRound
 
 class CraftanGameImpl(
     override val players: List<CraftanPlayer>,
     override val config: CraftanGameConfig,
-) : CraftanGame() {
+    override val settings: CraftanSettings,
+) : CraftanGame(settings) {
     var hasFinishedPreGame = false
     var hasFinishedPlacing = false
 
