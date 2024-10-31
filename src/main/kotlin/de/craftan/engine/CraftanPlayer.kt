@@ -1,6 +1,10 @@
 package de.craftan.engine
 
 import de.craftan.bridge.util.toComponent
+import de.craftan.io.CraftanNotification
+import de.craftan.io.CraftanPlaceholders
+import de.craftan.io.resolve
+import de.craftan.io.resolveWithPlaceholder
 import de.craftan.util.*
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
@@ -39,8 +43,8 @@ interface CraftanPlayer {
      * Send the notification to the player
      * @param notification
      */
-    fun sendNotification(notification: CraftanNotifications) {
-        bukkitPlayer.sendMessage(notification.resolve().toComponent())
+    fun sendNotification(notification: CraftanNotification) {
+        bukkitPlayer.sendMessage(notification.resolve(bukkitPlayer).toComponent())
     }
 
     /**
@@ -50,10 +54,10 @@ interface CraftanPlayer {
      * @see resolveWithPlaceholder
      */
     fun sendNotification(
-        notification: CraftanNotifications,
+        notification: CraftanNotification,
         placeholders: Map<CraftanPlaceholders, String>,
     ) {
-        bukkitPlayer.sendMessage(notification.resolveWithPlaceholder(placeholders).toComponent())
+        bukkitPlayer.sendMessage(notification.resolveWithPlaceholder(bukkitPlayer, placeholders).toComponent())
     }
 
     /**

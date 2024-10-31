@@ -1,5 +1,6 @@
 package de.craftan.engine.implementations
 
+import de.craftan.bridge.lobby.CraftanSettings
 import de.craftan.engine.*
 import de.craftan.engine.events.GameStartEvent
 import de.craftan.engine.flows.PreGameFlow
@@ -8,11 +9,12 @@ import de.craftan.engine.rounds.PreGameRound
 class CraftanGameImpl(
     override val players: List<CraftanPlayer>,
     override val config: CraftanGameConfig,
-) : CraftanGame() {
+    override val settings: CraftanSettings,
+) : CraftanGame(settings) {
     var hasFinishedPreGame = false
     var hasFinishedPlacing = false
 
-    override var round: GameRound = PreGameRound(players[0], PreGameFlow(this))
+    override var round: GameRound = PreGameRound(PreGameFlow(this), this)
 
     override var state: CraftanGameState = CraftanGameState.WAITING
 

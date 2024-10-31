@@ -1,7 +1,8 @@
 package de.craftan.bridge.lobby
 
 import de.craftan.engine.CraftanGameExtension
-import de.craftan.engine.map.CraftanMapLayout
+
+val craftanDefaultSettings = MutableCraftanSettings(mutableListOf(), 12, 7)
 
 /**
  * Models the settings for a game
@@ -11,17 +12,15 @@ import de.craftan.engine.map.CraftanMapLayout
  * @param cardsLimit the max cards a player can have before disposing when the robber comes
  */
 data class CraftanSettings(
-    val mapLayout: CraftanMapLayout,
     val extensions: List<CraftanGameExtension>,
     val pointsToWin: Int,
     val cardsLimit: Int,
 )
 
 data class MutableCraftanSettings(
-    var mapLayout: CraftanMapLayout,
     val extensions: MutableList<CraftanGameExtension>,
     var pointsToWin: Int,
     var cardsLimit: Int,
 ) {
-    fun toCraftanSettings(): CraftanSettings = CraftanSettings(mapLayout, extensions.toList(), pointsToWin, cardsLimit)
+    fun toCraftanSettings(): CraftanSettings = CraftanSettings(extensions.toList(), pointsToWin, cardsLimit)
 }
