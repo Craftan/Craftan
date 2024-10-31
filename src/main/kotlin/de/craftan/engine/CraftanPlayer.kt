@@ -44,7 +44,7 @@ interface CraftanPlayer {
      * @param notification
      */
     fun sendNotification(notification: CraftanNotification) {
-        bukkitPlayer.sendMessage(notification.resolve().toComponent())
+        bukkitPlayer.sendMessage(notification.resolve(bukkitPlayer).toComponent())
     }
 
     /**
@@ -57,7 +57,7 @@ interface CraftanPlayer {
         notification: CraftanNotification,
         placeholders: Map<CraftanPlaceholders, String>,
     ) {
-        bukkitPlayer.sendMessage(notification.resolveWithPlaceholder(placeholders).toComponent())
+        bukkitPlayer.sendMessage(notification.resolveWithPlaceholder(bukkitPlayer, placeholders).toComponent())
     }
 
     /**
