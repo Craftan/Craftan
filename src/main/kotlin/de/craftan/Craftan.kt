@@ -2,6 +2,7 @@ package de.craftan
 
 import de.craftan.commands.structureCommand
 import de.craftan.config.ConfigSystem
+import de.craftan.io.MessageAdapter
 import de.craftan.util.CraftanSystem
 import de.craftan.util.SystemManager
 import java.io.File
@@ -18,6 +19,11 @@ object Craftan {
         createSchematicFolder()
         loadSystems()
         loadCommands()
+        loadMessages()
+    }
+
+    private fun loadMessages() {
+        MessageAdapter.load()
     }
 
     private fun loadSystems() {
