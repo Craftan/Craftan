@@ -1,5 +1,6 @@
 package de.craftan.engine
 
+import de.craftan.bridge.lobby.CraftanSettings
 import de.craftan.engine.gameflow.GameRound
 import de.craftan.engine.gameflow.TurnSequence
 import net.ormr.eventbus.EventBus
@@ -7,7 +8,9 @@ import net.ormr.eventbus.EventBus
 /**
  * Models a game and the current game state inside a Craftan lobby
  */
-abstract class CraftanGame {
+abstract class CraftanGame(
+    open val settings: CraftanSettings,
+) {
     val eventBus: EventBus<Any, CraftanEvent> = EventBus()
 
     // TODO() We need the map to be here

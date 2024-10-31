@@ -1,5 +1,12 @@
 package de.craftan.engine
 
+import de.craftan.bridge.util.toComponent
+import de.craftan.io.CraftanNotification
+import de.craftan.io.CraftanPlaceholders
+import de.craftan.io.resolve
+import de.craftan.io.resolveWithPlaceholder
+import de.craftan.util.*
+import net.kyori.adventure.text.Component
 import de.craftan.engine.structures.CraftanStructure
 import org.bukkit.entity.Player
 
@@ -24,6 +31,47 @@ interface CraftanPlayer {
      * Contains the inventory the player currently has
      */
     val inventory: CraftanPlayerInventory
+
+    /**
+     * Send the given component to the ingame player
+     * @param component the text
+     */
+    fun sendMessage(component: Component) {
+        bukkitPlayer.sendMessage(component)
+    }
+
+    /**
+     * Send the notification to the player
+     * @param notification
+     */
+    fun sendNotification(notification: CraftanNotification) {
+        bukkitPlayer.sendMessage(notification.resolve(bukkitPlayer).toComponent())
+    }
+
+    /**
+     * Send the notification to the player with the given placeholders
+     * @param notification to send
+     * @param placeholders to replace with
+     * @see resolveWithPlaceholder
+     */
+    fun sendNotification(
+        notification: CraftanNotification,
+        placeholders: Map<CraftanPlaceholders, String>,
+    ) {
+        bukkitPlayer.sendMessage(notification.resolveWithPlaceholder(bukkitPlayer, placeholders).toComponent())
+    }
+
+    /**
+     * @param permission the permission
+     * @return true if player has the permission
+     */
+    fun hasPermission(permission: String): Boolean = bukkitPlayer.hasPermission(permission)
+
+    /**
+     * @param permission the permission
+     * @return true if player has the permission
+     */
+    fun hasPermission(permission: CraftanPermissions): Boolean = hasPermission(permission.permission)
 }
 
 /**

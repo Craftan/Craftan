@@ -29,27 +29,26 @@ import org.joml.Vector3f
 * @see de.craftan.engine.CraftanGame
 */
 class CraftanMap(
-    val usedLayout: CraftanMapLayout,
-    lobby: CraftanLobby,
+    val lobby: CraftanLobby,
 ) {
     /**
      * center coordinate of the created map
      */
-    val center: BlockVector3 = lobby.center
+    val center: BlockVector3 = lobby.board.center
 
     /**
      * bukkitWorld the map is in
      */
-    val bukkitWorld: World = Bukkit.getWorld(lobby.worldEditWorld.name)!!
+    val bukkitWorld: World = Bukkit.getWorld(lobby.board.worldEditWorld.name)!!
     private val worldEditWorld: com.sk89q.worldedit.world.World = FaweAPI.getWorld(bukkitWorld.name)!!
     private val hexagonSize: HexagonSize = HexagonSize()
-    private val spacing = lobby.spacing
+    private val spacing = lobby.board.spacing
 
     /**
      * Builds the map
      */
     fun build() {
-        for (tile in usedLayout.coordinatesToTile.values) {
+        for (tile in lobby.board.layout.coordinatesToTile.values) {
             val position = getPositionFromCoordinates(tile.coordinate)
             buildTile(tile, position)
         }
