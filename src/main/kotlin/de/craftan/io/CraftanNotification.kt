@@ -1,5 +1,8 @@
 package de.craftan.io
 
+import de.craftan.bridge.util.toComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.entity.Player
 
 /**
@@ -20,7 +23,7 @@ enum class CraftanNotification(
     val notification: MessageNotification,
 ) {
     JOINED_GAME(MessageNotification("game.joined", "The player %player% just joined the game!")),
-    LEFT_GAME(MessageNotification("game.joined", "The player %player% just left the game!")),
+    LEFT_GAME(MessageNotification("game.left", "The player %player% just left the game!")),
 }
 
 /**
@@ -39,28 +42,42 @@ enum class CraftanPlaceholders(
  * @param player to resolve the locale to, null to use default locale
  */
 fun CraftanNotification.resolveWithPlaceholder(
-    player: Player?,
+    locale: String?,
     placeholders: Map<CraftanPlaceholders, String>,
-): String {
-    var raw = notification.resolve(player)
+): TextComponent {
+    var raw = notification.resolve(locale).content()
 
     placeholders.forEach { (placeholder, content) -> raw = raw.replace(placeholder.placeholder, content) }
-    return raw
+    return raw.toComponent()
 }
 
-fun CraftanNotification.resolve(player: Player?): String = notification.resolve(player)
-
-fun MessageNotification.resolve(player: Player?): String {
+fun CraftanNotification.resolve(player: Player?): TextComponent {
     var locale: String? = null
-
     if (player != null) {
-        val playerLocale = player.locale()
-        locale = playerLocale.displayLanguage
+        locale = player.locale().displayName
     }
 
-    val configuresMessage = MessageAdapter.resolveMessage(configLocation, locale)
+    return notification.resolve(locale)
+}
 
-    val prefix = if (usesPrefix) "${PREFIX_STRING.resolve(player)} " else ""
+fun CraftanNotification.resolve(locale: String?): TextComponent = notification.resolve(locale)
 
-    return "$prefix$configLocation"
+fun CraftanNotification.resolveWithPlaceholder(
+    player: Player?,
+    placeholders: Map<CraftanPlaceholders, String>,
+): TextComponent {
+    var locale: String? = null
+    if (player != null) {
+        locale = player.locale().displayName
+    }
+
+    return resolveWithPlaceholder(locale, placeholders)
+}
+
+fun MessageNotification.resolve(locale: String?): TextComponent {
+    val configuredMessage = MessageAdapter.resolveMessage(configLocation, locale)
+
+    val prefix = if (usesPrefix) PREFIX_STRING.resolve(locale) else Component.empty()
+
+    return prefix.append(configuredMessage)
 }

@@ -17,7 +17,6 @@ import java.io.File
 
 val structureCommand =
     command("structure") {
-
         literal("load") {
             argument("structure", StringArgumentType.string()) {
                 suggestList {
