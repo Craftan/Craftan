@@ -4,14 +4,14 @@ import de.craftan.CraftanGameAction
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.gameflow.RoundState
 import de.craftan.engine.gameflow.actions.PlaceStructureAction
-import de.craftan.engine.map.graph.StructureInfo
+import de.craftan.engine.structures.CraftanStructure
 
 /**
- * The state in a round when the game awaits the placement of a structure from a player
+ * The state in the pregame round when the game awaits the placement of a structure from a player.
  */
 class AwaitStructurePlacement(
     game: CraftanGame,
-    allowedStructures: Set<StructureInfo>? = null, // null is to be interpreted as all structures are allowed
+    allowedStructure: CraftanStructure,
 ) : RoundState(game) {
     override val name: String = "Await placement of Structure..."
 
