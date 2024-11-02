@@ -6,6 +6,9 @@ import de.craftan.engine.gameflow.RoundState
 import de.craftan.engine.gameflow.actions.PlaceStructureAction
 import de.craftan.engine.map.graph.StructureInfo
 
+/**
+ * The state in a round when the game awaits the placement of a structure from a player
+ */
 class AwaitStructurePlacement(
     game: CraftanGame,
     allowedStructures: Set<StructureInfo>? = null, // null is to be interpreted as all structures are allowed
