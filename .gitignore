@@ -1,15 +1,20 @@
-# Gradle
-.gradle
+# Development
+## Docker Compose
+deployment/database/
+## Environment Variables
+.env
+## Gradle
+.gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+!gradle/wrapper/gradle-wrapper.jar
 local.properties
-
-# Environment
-.env
-
-# IntelliJ IDEA
+## IDE
+.vscode/
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 .idea/compiler.xml
 .idea/jarRepositories.xml
 .idea/libraries/
@@ -17,34 +22,9 @@ local.properties
 *.iml
 *.ipr
 *.iws
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-# Eclipse
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-# NetBeans
-/.nb-gradle/
-/dist/
-/nbbuild/
-/nbdist/
-/nbproject/private/
-
-# VS Code
-.vscode/
-
-# Mac OS
-.DS_Store
-
-# Taskfile
+## Taskfile Cache
 .task/
+
+# Operating System
+## MacOS
+.DS_Store
