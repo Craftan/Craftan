@@ -1,5 +1,6 @@
 package de.craftan
 
+import de.craftan.commands.craftanCommand
 import de.craftan.commands.structureCommand
 import de.craftan.config.ConfigSystem
 import de.craftan.io.MessageAdapter
@@ -48,5 +49,6 @@ object Craftan {
 
     private fun loadCommands() {
         structureCommand
+        craftanCommand
     }
 }

@@ -1,66 +1,22 @@
 package de.craftan.io
 
-import org.bukkit.entity.Player
-
-/**
- * Models a notification string which will be retrieved from the config.
- */
-data class MessageNotification(
-    val configLocation: String,
-    val default: String,
-    val usesPrefix: Boolean = true,
-)
-
-val PREFIX_STRING = MessageNotification("prefix", "[CRAFTAN]", false)
-
 /**
  * A collection of all notifications
  */
 enum class CraftanNotification(
     val notification: MessageNotification,
 ) {
-    JOINED_GAME(MessageNotification("game.joined", "The player %player% just joined the game!")),
-    LEFT_GAME(MessageNotification("game.joined", "The player %player% just left the game!")),
-}
+    // BASICS
+    PREFIX(MessageNotification("prefix", "<grey>[<#00c9a5>CRAFTAN</#00c9a5>]<reset> ", false)),
+    BASE_COLOR(MessageNotification("base_color", "<grey>", false)),
+    BASE_HIGHLIGHT(MessageNotification("base_highlight", "<#00c9a5>", false)),
 
-/**
- * Models a placeholder in a craftan notification
- * @see resolveWithPlaceholder
- */
-enum class CraftanPlaceholders(
-    val placeholder: String,
-) {
-    PLAYER("%placer%"),
-}
+    // EXAMPLES TODO Move to correct section
+    JOINED_GAME(MessageNotification("game.joined", "%bc%The player %player% just joined the game!")),
+    LEFT_GAME(MessageNotification("game.left", "%bc%The player %player% just left the game!")),
 
-/**
- * Resolves the given notification with the given placeholders
- * @param placeholders a map where the placeholder maps to the content
- * @param player to resolve the locale to, null to use default locale
- */
-fun CraftanNotification.resolveWithPlaceholder(
-    player: Player?,
-    placeholders: Map<CraftanPlaceholders, String>,
-): String {
-    var raw = notification.resolve(player)
-
-    placeholders.forEach { (placeholder, content) -> raw = raw.replace(placeholder.placeholder, content) }
-    return raw
-}
-
-fun CraftanNotification.resolve(player: Player?): String = notification.resolve(player)
-
-fun MessageNotification.resolve(player: Player?): String {
-    var locale: String? = null
-
-    if (player != null) {
-        val playerLocale = player.locale()
-        locale = playerLocale.displayLanguage
-    }
-
-    val configuresMessage = MessageAdapter.resolveMessage(configLocation, locale)
-
-    val prefix = if (usesPrefix) "${PREFIX_STRING.resolve(player)} " else ""
-
-    return "$prefix$configLocation"
+    // CRAFTAN COMMAND
+    LOCALES(MessageNotification("cmd.craftan.locales", "%bc%We found the following locales:%bh% %locales%")),
+    RELOAD_FILES_START(MessageNotification("cmd.craftan.reload", "%bc%Reloading locale files...")),
+    RELOAD_FILES_FINISH(MessageNotification("cmd.craftan.finish", "%bc%Finished loading locale files...")),
 }

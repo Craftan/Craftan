@@ -8,5 +8,6 @@ import de.craftan.engine.structures.CraftanStructure
 data class PlacedStructureEvent(
     override val game: CraftanGame,
     val player: CraftanPlayer,
-    val structureInfo: CraftanStructure, // TODO: Missing structure coordinates
+    // TODO: Missing structure coordinates
+    val structureInfo: CraftanStructure,
 ) : CraftanEvent(game)
