@@ -1,4 +1,6 @@
-package de.craftan.engine
+package de.craftan.engine.structures
+
+import de.craftan.engine.CraftanResource
 
 interface CraftanStructure {
     /**

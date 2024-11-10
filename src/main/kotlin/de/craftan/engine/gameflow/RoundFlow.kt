@@ -1,4 +1,7 @@
-package de.craftan.engine
+package de.craftan.engine.gameflow
+
+import de.craftan.engine.CraftanGame
+import de.craftan.engine.gameflow.states.DecidableState
 
 /**
  * Models a flow inside a round from state to state

@@ -1,4 +1,4 @@
-package de.craftan.engine.events
+package de.craftan.engine.gameflow.events
 
 import de.craftan.engine.CancelableCraftanEvent
 import de.craftan.engine.CraftanGame

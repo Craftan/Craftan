@@ -1,21 +1,21 @@
-package de.craftan.engine.flows
+package de.craftan.engine.gameflow.flows
 
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanPlayer
-import de.craftan.engine.RoundFlow
-import de.craftan.engine.TurnSequence
-import de.craftan.engine.events.actions.RolledDiceEvent
+import de.craftan.engine.gameflow.RoundFlow
+import de.craftan.engine.gameflow.TurnSequence
+import de.craftan.engine.gameflow.events.actions.RolledDiceEvent
+import de.craftan.engine.gameflow.states.AwaitingDiceRoundState
 import de.craftan.engine.map.DiceNumber
-import de.craftan.engine.states.AwaitingDiceState
 
-class PreGameFlow(
+class PreRoundFlow(
     game: CraftanGame,
-) : RoundFlow(AwaitingDiceState(game), game) {
+) : RoundFlow(AwaitingDiceRoundState(game), game) {
     init {
         for (i in 1 until game.players.size) {
-            addState(AwaitingDiceState(game))
+            addState(AwaitingDiceRoundState(game))
         }
-
+        // TODO: Make sure roll dice can only be executed once
         states.forEach { it.eventBus.on<RolledDiceEvent> { addPlayerResult(player, result) } }
     }
 

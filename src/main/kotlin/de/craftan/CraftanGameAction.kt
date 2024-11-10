@@ -1,9 +1,9 @@
 package de.craftan
 
-import de.craftan.engine.CraftanActionItem
 import de.craftan.engine.CraftanEvent
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.gameflow.CraftanActionItem
 import de.staticred.kia.inventory.item.KItem
 import net.ormr.eventbus.EventBus
 

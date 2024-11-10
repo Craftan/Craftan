@@ -1,6 +1,7 @@
-package de.craftan.engine
+package de.craftan.engine.gameflow
 
 import de.craftan.CraftanGameAction
+import de.craftan.engine.CraftanPlayer
 import de.staticred.kia.inventory.builder.kItem
 import de.staticred.kia.inventory.item.RegisteredKItem
 import org.bukkit.Material

@@ -1,4 +1,7 @@
-package de.craftan.engine
+package de.craftan.engine.gameflow
+
+import de.craftan.engine.CraftanGame
+import de.craftan.engine.CraftanPlayer
 
 /**
  * Models a round of a CraftanGame

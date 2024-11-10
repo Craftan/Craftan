@@ -1,4 +1,4 @@
-package de.craftan.engine.events.actions
+package de.craftan.engine.gameflow.events.actions
 
 import de.craftan.engine.CraftanEvent
 import de.craftan.engine.CraftanGame

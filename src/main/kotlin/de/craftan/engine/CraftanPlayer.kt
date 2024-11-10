@@ -7,6 +7,7 @@ import de.craftan.io.resolve
 import de.craftan.io.resolveWithPlaceholder
 import de.craftan.util.*
 import net.kyori.adventure.text.Component
+import de.craftan.engine.structures.CraftanStructure
 import org.bukkit.entity.Player
 
 /**
