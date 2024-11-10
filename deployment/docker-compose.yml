@@ -1,14 +1,46 @@
-volumes:
-  craftan-server:
+networks:
+  craftan-network:
+    driver: bridge
 
 services:
+  mariadb:
+    image: bitnami/mariadb:11.5
+    environment:
+      MARIADB_DATABASE: "${MARIADB_DATABASE:-craftandatabase}"
+      MARIADB_PASSWORD: "${MARIADB_PASSWORD:-craftanpassword}"
+      MARIADB_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD:-craftanrootpassword}"
+      MARIADB_USER: "${MARIADB_USER:-craftanuser}"
+    healthcheck:
+      interval: 15s
+      retries: 6
+      start_period: 10s
+      test: ["CMD", "/opt/bitnami/scripts/mariadb/healthcheck.sh"]
+      timeout: 5s
+    networks:
+      - craftan-network
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    volumes:
+      - "${PWD}/deployment/database/mariadb:/bitnami/mariadb"
+
   paper-server:
     build:
       context: ..
       dockerfile: ./deployment/Dockerfile
-    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      CT_MARIADB_DATABASE: "${MARIADB_DATABASE:-craftandatabase}"
+      CT_MARIADB_HOST: "${MARIADB_HOST:-mariadb}"
+      CT_MARIADB_PASSWORD: "${MARIADB_PASSWORD:-craftanpassword}"
+      CT_MARIADB_USER: "${MARIADB_USER:-craftanuser}"
+    networks:
+      - craftan-network
     ports:
       - "25565:25565"
       - "5005:5005"
+    restart: unless-stopped
     volumes:
       - "${PWD}/deployment/build/craftan.jar:/app/plugins/craftan.jar"
