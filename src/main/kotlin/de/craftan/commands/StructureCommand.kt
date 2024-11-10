@@ -5,8 +5,11 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
-import de.craftan.game.lobby.CraftanLobby
-import de.craftan.game.map.maps.DefaultMapLayout
+import de.craftan.bridge.lobby.CraftanBoard
+import de.craftan.bridge.lobby.CraftanLobby
+import de.craftan.bridge.lobby.craftanDefaultSettings
+import de.craftan.bridge.map.CraftanMap
+import de.craftan.engine.map.maps.DefaultMapLayout
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
 import net.axay.kspigot.commands.*
@@ -14,7 +17,6 @@ import java.io.File
 
 val structureCommand =
     command("structure") {
-
         literal("load") {
             argument("structure", StringArgumentType.string()) {
                 suggestList {
@@ -50,9 +52,9 @@ val structureCommand =
                     val location = player.location
                     val world = FaweAPI.getWorld(player.world.name)
                     val center = BlockVector3.at(location.x, location.y, location.z)
-                    val lobby = CraftanLobby(world, center, spacing)
+                    val lobby = CraftanLobby(CraftanBoard(world, center, spacing, DefaultMapLayout()), craftanDefaultSettings)
                     player.sendMessage("Building map...")
-                    DefaultMapLayout().build(lobby)
+                    CraftanMap(lobby).build()
                 }
             }
         }

@@ -30,12 +30,13 @@ dependencies {
     implementation("net.axay:kspigot:$kspigotVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.10")
     implementation("com.uchuhimo:konf:1.1.2")
+    implementation("net.ormr.eventbus:eventbus-core:0.2.0")
 
     implementation(platform("com.intellectualsites.bom:bom-newest:1.48")) // Ref: https://github.com/IntellectualSites/bom
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
-    api("com.github.StaticFX:kia:1.1.4")
+    api("com.github.StaticFX:kia:1.1.5")
 }
 
 paperweight {
@@ -51,7 +52,7 @@ bukkit {
     authors = listOf("StaticFX")
 
     generateLibrariesJson = true
-    apiVersion = "1.19"
+    apiVersion = "1.21"
 
     libraries = listOf("net.axay:kspigot:$kspigotVersion")
     depend = listOf("FastAsyncWorldEdit")
