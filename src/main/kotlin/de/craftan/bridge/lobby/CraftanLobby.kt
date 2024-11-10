@@ -2,7 +2,7 @@ package de.craftan.bridge.lobby
 
 import de.craftan.engine.CraftanPlayer
 import de.craftan.io.CraftanNotification
-import de.craftan.io.CraftanPlaceholders
+import de.craftan.io.CraftanPlaceholder
 
 /**
  * Models a lobby which holds the players and the ongoing game.
@@ -16,12 +16,12 @@ class CraftanLobby(
 
     fun addPlayer(player: CraftanPlayer) {
         players += player
-        notifyPlayers(CraftanNotification.JOINED_GAME, mapOf(CraftanPlaceholders.PLAYER to player.bukkitPlayer.name))
+        notifyPlayers(CraftanNotification.JOINED_GAME, mapOf(CraftanPlaceholder.PLAYER to player.bukkitPlayer.name))
     }
 
     fun removePlayer(player: CraftanPlayer) {
         players -= player
-        notifyPlayers(CraftanNotification.LEFT_GAME, mapOf(CraftanPlaceholders.PLAYER to player.bukkitPlayer.name))
+        notifyPlayers(CraftanNotification.LEFT_GAME, mapOf(CraftanPlaceholder.PLAYER to player.bukkitPlayer.name))
     }
 
     fun notifyPlayers(notification: CraftanNotification) {
@@ -30,7 +30,7 @@ class CraftanLobby(
 
     fun notifyPlayers(
         notification: CraftanNotification,
-        placeholders: Map<CraftanPlaceholders, String>,
+        placeholders: Map<CraftanPlaceholder, String>,
     ) {
         players.forEach { it.sendNotification(notification, placeholders) }
     }
