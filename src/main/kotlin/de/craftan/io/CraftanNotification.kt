@@ -7,7 +7,8 @@ enum class CraftanNotification(
     val notification: MessageNotification,
 ) {
     // BASICS
-    PREFIX(MessageNotification("prefix", "<grey>[<#00c9a5>CRAFTAN</#00c9a5>]<reset> ", false)),
+    PREFIX(MessageNotification("prefix", "<grey>[<#00c9a5>CRAFTAN</#00c9a5>]<reset>", false)),
+    PREFIX_SEPARATOR(MessageNotification("prefix_separator", " » ", false)),
     BASE_COLOR(MessageNotification("base_color", "<grey>", false)),
     BASE_HIGHLIGHT(MessageNotification("base_highlight", "<#00c9a5>", false)),
 
@@ -20,7 +21,7 @@ enum class CraftanNotification(
         MessageNotification(
             "cmd.craftan.info.formating",
             """
-            <st>⎯⎯⎯</st>%prefix%<st>⎯⎯⎯</st>
+            %bc%<st>⎯⎯⎯</st>%prefix%%bc%<st>⎯⎯⎯</st>
             %bc%Usage: /%bh%%command_name% %command_args%
             %bc%Description: %bh%%command_description%
             """.trimIndent(),
