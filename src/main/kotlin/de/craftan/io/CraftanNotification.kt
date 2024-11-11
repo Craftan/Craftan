@@ -16,6 +16,17 @@ enum class CraftanNotification(
     LEFT_GAME(MessageNotification("game.left", "%bc%The player %player% just left the game!")),
 
     // CRAFTAN COMMAND
+    INFORMATION_FORMATING(
+        MessageNotification(
+            "cmd.craftan.info.formating",
+            """
+            <st>⎯⎯⎯</st>%prefix%<st>⎯⎯⎯</st>
+            %bc%Usage: /%bh%%command_name% %command_args%
+            %bc%Description: %bh%%command_description%
+            """.trimIndent(),
+            false,
+        ),
+    ),
     LOCALES(MessageNotification("cmd.craftan.locales", "%bc%We found the following locales:%bh% %locales%")),
     RELOAD_FILES_START(MessageNotification("cmd.craftan.reload", "%bc%Reloading locale files...")),
     RELOAD_FILES_FINISH(MessageNotification("cmd.craftan.finish", "%bc%Finished loading locale files...")),

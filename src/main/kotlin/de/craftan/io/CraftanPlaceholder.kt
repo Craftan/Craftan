@@ -8,8 +8,16 @@ package de.craftan.io
 enum class CraftanPlaceholder(
     val placeholder: String,
 ) {
+    PREFIX("%prefix%"),
     PLAYER("%player%"),
     BASE_COLOR("%bc%"),
     BASE_HIGHLIGHT("%bh%"),
     LOCALES("%locales%"),
+
+    /**
+     * Used for command information formatting
+     */
+    COMMAND_NAME("%command_name%"),
+    COMMAND_ARGS("%command_args%"),
+    COMMAND_DESCRIPTION("%command_description%"),
 }

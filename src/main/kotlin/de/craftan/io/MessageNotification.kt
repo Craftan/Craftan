@@ -58,6 +58,7 @@ fun MessageNotification.resolve(locale: String?): Component {
         configuredMessage
             .replace(CraftanPlaceholder.BASE_COLOR.placeholder, baseColor)
             .replace(CraftanPlaceholder.BASE_HIGHLIGHT.placeholder, baseHighlight)
+            .replace(CraftanPlaceholder.PREFIX.placeholder, CraftanNotification.PREFIX.resolveRaw(locale))
 
     return (prefix + replaced).resolveMiniMessage()
 }

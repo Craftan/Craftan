@@ -2,6 +2,7 @@ package de.craftan
 
 import de.craftan.commands.craftanCommand
 import de.craftan.commands.structureCommand
+import de.craftan.commands.testCommand
 import de.craftan.config.ConfigSystem
 import de.craftan.io.MessageAdapter
 import de.craftan.util.CraftanSystem
@@ -50,5 +51,6 @@ object Craftan {
     private fun loadCommands() {
         structureCommand
         craftanCommand
+        testCommand
     }
 }
