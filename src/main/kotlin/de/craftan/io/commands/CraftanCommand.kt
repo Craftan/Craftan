@@ -17,7 +17,9 @@ import net.minecraft.commands.CommandSourceStack
  * Description of commands will be build the following:
  * - commands will be appended with the "info" subcommand to get the information about the command
  * - /<name> info - will then return the information about the command, and how to build it.
+ * - permission: "craftan.cmd.$name"
  *
+ * @return returns the command builder
  */
 fun craftanCommand(
     name: String,
@@ -37,6 +39,18 @@ fun craftanCommand(
     return command
 }
 
+/**
+ * Builds a sub command for a craftan command and generates the required info and permission command
+ * @param name of the sub command
+ * @param description of the sub command
+ * @param builder command builder
+ *
+ * Builds the sub command based on the parent command.
+ * THE PARENT COMMAND NEEDS TO BE BUILT USING [craftanCommand] for this to work
+ *
+ * will generate the permission and info sub command for this command
+ * - permission: "$parentCommand.$name"
+ */
 inline fun ArgumentBuilder<CommandSourceStack, *>.craftanSubCommand(
     name: String,
     description: String,
@@ -61,6 +75,13 @@ inline fun ArgumentBuilder<CommandSourceStack, *>.craftanSubCommand(
     then(subCommand)
 }
 
+/**
+ * Builds an <info> sub command
+ * @param name of the parent command
+ * @param description of the parent command
+ * @param builder additional information builder
+ * @return Builder with attached sub command
+ */
 inline fun ArgumentBuilder<CommandSourceStack, *>.infoSubCommand(
     name: String,
     description: String,
@@ -84,6 +105,10 @@ inline fun ArgumentBuilder<CommandSourceStack, *>.infoSubCommand(
         }
     }.also { then(it) }
 
+/**
+ * Holds the information of a craftan command
+ * @see de.craftan.io.commands.CommandPermissionUtil.commandPermissions
+ */
 data class CraftanCommand(
     val name: String,
     val description: String,
