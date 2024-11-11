@@ -13,6 +13,7 @@ enum class CraftanPlaceholder(
     BASE_COLOR("%bc%"),
     BASE_HIGHLIGHT("%bh%"),
     LOCALES("%locales%"),
+    COUNT("%count%"),
 
     /**
      * Used for command information formatting
@@ -20,4 +21,6 @@ enum class CraftanPlaceholder(
     COMMAND_NAME("%command_name%"),
     COMMAND_ARGS("%command_args%"),
     COMMAND_DESCRIPTION("%command_description%"),
+    COMMAND_SUBCOMMAND_INFO("%command_subcommands_info%"),
+    COMMAND_SUBCOMMANDS("%command_subcommands%"),
 }

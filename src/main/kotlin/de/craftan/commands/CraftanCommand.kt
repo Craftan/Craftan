@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
 import de.craftan.io.commands.craftanSubCommand
+import de.craftan.io.commands.to
 import net.axay.kspigot.commands.*
 
 val craftanCommand =

@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
  */
 fun CraftanNotification.resolveWithPlaceholder(
     locale: String?,
-    placeholders: Map<CraftanPlaceholder, String>,
+    placeholders: Map<CraftanPlaceholder, Component>,
 ): Component {
     var component = notification.resolve(locale)
 
@@ -73,7 +73,7 @@ fun CraftanNotification.resolveRaw(locale: String?): String = notification.resol
 
 fun CraftanNotification.resolveWithPlaceholder(
     player: Player?,
-    placeholders: Map<CraftanPlaceholder, String>,
+    placeholders: Map<CraftanPlaceholder, Component>,
 ): Component {
     var locale: String? = null
     if (player != null) {

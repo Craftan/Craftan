@@ -22,12 +22,18 @@ enum class CraftanNotification(
             "cmd.craftan.info.formating",
             """
             %bc%<st>⎯⎯⎯</st>%prefix%%bc%<st>⎯⎯⎯</st>
-            %bc%Usage: /%bh%%command_name% %command_args%
+            %bc%Usage: %bh%/%command_name% %command_args%
             %bc%Description: %bh%%command_description%
+            %bc%Subcommands: %command_subcommands_info%
+            %command_subcommands%
+            %bc%<st>⎯⎯⎯</st>%prefix%%bc%<st>⎯⎯⎯</st>
             """.trimIndent(),
             false,
         ),
     ),
+    COMMAND_SUBCOMMAND_PREFIX(MessageNotification("cmd.craftan.info.subcommand_prefix", "-", false)),
+    COMMAND_SUBCOMMANDS_NONE(MessageNotification("cmd.craftan.info.subcommands_none", "This command has no subcommands", false)),
+    COMMAND_SUBCOMMANDS_COUNT(MessageNotification("cmd.craftan.info.subcommands_count", "This command has %count% subcommands", false)),
     LOCALES(MessageNotification("cmd.craftan.locales", "%bc%We found the following locales:%bh% %locales%")),
     RELOAD_FILES_START(MessageNotification("cmd.craftan.reload", "%bc%Reloading locale files...")),
     RELOAD_FILES_FINISH(MessageNotification("cmd.craftan.finish", "%bc%Finished loading locale files...")),

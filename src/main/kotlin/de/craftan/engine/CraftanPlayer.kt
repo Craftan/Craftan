@@ -52,7 +52,7 @@ interface CraftanPlayer {
      */
     fun sendNotification(
         notification: CraftanNotification,
-        placeholders: Map<CraftanPlaceholder, String>,
+        placeholders: Map<CraftanPlaceholder, Component>,
     ) {
         bukkitPlayer.sendMessage(notification.resolveWithPlaceholder(bukkitPlayer, placeholders))
     }

@@ -3,6 +3,8 @@ package de.craftan.bridge.lobby
 import de.craftan.engine.CraftanPlayer
 import de.craftan.io.CraftanNotification
 import de.craftan.io.CraftanPlaceholder
+import de.craftan.io.commands.to
+import net.kyori.adventure.text.Component
 
 /**
  * Models a lobby which holds the players and the ongoing game.
@@ -30,7 +32,7 @@ class CraftanLobby(
 
     fun notifyPlayers(
         notification: CraftanNotification,
-        placeholders: Map<CraftanPlaceholder, String>,
+        placeholders: Map<CraftanPlaceholder, Component>,
     ) {
         players.forEach { it.sendNotification(notification, placeholders) }
     }

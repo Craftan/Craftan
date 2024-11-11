@@ -2,10 +2,13 @@ package de.craftan.io.commands
 
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import de.craftan.bridge.util.toComponent
 import de.craftan.io.CraftanNotification
 import de.craftan.io.CraftanPlaceholder
 import de.craftan.io.resolveWithPlaceholder
 import net.axay.kspigot.commands.*
+import net.axay.kspigot.extensions.bukkit.plainText
+import net.kyori.adventure.text.Component
 import net.minecraft.commands.CommandSourceStack
 
 /**
@@ -30,11 +33,12 @@ fun craftanCommand(
     val command =
         command(name) {
             requiresPermission(permission)
-            infoSubCommand(name, description)
         }
 
-    CommandPermissionUtil.commandPermissions[command] = CraftanCommand(name, description, permission)
+    val cc = CraftanCommand(name, name, description, permission)
+    CommandPermissionUtil.commandPermissions[command] = cc
     command.apply(builder)
+    command.apply { infoSubCommand(cc) }
 
     return command
 }
@@ -56,48 +60,72 @@ inline fun ArgumentBuilder<CommandSourceStack, *>.craftanSubCommand(
     description: String,
     builder: LiteralArgumentBuilder<CommandSourceStack>.() -> Unit = {},
 ) {
-    val parent = CommandPermissionUtil.commandPermissions[this] ?: error("Parent command not found. Use <craftanCommand()> to build a craftan sub command!")
+    val initParent = CommandPermissionUtil.commandPermissions[this] ?: error("Parent command not found. Use <craftanCommand()> to build a craftan sub command!")
 
-    val computedName = "${parent.name} $name"
+    var currParent = initParent
+    var parentCommandName = currParent.name
 
-    val permission = parent.permission + ".$name"
+    while (currParent.parent != null) { // walk through parents until root is found
+        currParent = currParent.parent!!
+        parentCommandName = currParent.name + " $parentCommandName"
+    }
+
+    val computedName = "$parentCommandName $name"
+
+    val permission = initParent.permission + ".$name"
+
+    println("Building SC $name")
+    println("Initial parent: ${initParent.name}")
+    println("Permission: $permission")
 
     val subCommand =
         command(name, false) {
             requiresPermission(permission)
-            infoSubCommand(computedName, description)
         }
 
-    val cc = CraftanCommand(name, description, permission, parent)
+    val cc = CraftanCommand(name, computedName, description, permission, initParent)
+    initParent.subCommands += cc
+
     CommandPermissionUtil.commandPermissions[subCommand] = cc
 
     subCommand.apply(builder)
+    subCommand.apply { infoSubCommand(cc) }
     then(subCommand)
 }
 
 /**
  * Builds an <info> sub command
- * @param name of the parent command
- * @param description of the parent command
+ * @param cc command to build from
  * @param builder additional information builder
  * @return Builder with attached sub command
  */
-inline fun ArgumentBuilder<CommandSourceStack, *>.infoSubCommand(
-    name: String,
-    description: String,
+fun ArgumentBuilder<CommandSourceStack, *>.infoSubCommand(
+    cc: CraftanCommand,
     builder: LiteralArgumentBuilder<CommandSourceStack>.() -> Unit = {},
-) = command("info", false, builder)
+) = command("info", false) {}
+    .apply(builder)
     .apply {
         runs {
             val commandArgs = arguments.map { it.usageText }
+
+            val subcommands = cc.subCommands
+
+            val message = if (subcommands.isEmpty()) CraftanNotification.COMMAND_SUBCOMMANDS_NONE else CraftanNotification.COMMAND_SUBCOMMANDS_COUNT
+
+            val subCommandInfo = message.resolveWithPlaceholder(player, mapOf(CraftanPlaceholder.COUNT to "${subcommands.size}"))
+
+            val subCommandsComponent = Component.text(subcommands.joinToString("\n") { "- ${it.name}${if (it.subCommands.isNotEmpty()) " - and ${it.subCommands.size} more" else "" }" })
+
             val information =
                 CraftanNotification.INFORMATION_FORMATING
                     .resolveWithPlaceholder(
                         player,
                         mapOf(
-                            CraftanPlaceholder.COMMAND_ARGS to commandArgs.joinToString(" "),
-                            CraftanPlaceholder.COMMAND_NAME to name,
-                            CraftanPlaceholder.COMMAND_DESCRIPTION to description,
+                            CraftanPlaceholder.COMMAND_ARGS to commandArgs.joinToString(" ") { it },
+                            CraftanPlaceholder.COMMAND_NAME to cc.fullName,
+                            CraftanPlaceholder.COMMAND_DESCRIPTION to cc.description,
+                            CraftanPlaceholder.COMMAND_SUBCOMMAND_INFO to subCommandInfo.plainText(),
+                            CraftanPlaceholder.COMMAND_SUBCOMMANDS to subCommandsComponent,
                         ),
                     )
 
@@ -108,10 +136,26 @@ inline fun ArgumentBuilder<CommandSourceStack, *>.infoSubCommand(
 /**
  * Holds the information of a craftan command
  * @see de.craftan.io.commands.CommandPermissionUtil.commandPermissions
+ * @param name single of the command
+ * @param fullName of the command, including parents
+ * @param description of the command
+ * @param permission required to execute this command
+ * @param parent if command is not a root
+ * @param subCommands list of subcommands
  */
 data class CraftanCommand(
     val name: String,
+    val fullName: String,
     val description: String,
     val permission: String,
     val parent: CraftanCommand? = null,
+    val subCommands: MutableList<CraftanCommand> = mutableListOf(),
 )
+
+/**
+ * Maps A to the given string. The string will be converted to a valid component
+ * @param A type a to map
+ * @param that the string to map to
+ * @return Pair returning a mapping to the component
+ */
+infix fun <A> A.to(that: String): Pair<A, Component> = Pair(this, that.toComponent())
