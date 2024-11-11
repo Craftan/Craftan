@@ -2,12 +2,14 @@ package de.craftan.commands
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import de.craftan.io.*
+import de.craftan.io.commands.craftanCommand
+import de.craftan.io.commands.craftanSubCommand
 import net.axay.kspigot.commands.*
 
 val craftanCommand =
-    command("craftan") {
-        literal("messages") {
-            literal("reload") {
+    craftanCommand("craftan", "Manage all configuration and settings of craftan") {
+        craftanSubCommand("messages", "Manage the localization of craftan's messages") {
+            craftanSubCommand("reload", "reload all messages from the configuration") {
                 runs {
                     player.sendMessage(CraftanNotification.RELOAD_FILES_START.resolve(player))
                     MessageAdapter.load()
@@ -15,7 +17,7 @@ val craftanCommand =
                 }
             }
 
-            literal("load") {
+            craftanSubCommand("load", "loads the given argument from the players localization.") {
                 argument<String>("notification", StringArgumentType.string()) {
                     suggestList {
                         CraftanNotification.entries.map { it.name }
@@ -51,8 +53,8 @@ val craftanCommand =
             }
         }
 
-        literal("locales") {
-            literal("list") {
+        craftanSubCommand("locales", "manage the localization files of craftan") {
+            craftanSubCommand("list", "list all registered locales") {
                 runs {
                     val locales = MessageAdapter.getResolvedLocales()
                     val localeNotification = CraftanNotification.LOCALES.resolveWithPlaceholder(player, mapOf(CraftanPlaceholder.LOCALES to locales.joinToString(",") { it }))
