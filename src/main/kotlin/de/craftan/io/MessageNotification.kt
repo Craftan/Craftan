@@ -50,7 +50,9 @@ fun MessageNotification.resolveRaw(locale: String?): String = MessageAdapter.res
 fun MessageNotification.resolve(locale: String?): Component {
     val configuredMessage = MessageAdapter.resolveRawMessage(configLocation, locale)
 
-    val prefix = if (usesPrefix) CraftanNotification.PREFIX.resolveRaw(locale) else ""
+    val assembledPrefix = CraftanNotification.PREFIX.resolveRaw(locale) + CraftanNotification.PREFIX_SEPARATOR.resolveRaw(locale)
+
+    val prefix = if (usesPrefix) assembledPrefix else ""
     val baseColor = CraftanNotification.BASE_COLOR.resolveRaw(locale)
     val baseHighlight = CraftanNotification.BASE_HIGHLIGHT.resolveRaw(locale)
 
@@ -58,6 +60,7 @@ fun MessageNotification.resolve(locale: String?): Component {
         configuredMessage
             .replace(CraftanPlaceholder.BASE_COLOR.placeholder, baseColor)
             .replace(CraftanPlaceholder.BASE_HIGHLIGHT.placeholder, baseHighlight)
+            .replace(CraftanPlaceholder.PREFIX.placeholder, CraftanNotification.PREFIX.resolveRaw(locale))
 
     return (prefix + replaced).resolveMiniMessage()
 }

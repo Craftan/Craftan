@@ -8,7 +8,6 @@ import de.craftan.util.CraftanSystem
 import de.craftan.util.SystemManager
 import java.io.File
 import java.nio.file.Files
-import kotlin.io.path.exists
 
 object Craftan {
     val schematicsFolder = File("${PluginManager.dataFolder.absolutePath}/schematics")
