@@ -11,7 +11,7 @@ import java.io.File
 /**
  * Util class to help load messages from a configuration file, based on localization
  */
-object MessageAdapter {
+object MessageAdapter : FileAdapter {
     private const val LANGUAGE_FILE_LOCATION = "/language/"
 
     private const val LOCALE_LOCATION = "locale"
@@ -30,7 +30,7 @@ object MessageAdapter {
      * Will load every locale file found in the language folder
      * @see LANGUAGE_FILE_LOCATION
      */
-    fun load() {
+    override fun load() {
         loadDefault()
         loadLocales()
         updatesLocalesFiles()
