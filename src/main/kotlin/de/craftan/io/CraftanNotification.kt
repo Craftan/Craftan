@@ -35,7 +35,7 @@ enum class CraftanNotification(
     COMMAND_SUBCOMMANDS_NONE(MessageNotification("cmd.craftan.info.subcommands_none", "This command has no subcommands", false)),
     COMMAND_SUBCOMMANDS_COUNT(MessageNotification("cmd.craftan.info.subcommands_count", "This command has %count% subcommands", false)),
 
-    LOCALES(MessageNotification("cmd.craftan.locales", "%bc%We found the following locales:%bh% %locales%")),
+    LOCALES(MessageNotification("cmd.craftan.locales.list", "%bc%We found the following locales:%bh% %locales%")),
     LOCALES_CREATE_FAILED(MessageNotification("cmd.craftan.locales.create.failed", "%bc%There is already a file for the given localization.")),
     LOCALES_CREATE_SUCCESS(
         MessageNotification("cmd.craftan.locales.create.success", "%bc%The file for the desired locale has been created. Be sure to %bh%<hover:show_text:'Click to insert command'><click:suggest_command:'/craftan messages reload'>reload</click></hover> the localizations."),
