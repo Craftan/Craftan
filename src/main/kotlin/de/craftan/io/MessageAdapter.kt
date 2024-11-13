@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
+import java.nio.file.Files
 
 /**
  * Util class to help load messages from a configuration file, based on localization
@@ -40,6 +41,24 @@ object MessageAdapter {
      * @return the found files in the langauges folder [LANGUAGE_FILE_LOCATION]
      */
     fun getResolvedLocales(): List<String> = localeConfigs.keys.toMutableList().apply { add(DEFAULT_LOCALE) }
+
+    /**
+     * Creates a new localization file for the given locale.
+     * Will copy the current default locale file, to the new locale
+     * @param locale to create
+     */
+    fun createLocaleFromDefault(locale: String) {
+        val location = File(PluginManager.dataFolder, "$LANGUAGE_FILE_LOCATION/$locale.yml")
+        val defaultLocation = File(PluginManager.dataFolder, "$LANGUAGE_FILE_LOCATION/$DEFAULT_LOCALE.yml")
+
+        if (!defaultLocation.exists()) {
+            error("Default localization file not found!")
+        }
+
+        if (!location.exists()) {
+            Files.copy(defaultLocation.toPath(), location.toPath())
+        }
+    }
 
     /**
      * Resolves the given location from the config from the given locale.
