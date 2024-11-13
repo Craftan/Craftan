@@ -31,7 +31,7 @@ enum class CraftanNotification(
             false,
         ),
     ),
-    COMMAND_SUBCOMMAND_PREFIX(MessageNotification("cmd.craftan.info.subcommand_prefix", "-", false)),
+    COMMAND_SUBCOMMAND_PREFIX(MessageNotification("cmd.craftan.info.subcommand_prefix", ">", false)),
     COMMAND_SUBCOMMANDS_NONE(MessageNotification("cmd.craftan.info.subcommands_none", "This command has no subcommands", false)),
     COMMAND_SUBCOMMANDS_COUNT(MessageNotification("cmd.craftan.info.subcommands_count", "This command has %count% subcommands", false)),
 

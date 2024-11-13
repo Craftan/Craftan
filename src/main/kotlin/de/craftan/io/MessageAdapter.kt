@@ -57,6 +57,8 @@ object MessageAdapter {
 
         if (!location.exists()) {
             Files.copy(defaultLocation.toPath(), location.toPath())
+            val config = YamlConfiguration.loadConfiguration(location)
+            config.set("locale", locale)
         }
     }
 
