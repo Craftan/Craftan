@@ -1,6 +1,7 @@
 package de.craftan.commands
 
 import com.mojang.brigadier.arguments.StringArgumentType
+import de.craftan.bridge.util.sendNotification
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
 import de.craftan.io.commands.craftanSubCommand
@@ -60,6 +61,21 @@ val craftanCommand =
                     val locales = MessageAdapter.getResolvedLocales()
                     val localeNotification = CraftanNotification.LOCALES.resolveWithPlaceholder(player, mapOf(CraftanPlaceholder.LOCALES to locales.joinToString(",") { it }))
                     player.sendMessage(localeNotification)
+                }
+            }
+            craftanSubCommand("create", "create a new localization language file") {
+                argument<String>("locale") {
+                    runs {
+                        val locale = getArgument<String>("locale")
+
+                        if (MessageAdapter.getResolvedLocales().contains(locale)) {
+                            player.sendNotification(CraftanNotification.LOCALES_CREATE_FAILED)
+                            return@runs
+                        }
+
+                        MessageAdapter.createLocaleFromDefault(locale)
+                        player.sendNotification(CraftanNotification.LOCALES_CREATE_SUCCESS)
+                    }
                 }
             }
         }

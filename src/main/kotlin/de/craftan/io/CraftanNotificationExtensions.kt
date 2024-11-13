@@ -77,7 +77,7 @@ fun CraftanNotification.resolveWithPlaceholder(
 ): Component {
     var locale: String? = null
     if (player != null) {
-        locale = player.locale().displayName
+        locale = player.locale().toString()
     }
 
     return resolveWithPlaceholder(locale, placeholders)
