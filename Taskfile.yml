@@ -9,7 +9,7 @@ tasks:
   # build
   build:
     cmds:
-      - ./gradlew clean build --parallel
+      - ./gradlew build --parallel
       - mkdir -p ./deployment/build
       - cp ./build/libs/Craftan-*-all.jar ./deployment/build/craftan.jar
 
