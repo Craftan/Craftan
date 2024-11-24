@@ -10,7 +10,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN --mount=type=cache,target=/root/.gradle gradle build --parallel
+RUN --mount=type=cache,target=/root/.gradle gradle build --parallel --no-daemon
 
 RUN PAPER_MC_DOWNLOAD_LINK=$(curl -s https://qing762.is-a.dev/api/papermc | jq -r ".versions.\"${PAPERMC_VERSION}\"") \
   ; curl --output /app/paper.jar ${PAPER_MC_DOWNLOAD_LINK}

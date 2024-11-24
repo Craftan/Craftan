@@ -22,7 +22,7 @@ services:
       - "3306:3306"
     restart: unless-stopped
     volumes:
-      - "${PWD}/deployment/database/mariadb:/bitnami/mariadb"
+      - "mariadb_data:/bitnami/mariadb"
 
   paper-server:
     build:
@@ -44,3 +44,11 @@ services:
     restart: unless-stopped
     volumes:
       - "${PWD}/deployment/build/craftan.jar:/app/plugins/craftan.jar"
+      - "paper-server_data:/app"
+      - "/app/plugins/"
+
+volumes:
+  mariadb_data:
+    driver: local
+  paper-server_data:
+    driver: local

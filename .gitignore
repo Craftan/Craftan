@@ -1,6 +1,6 @@
 # Development
 ## Docker Compose
-deployment/database/
+deployment/build/
 ## Environment Variables
 .env
 ## Gradle
