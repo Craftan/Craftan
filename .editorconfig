@@ -4,10 +4,11 @@ root = true
 end_of_line = lf
 
 [*.{kt,kts}]
+ktlint_code_style = ktlint_official
+ktlint_standard_max-line-length = 280
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_parameter-list-wrapping = disabled
+ktlint_standard_parameter-wrapping = disabled
+ktlint_standard_property-naming = disabled
+ktlint_standard_property-wrapping = disabled
 max_line_length = 280
-ktlint_standard_max-line-length=280
-ktlint_standard_no-wildcard-imports=disabled
-ktlint_standard_property-naming=disabled
-ktlint_standard_parameter-list-wrapping=disabled
-ktlint_standard_parameter-wrapping=disabled
-ktlint_standard_property-wrapping=disabled
