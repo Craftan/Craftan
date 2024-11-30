@@ -1,0 +1,31 @@
+version: "3"
+
+tasks:
+  # environment
+  setup:
+    cmds:
+      - >
+        ./gradlew
+        --parallel
+        dependencies
+  cleanup:
+    cmds:
+      - >
+        rm -rf
+        ./.gradle
+        ./build
+        ./deployment/build
+
+  # build
+  code:build:
+    cmds:
+      - >
+        ./gradlew
+        --parallel
+        --exclude-task ktlintMainSourceSetCheck
+        build
+
+  # qa
+  code:guidelines:check:
+    cmds:
+      - ./gradlew ktlintCheck
