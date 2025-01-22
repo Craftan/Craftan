@@ -1,6 +1,6 @@
 FROM gradle:8.10-alpine AS build
 
-ARG PAPERMC_VERSION="1.21.1"
+ARG PAPERMC_VERSION="1.21.4"
 
 RUN apk add --no-cache \
   curl \
