@@ -28,7 +28,7 @@ interface CraftanGameAction<R> {
      * @param player the player who invoked this action
      * @return whether the action was successful or not
      */
-    fun invoke(player: CraftanPlayer, data: CraftanActionData): Boolean
+    fun <T: CraftanActionData> invoke(player: CraftanPlayer, data: T): Boolean
 
     /**
      * Builds this action as a KItem
