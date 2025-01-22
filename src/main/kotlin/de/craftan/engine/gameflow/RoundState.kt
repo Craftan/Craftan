@@ -1,6 +1,6 @@
 package de.craftan.engine.gameflow
 
-import de.craftan.CraftanGameAction
+import de.craftan.engine.CraftanGameAction
 import de.craftan.engine.CraftanEvent
 import de.craftan.engine.CraftanGame
 import net.ormr.eventbus.EventBus

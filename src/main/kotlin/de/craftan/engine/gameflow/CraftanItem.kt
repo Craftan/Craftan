@@ -1,6 +1,7 @@
 package de.craftan.engine.gameflow
 
-import de.craftan.CraftanGameAction
+import de.craftan.engine.CraftanActionData
+import de.craftan.engine.CraftanGameAction
 import de.craftan.engine.CraftanPlayer
 import de.staticred.kia.inventory.builder.kItem
 import de.staticred.kia.inventory.item.RegisteredKItem
@@ -33,7 +34,7 @@ class CraftanActionItem<R>(
 ) : CraftanItem(material, amount, player) {
     init {
         kItem.onRightClick { _, _ ->
-            action.invoke(player)
+            action.invoke(player, CraftanActionData.empty())
         }
     }
 }
