@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component
 class CraftanLobby(
     val board: CraftanBoard,
     val settings: MutableCraftanSettings,
+    val maxPlayers: Int = 4
 ) {
     private val players = mutableListOf<CraftanPlayer>()
 
