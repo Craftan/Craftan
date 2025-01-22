@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import de.craftan.bridge.util.toComponent
 import de.craftan.io.CraftanNotification
 import de.craftan.io.CraftanPlaceholder
+import de.craftan.io.permissions.CraftanPermission
 import de.craftan.io.resolveWithPlaceholder
 import net.axay.kspigot.commands.*
 import net.axay.kspigot.extensions.bukkit.plainText
@@ -32,7 +33,7 @@ fun craftanCommand(
     val permission = "craftan.cmd.$name"
     val command =
         command(name) {
-            requiresPermission(permission)
+            requiresPermission(CraftanPermission(permission, "Required for command $name"))
         }
 
     val cc = CraftanCommand(name, name, description, permission)
@@ -74,13 +75,9 @@ inline fun ArgumentBuilder<CommandSourceStack, *>.craftanSubCommand(
 
     val permission = initParent.permission + ".$name"
 
-    println("Building SC $name")
-    println("Initial parent: ${initParent.name}")
-    println("Permission: $permission")
-
     val subCommand =
         command(name, false) {
-            requiresPermission(permission)
+            requiresPermission(CraftanPermission(permission, "Require for command $name"))
         }
 
     val cc = CraftanCommand(name, computedName, description, permission, initParent)
@@ -159,3 +156,8 @@ data class CraftanCommand(
  * @return Pair returning a mapping to the component
  */
 infix fun <A> A.to(that: String): Pair<A, Component> = Pair(this, that.toComponent())
+
+fun ArgumentBuilder<CommandSourceStack, *>.requiresPermission(permission: CraftanPermission): ArgumentBuilder<*, *> =
+    requires {
+        it.bukkitSender.hasPermission(permission.permission)
+    }
