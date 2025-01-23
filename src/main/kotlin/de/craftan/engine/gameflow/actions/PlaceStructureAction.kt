@@ -40,18 +40,20 @@ class PlaceStructureAction(
             if (tile != null && tile.nodes[data.direction] != null) {
                 val node = tile.nodes[data.direction]!!
                 if (node.structureInfo.structure is City) return false
-                val playerHasRessources = player.inventory.containsAtleast(data.structureInfo.cost)
-                val playerHasStructure = player.inventory.containsAtleast(data.structureInfo to 1)
-                if (playerHasRessources) {
+                val playerHasRessources = player.inventory.containsAtleastOne(data.structureInfo.cost)
+                val playerHasStructure = player.inventory.containsAtleastOne(data.structureInfo)
+                if (playerHasRessources && playerHasStructure) {
                     player.inventory.remove(data.structureInfo.cost)
+                    player.inventory.remove(data.structureInfo)
                 }
-                // limit reached?
-                // 2 space rule
+                val canPlace = data.structureInfo.canPlace(data.coordinates, data.direction, game.map.coordinatesToTile)
+                if (!canPlace) return false
                 node.structureInfo.structure = data.structureInfo
             } else {
                 return false
             }
         } else {
+            TODO()
         }
         return true
     }
