@@ -1,6 +1,6 @@
 package de.craftan.engine.map
 
-interface CraftanMapLayout {
+interface CraftanMap {
     /**
      * Abstract name of this map layout, for example: default no water
      */

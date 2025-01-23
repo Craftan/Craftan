@@ -3,6 +3,7 @@ package de.craftan.engine
 import de.craftan.bridge.lobby.CraftanSettings
 import de.craftan.engine.gameflow.GameRound
 import de.craftan.engine.gameflow.TurnSequence
+import de.craftan.engine.map.CraftanMap
 import net.ormr.eventbus.EventBus
 
 /**
@@ -13,7 +14,10 @@ abstract class CraftanGame(
 ) {
     val eventBus: EventBus<Any, CraftanEvent> = EventBus()
 
-    // TODO() We need the map to be here
+    /**
+     * The map of this game
+     */
+    abstract val map: CraftanMap
 
     /**
      * The config of this game

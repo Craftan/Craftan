@@ -15,7 +15,7 @@ data class Edge(
 enum class EdgeDirection(
     val nodeDirections: Pair<NodeDirection, NodeDirection>,
     val otherNode: TileDirection,
-) {
+) : Direction {
     NORTH_WEST(Pair(NodeDirection.NORTH, NodeDirection.NORTH_WEST), TileDirection.NORTH_WEST),
     NORTH_EAST(Pair(NodeDirection.NORTH, NodeDirection.NORTH_EAST), TileDirection.NORTH_EAST),
     EAST(Pair(NodeDirection.NORTH_EAST, NodeDirection.SOUTH_EAST), TileDirection.EAST),

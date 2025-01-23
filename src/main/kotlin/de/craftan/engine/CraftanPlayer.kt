@@ -77,15 +77,41 @@ interface CraftanPlayerInventory {
     /**
      * Maps the resource to the amount
      */
-    val resources: Map<CraftanResource, Int>
+    val resources: MutableMap<CraftanResource, Int>
 
     /**
      * Maps the structure to the amount
      */
-    val structures: Map<CraftanStructure, Int>
+    val structures: MutableMap<CraftanStructure, Int>
 
     /**
      * Maps the action card to the amount
      */
     val actionCards: Map<CraftanActionCard, Int>
+
+    fun containsAtleast(neededResources: Map<CraftanResource, Int>): Boolean {
+        for (neededResource in neededResources) {
+            if (resources[neededResource.key]!! >= neededResource.value) return false
+        }
+        return true
+    }
+
+    fun remove(toRemove: Map<CraftanResource, Int>) {
+        for (resource in toRemove) {
+            resources[resource.key] = resources[resource.key]!! - resource.value
+        }
+    }
+    fun containsAtleast(neededResources: Map<CraftanStructure, Int>): Boolean {
+        for (neededResource in neededResources) {
+            if (structures[neededResource.key]!! >= neededResource.value) return false
+        }
+        return true
+    }
+
+    fun remove(toRemove: Map<CraftanStructure, Int>) {
+        for (resource in toRemove) {
+            structures[resource.key] = structures[resource.key]!! - resource.value
+        }
+    }
+
 }

@@ -3,7 +3,7 @@ package de.craftan.bridge.map
 import com.fastasyncworldedit.core.FaweAPI
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.bridge.lobby.CraftanLobby
-import de.craftan.engine.map.CraftanMapLayout
+import de.craftan.engine.map.CraftanMap
 import de.craftan.engine.map.GameTile
 import de.craftan.engine.map.TileCoordinate
 import de.craftan.structures.hexagonStructure
@@ -25,10 +25,10 @@ import org.joml.Vector3f
  *
  * The tiles work via the QRS coordinates. Based on those we calculate the ingame Position of the tiles
  * @see GameTile
- * @see CraftanMapLayout
+ * @see CraftanMap
 * @see de.craftan.engine.CraftanGame
 */
-class CraftanMap(
+class CraftanMapBuilder(
     val lobby: CraftanLobby,
 ) {
     /**

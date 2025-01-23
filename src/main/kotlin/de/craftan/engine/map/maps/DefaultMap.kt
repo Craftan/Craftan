@@ -1,11 +1,11 @@
 package de.craftan.engine.map.maps
 
 import de.craftan.engine.map.*
-import de.craftan.engine.map.CraftanMapLayout
+import de.craftan.engine.map.CraftanMap
 
-class DefaultMapLayout(
+class DefaultMap(
     override val name: String = "Default",
-) : CraftanMapLayout {
+) : CraftanMap {
     override val coordinatesToTile: MutableMap<TileCoordinate, GameTile> =
         toCoordinateToGameTileMap(
             listOf(

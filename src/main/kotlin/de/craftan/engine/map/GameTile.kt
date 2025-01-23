@@ -1,6 +1,6 @@
 package de.craftan.engine.map
 
-import de.craftan.bridge.map.CraftanMap
+import de.craftan.bridge.map.CraftanMapBuilder
 import de.craftan.engine.map.graph.*
 
 /**
@@ -92,7 +92,7 @@ data class GameTile(
  * Earlier in the outer List means the row is more up in the board.
  * Earlier in the inner List means more to the left on the game board
  * @param tilesInfo a list of rows of TileInformation
- * @see CraftanMap
+ * @see CraftanMapBuilder
  */
 fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
     val gametiles = mutableListOf<GameTile>()
