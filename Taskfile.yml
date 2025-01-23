@@ -1,17 +1,22 @@
 version: "3"
 
+includes:
+  ci:
+    dir: .
+    taskfile: "./taskfiles/ci.taskfile.yml"
+
 tasks:
+  # build
+  build:
+    cmds:
+      - ./gradlew --parallel build
+      - mkdir -p ./deployment/build
+      - cp ./build/libs/Craftan-*-all.jar ./deployment/build/craftan.jar
+
   # code
   format:
     cmds:
       - ./gradlew ktlintFormat
-
-  # build
-  build:
-    cmds:
-      - ./gradlew build --parallel
-      - mkdir -p ./deployment/build
-      - cp ./build/libs/Craftan-*-all.jar ./deployment/build/craftan.jar
 
   # docker
   docker:build:
