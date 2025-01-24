@@ -1,5 +1,6 @@
 package de.craftan.engine.map.graph
 
+import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.map.TileCoordinate
 import de.craftan.engine.map.TileDirection
 import de.craftan.engine.structures.CraftanStructure
@@ -19,6 +20,7 @@ data class Node(
  */
 data class StructureInfo(
     var structure: CraftanStructure? = null,
+    var owner: CraftanPlayer? = null,
 )
 
 /**
