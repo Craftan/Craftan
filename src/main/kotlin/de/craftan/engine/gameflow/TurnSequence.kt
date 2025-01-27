@@ -10,17 +10,22 @@ import de.craftan.engine.CraftanPlayer
 class TurnSequence(
     private val players: List<CraftanPlayer>,
 ) {
-    private var currentPlayerIndex: Int = -1
+    private var currentPlayerIndex: Int = 0
+
+    var currentPlayer: CraftanPlayer = players[currentPlayerIndex]
 
     /**
-     * Returns the next player to have his turn. Starting with the first one
+     * Gives the Turn-over to the next player
      */
-    fun getNextPlayer(): CraftanPlayer {
+    fun nextPlayer() {
         currentPlayerIndex++
         if (currentPlayerIndex > players.size - 1) {
             currentPlayerIndex = 0
         }
+        currentPlayer = players[currentPlayerIndex]
+    }
 
-        return players[currentPlayerIndex]
+    fun getPlayerAmount():Int {
+        return players.size
     }
 }

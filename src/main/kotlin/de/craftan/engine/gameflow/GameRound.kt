@@ -4,7 +4,7 @@ import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanPlayer
 
 /**
- * Models a round of a CraftanGame
+ * Models a round of a CraftanGame, which takes all players into consideration, and each player can make their turn
  */
 interface GameRound {
     /**
@@ -31,12 +31,31 @@ interface GameRound {
      * Used before this round actually starts
      */
     fun prepare() {}
+
+    /**
+     * Used after a Flow is finished
+     */
+    fun finishFlow() {
+        game.nextRound()
+    }
 }
 
 /**
- * Models a global round, which takes all players into consideration, and each player can make their turn
+ * Models a global round, which takes all players into consideration, and each player can make their turn in order
  */
-interface GlobalGameRound : GameRound
+abstract class GlobalGameRound : GameRound {
+
+    private val numberOfRepetitions: Int = 0
+
+    override fun finishFlow() {
+        if  (numberOfRepetitions < game.playerSequence.getPlayerAmount()) {
+            game.playerSequence.nextPlayer()
+            flow.repeat()
+        } else {
+            super.finishFlow()
+        }
+    }
+}
 
 /**
  * A round which is focused around a single player

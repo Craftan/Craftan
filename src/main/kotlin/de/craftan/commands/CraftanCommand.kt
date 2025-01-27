@@ -15,7 +15,6 @@ val craftanCommand =
         craftanSubCommand("lobby", "manage current craftan lobbies") {
             craftanSubCommand("list", "list all current lobbies") {
                 runs {
-                    val lobbies =
 
 
                 }

@@ -1,8 +1,9 @@
 package de.craftan.engine.gameflow.flows
 
 import de.craftan.engine.CraftanGame
+import de.craftan.engine.gameflow.GameRound
 import de.craftan.engine.gameflow.RoundFlow
-import de.craftan.engine.gameflow.events.actions.RolledDiceEvent
+import de.craftan.engine.gameflow.events.actions.PlacedStructureEvent
 import de.craftan.engine.gameflow.states.AwaitStructurePlacement
 import de.craftan.engine.structures.Road
 import de.craftan.engine.structures.Settlement
@@ -13,9 +14,10 @@ import de.craftan.engine.structures.Settlement
  */
 class InitRoundFlow(
     game: CraftanGame,
-) : RoundFlow(AwaitStructurePlacement(game, Settlement()), game) {
+    round:GameRound
+) : RoundFlow(AwaitStructurePlacement(game, Settlement()), game, round) {
     init {
         addState(AwaitStructurePlacement(game, Road()))
-        states.forEach { it.eventBus.on<RolledDiceEvent> { addPlayerResult(player, result) } }
+        states.forEach { it.eventBus.on<PlacedStructureEvent> { nextState() } }
     }
 }

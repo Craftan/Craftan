@@ -15,7 +15,7 @@ class AwaitStructurePlacement(
 ) : RoundState(game) {
     override val name: String = "Await placement of Structure..."
 
-    override val actions: List<CraftanGameAction<*>> = listOf(PlaceStructureAction(game))
+    override val actions: List<CraftanGameAction<*>> = listOf(PlaceStructureAction(game,allowedStructure, game.playerSequence.currentPlayer))
 
     override fun onTimeEnd() {
         TODO("Not yet implemented")

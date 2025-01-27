@@ -16,15 +16,16 @@ import org.bukkit.Material
 
 class PlaceStructureAction(
     override val game: CraftanGame,
-    override var result: PlacedStructureEvent?,
+    val allowedStructure: CraftanStructure,
     val player: CraftanPlayer,
-) : CraftanGameAction<PlacedStructureEvent> {
+    override var result: PlacedStructureEvent? = null,
+    ) : CraftanGameAction<PlacedStructureEvent> {
     override fun <T : CraftanActionData> invoke(
         player: CraftanPlayer,
         data: T,
     ): Boolean {
         val data = data as PlacedStructureEventData
-        val result =
+        val resultInternal =
             eventBus.fire(
                 PlacedStructureEvent(
                     game,
@@ -34,26 +35,26 @@ class PlaceStructureAction(
                     data.structureInfo,
                 ),
             )
-        if (result.isCancelled) return true
+        if (resultInternal.isCancelled) return true
+        result = resultInternal
+        if (data.structureInfo::class != allowedStructure::class) return false
+        val tile = game.map.coordinatesToTile[data.coordinates]
+        if (tile == null) return false
+        if (tile.nodes[data.direction] == null) return false
+        val canPlace = data.structureInfo.canPlace(data.coordinates, data.direction, game.map.coordinatesToTile)
+        if (!canPlace) return false
+        val playerHasRessources = player.inventory.containsAtleastOne(data.structureInfo.cost)
+        val playerHasStructure = player.inventory.containsAtleastOne(data.structureInfo)
+        if (playerHasRessources && playerHasStructure) {
+            player.inventory.remove(data.structureInfo.cost)
+            player.inventory.remove(data.structureInfo)
+        }
         if (data.direction is NodeDirection) {
-            val tile = game.map.coordinatesToTile[data.coordinates]
-            if (tile != null && tile.nodes[data.direction] != null) {
-                val node = tile.nodes[data.direction]!!
-                if (node.structureInfo.structure is City) return false
-                val playerHasRessources = player.inventory.containsAtleastOne(data.structureInfo.cost)
-                val playerHasStructure = player.inventory.containsAtleastOne(data.structureInfo)
-                if (playerHasRessources && playerHasStructure) {
-                    player.inventory.remove(data.structureInfo.cost)
-                    player.inventory.remove(data.structureInfo)
-                }
-                val canPlace = data.structureInfo.canPlace(data.coordinates, data.direction, game.map.coordinatesToTile)
-                if (!canPlace) return false
-                node.structureInfo.structure = data.structureInfo
-            } else {
-                return false
-            }
+            val node = tile.nodes[data.direction]!!
+            node.structureInfo.structure = data.structureInfo
         } else {
-            TODO()
+            val edge = tile.edges[data.direction]!!
+            edge.structureInfo.structure = data.structureInfo
         }
         return true
     }

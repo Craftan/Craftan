@@ -17,11 +17,13 @@ import de.craftan.engine.gameflow.states.DecidableState
  *
  * @param startState the starting state, which can also be the end state
  * @param game the game this flow is currently using
+ * @param round the round the flow is being used in
  */
 abstract class RoundFlow(
     val startState: RoundState,
     val game: CraftanGame,
-) {
+    val round: GameRound,
+    ) {
     val states = mutableListOf(startState)
 
     private var stateIndex = 0
@@ -63,10 +65,16 @@ abstract class RoundFlow(
         currentState.setup()
     }
 
+    fun repeat() {
+        currentState = startState
+        currentState.flow = this
+        startState.setup()
+    }
+
     /**
      * Finished the flow by notifying the game
      */
     open fun finishFlow() {
-        game.nextRound()
+        round.finishFlow()
     }
 }

@@ -5,11 +5,13 @@ import de.craftan.engine.*
 import de.craftan.engine.gameflow.GameRound
 import de.craftan.engine.gameflow.events.GameStartEvent
 import de.craftan.engine.gameflow.rounds.PreGameGlobalRound
+import de.craftan.engine.map.CraftanMap
 
 class CraftanGameImpl(
     override val players: List<CraftanPlayer>,
     override val config: CraftanGameConfig,
     override val settings: CraftanSettings,
+    override val map: CraftanMap,
 ) : CraftanGame(settings) {
     var hasFinishedPreGame = false
     var hasFinishedPlacing = false
@@ -29,6 +31,12 @@ class CraftanGameImpl(
     }
 
     override fun nextRound() {
+        /*
+        The Rounds should be executed in the order:
+        PreGameRound x 1
+        InitGame x 1
+        NormalGameRound x n
+         */
         if (round is PreGameGlobalRound) {
             hasFinishedPreGame = true
         }
