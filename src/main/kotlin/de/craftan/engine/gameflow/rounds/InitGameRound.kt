@@ -17,4 +17,22 @@ class InitGameRound(
 ) : GlobalGameRound() {
     override val index: Int = 0
     override val flow: RoundFlow = InitRoundFlow(game, this)
+
+    private val firstPlacementAllDone = false
+    override fun finishFlow() {
+        if  (numberOfRepetitions < game.playerSequence.getPlayerAmount()) {
+            numberOfRepetitions++
+            if (!firstPlacementAllDone) {
+                game.playerSequence.nextPlayer()
+            } else game.playerSequence.previousPlayer()
+            flow.repeat()
+        } else {
+            if (firstPlacementAllDone) {
+                game.nextRound()
+            } else {
+                numberOfRepetitions = 0
+                flow.repeat()
+            }
+        }
+    }
 }

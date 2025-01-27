@@ -25,6 +25,17 @@ class TurnSequence(
         currentPlayer = players[currentPlayerIndex]
     }
 
+    /**
+     * Gives the Turn-over to the previous player
+     */
+    fun previousPlayer() {
+        currentPlayerIndex--
+        if (currentPlayerIndex < 0) {
+            currentPlayerIndex = players.size - 1
+        }
+        currentPlayer = players[currentPlayerIndex]
+    }
+
     fun getPlayerAmount():Int {
         return players.size
     }

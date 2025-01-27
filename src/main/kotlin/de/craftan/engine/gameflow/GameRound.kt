@@ -45,14 +45,15 @@ interface GameRound {
  */
 abstract class GlobalGameRound : GameRound {
 
-    private val numberOfRepetitions: Int = 0
+    public var numberOfRepetitions: Int = 0
 
     override fun finishFlow() {
         if  (numberOfRepetitions < game.playerSequence.getPlayerAmount()) {
+            numberOfRepetitions++
             game.playerSequence.nextPlayer()
             flow.repeat()
         } else {
-            super.finishFlow()
+            game.nextRound()
         }
     }
 }
