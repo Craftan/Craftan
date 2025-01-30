@@ -2,12 +2,14 @@ package de.craftan.commands
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import de.craftan.Craftan
+import de.craftan.bridge.lobby.LobbyManager
 import de.craftan.bridge.util.sendNotification
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
 import de.craftan.io.commands.craftanSubCommand
 import de.craftan.io.commands.to
 import net.axay.kspigot.commands.*
+import net.kyori.adventure.text.Component
 
 val craftanCommand =
     craftanCommand("craftan", "Manage all configuration and settings of craftan") {
@@ -15,9 +17,28 @@ val craftanCommand =
         craftanSubCommand("lobby", "manage current craftan lobbies") {
             craftanSubCommand("list", "list all current lobbies") {
                 runs {
-                    val lobbies =
+                    val lobbies = LobbyManager.listLobbies()
 
+                    if (lobbies.isEmpty()) {
+                        player.sendMessage(CraftanNotification.LIST_LOBBIES_EMPTY.resolve(player))
+                        return@runs
+                    }
 
+                    player.sendMessage(CraftanNotification.LIST_LOBBIES_INTRO.resolve(player))
+
+                    for ((id, lobby) in lobbies) {
+                        player.sendMessage(CraftanNotification.LIST_LOBBIES_ENTRY.resolveWithPlaceholder(player, mapOf(
+                            CraftanPlaceholder.LOBBY_ID to Component.text(id),
+                            CraftanPlaceholder.CURRENT_PLAYERS to Component.text(lobby.players().size),
+                            CraftanPlaceholder.MAX_PLAYERS to Component.text(lobby.maxPlayers),
+                            CraftanPlaceholder.CURRENT_MAP to Component.text(lobby.board.layout.name)
+                        )))
+                    }
+                }
+            }
+            craftanSubCommand("create", "create a new lobby and join it") {
+                runs {
+                    
                 }
             }
         }
