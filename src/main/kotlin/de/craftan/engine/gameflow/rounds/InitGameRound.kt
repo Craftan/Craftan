@@ -15,7 +15,7 @@ class InitGameRound(
     override val game: CraftanGame,
     override val name: String = "Init game",
 ) : GlobalGameRound() {
-    override val index: Int = 0
+    override val index: Int = game.roundIndex
     override val flow: RoundFlow = InitRoundFlow(game, this)
 
     private val firstPlacementAllDone = false

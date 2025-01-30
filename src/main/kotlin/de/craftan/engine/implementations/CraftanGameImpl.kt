@@ -4,6 +4,7 @@ import de.craftan.bridge.lobby.CraftanSettings
 import de.craftan.engine.*
 import de.craftan.engine.gameflow.GameRound
 import de.craftan.engine.gameflow.events.GameStartEvent
+import de.craftan.engine.gameflow.rounds.InitGameRound
 import de.craftan.engine.gameflow.rounds.PreGameGlobalRound
 import de.craftan.engine.map.CraftanMap
 
@@ -31,18 +32,19 @@ class CraftanGameImpl(
     }
 
     override fun nextRound() {
-        /*
-        The Rounds should be executed in the order:
-        PreGameRound x 1
-        InitGame x 1
-        NormalGameRound x n
-         */
+        roundIndex++
         if (round is PreGameGlobalRound) {
             hasFinishedPreGame = true
+            round = InitGameRound(this)
+            return
         }
 
-        if (hasFinishedPlacing && !hasFinishedPreGame) {
+        if (round is InitGameRound) {
+            hasFinishedPlacing = true
+            round = TODO("NormalGameRound")
+            return
         }
+        round = TODO("NormalGameRound")
     }
 
     override fun start() {

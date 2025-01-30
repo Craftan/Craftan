@@ -24,6 +24,7 @@ class PlaceStructureAction(
         player: CraftanPlayer,
         data: T,
     ): Boolean {
+        //TODO: Should this be here or just fire an Event y
         val data = data as PlacedStructureEventData
         val resultInternal =
             eventBus.fire(
