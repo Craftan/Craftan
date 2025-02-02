@@ -20,23 +20,21 @@ import de.craftan.engine.gameflow.states.DecidableState
  * @param round the round the flow is being used in
  */
 abstract class RoundFlow(
-    val startState: RoundState,
     val game: CraftanGame,
     val round: GameRound,
     ) {
-    val states = mutableListOf(startState)
+    lateinit var states:MutableList<RoundState>
 
     private var stateIndex = 0
 
     /**
      * Shows the current state of this flow
      */
-    var currentState = startState
-        private set
+    lateinit var currentState: RoundState
 
     init {
         currentState.flow = this
-        startState.setup()
+        currentState.setup()
     }
 
     fun addState(state: RoundState) {
@@ -66,9 +64,10 @@ abstract class RoundFlow(
     }
 
     fun repeat() {
-        currentState = startState
+        stateIndex = 0
+        currentState = states[stateIndex]
         currentState.flow = this
-        startState.setup()
+        currentState.setup()
     }
 
     /**

@@ -12,11 +12,11 @@ import de.craftan.engine.map.DiceNumber
 class PreRoundFlow(
     game: CraftanGame,
     round: GameRound
-) : RoundFlow(AwaitingDiceRoundState(game), game, round) {
+) : RoundFlow(game, round) {
 
     init {
-        for (i in 1 until game.players.size) {
-            addState(AwaitingDiceRoundState(game))
+        for (player in game.players) {
+            addState(AwaitingDiceRoundState(game, player))
         }
         // TODO: Make sure roll dice can only be executed once
         states.forEach { it.eventBus.on<RolledDiceEvent> { addPlayerResult(this.player, result) } }

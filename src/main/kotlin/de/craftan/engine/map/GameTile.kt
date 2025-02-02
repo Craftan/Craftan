@@ -1,6 +1,7 @@
 package de.craftan.engine.map
 
 import de.craftan.bridge.map.CraftanMapBuilder
+import de.craftan.engine.CraftanResource
 import de.craftan.engine.map.graph.*
 
 /**
@@ -76,7 +77,7 @@ enum class TileDirection(
  * Meaning the type of material you can get and the DiceNumber you get it at
  */
 data class TileInfo(
-    val type: MaterialType,
+    val type: CraftanResource,
     val chance: DiceNumber,
 )
 

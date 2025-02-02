@@ -9,7 +9,7 @@ import de.craftan.engine.structures.CraftanStructure
 /**
  * The state in the pregame round when the game awaits the placement of a structure from a player.
  */
-class AwaitStructurePlacement(
+class AwaitStructurePlacementRoundState(
     game: CraftanGame,
     allowedStructure: CraftanStructure,
 ) : RoundState(game) {

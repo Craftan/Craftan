@@ -24,9 +24,18 @@ class PlaceStructureAction(
         player: CraftanPlayer,
         data: T,
     ): Boolean {
-        //TODO: Should this be here or just fire an Event y
         val data = data as PlacedStructureEventData
-        val resultInternal =
+        if (data.structureInfo::class != allowedStructure::class) return false
+        val tile = game.map.coordinatesToTile[data.coordinates] ?: return false
+        if (tile.nodes[data.direction] == null) return false
+        val canPlace = data.structureInfo.canPlace(data.coordinates, data.direction, game.map)
+        if (!canPlace) return false
+        val playerHasRessources = player.inventory.containsAtleastOne(data.structureInfo.cost)
+        if (!playerHasRessources) return  false
+        val playerHasStructure = player.inventory.containsAtleastOne(data.structureInfo)
+        if (!playerHasStructure) return  false
+
+        result =
             eventBus.fire(
                 PlacedStructureEvent(
                     game,
@@ -36,27 +45,6 @@ class PlaceStructureAction(
                     data.structureInfo,
                 ),
             )
-        if (resultInternal.isCancelled) return true
-        result = resultInternal
-        if (data.structureInfo::class != allowedStructure::class) return false
-        val tile = game.map.coordinatesToTile[data.coordinates]
-        if (tile == null) return false
-        if (tile.nodes[data.direction] == null) return false
-        val canPlace = data.structureInfo.canPlace(data.coordinates, data.direction, game.map.coordinatesToTile)
-        if (!canPlace) return false
-        val playerHasRessources = player.inventory.containsAtleastOne(data.structureInfo.cost)
-        val playerHasStructure = player.inventory.containsAtleastOne(data.structureInfo)
-        if (playerHasRessources && playerHasStructure) {
-            player.inventory.remove(data.structureInfo.cost)
-            player.inventory.remove(data.structureInfo)
-        }
-        if (data.direction is NodeDirection) {
-            val node = tile.nodes[data.direction]!!
-            node.structureInfo.structure = data.structureInfo
-        } else {
-            val edge = tile.edges[data.direction]!!
-            edge.structureInfo.structure = data.structureInfo
-        }
         return true
     }
 

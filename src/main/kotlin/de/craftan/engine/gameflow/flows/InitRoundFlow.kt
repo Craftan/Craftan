@@ -4,7 +4,7 @@ import de.craftan.engine.CraftanGame
 import de.craftan.engine.gameflow.GameRound
 import de.craftan.engine.gameflow.RoundFlow
 import de.craftan.engine.gameflow.events.actions.PlacedStructureEvent
-import de.craftan.engine.gameflow.states.AwaitStructurePlacement
+import de.craftan.engine.gameflow.states.AwaitStructurePlacementRoundState
 import de.craftan.engine.structures.Road
 import de.craftan.engine.structures.Settlement
 
@@ -15,9 +15,15 @@ import de.craftan.engine.structures.Settlement
 class InitRoundFlow(
     game: CraftanGame,
     round:GameRound
-) : RoundFlow(AwaitStructurePlacement(game, Settlement()), game, round) {
+) : RoundFlow(game, round) {
     init {
-        addState(AwaitStructurePlacement(game, Road()))
-        states.forEach { it.eventBus.on<PlacedStructureEvent> { nextState() } }
+        addState(AwaitStructurePlacementRoundState(game, Settlement()))
+        addState(AwaitStructurePlacementRoundState(game, Road()))
+        states.forEach { it.eventBus.on<PlacedStructureEvent> {
+            player.inventory.remove(structureInfo.cost)
+            player.inventory.remove(structureInfo)
+            game.map.placeStructure(structureInfo, coordinates, direction, player)
+            nextState()
+        } }
     }
 }

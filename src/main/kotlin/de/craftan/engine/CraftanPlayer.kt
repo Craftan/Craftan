@@ -96,6 +96,10 @@ interface CraftanPlayerInventory {
         return true
     }
 
+    fun add(resource: CraftanResource, amount:Int) {
+        resources[resource] = resources[resource]!! + amount
+    }
+
     fun remove(toRemove: Map<CraftanResource, Int>) {
         for (resource in toRemove) {
             resources[resource.key] = resources[resource.key]!! - resource.value

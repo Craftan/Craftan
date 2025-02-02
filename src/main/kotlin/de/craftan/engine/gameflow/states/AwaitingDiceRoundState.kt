@@ -9,6 +9,7 @@ import de.craftan.engine.gameflow.events.actions.RolledDiceEvent
 
 class AwaitingDiceRoundState(
     game: CraftanGame,
+    val roundPlayer: CraftanPlayer
 ) : RoundState(game) {
     override val name: String = "Waiting for dice to be rolled"
 
@@ -22,7 +23,9 @@ class AwaitingDiceRoundState(
 
     override fun setup() {
         rollDiceAction.eventBus.on<RolledDiceEvent> {
-            eventBus.fire(this)
+            if (player == roundPlayer) {
+                eventBus.fire(this)
+            }
         }
     }
 }

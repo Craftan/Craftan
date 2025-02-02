@@ -57,13 +57,3 @@ abstract class GlobalGameRound : GameRound {
         }
     }
 }
-
-/**
- * A round which is focused around a single player
- */
-interface PlayerGameRound : GameRound {
-    /**
-     * The player to focus
-     */
-    val player: CraftanPlayer
-}
