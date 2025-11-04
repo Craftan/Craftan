@@ -31,6 +31,8 @@ class CraftanLobby(
         players.forEach { it.sendNotification(notification) }
     }
 
+    fun players() = players.toList()
+
     fun notifyPlayers(
         notification: CraftanNotification,
         placeholders: Map<CraftanPlaceholder, Component>,

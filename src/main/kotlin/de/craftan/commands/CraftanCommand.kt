@@ -1,14 +1,13 @@
 package de.craftan.commands
 
 import com.mojang.brigadier.arguments.StringArgumentType
+import de.craftan.Craftan
 import de.craftan.bridge.util.sendNotification
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
 import de.craftan.io.commands.craftanSubCommand
 import de.craftan.io.commands.to
-import net.axay.kspigot.commands.argument
-import net.axay.kspigot.commands.runs
-import net.axay.kspigot.commands.suggestList
+import net.axay.kspigot.commands.*
 
 val craftanCommand =
     craftanCommand("craftan", "Manage all configuration and settings of craftan") {
@@ -16,6 +15,12 @@ val craftanCommand =
         craftanSubCommand("lobby", "manage current craftan lobbies") {
             craftanSubCommand("list", "list all current lobbies") {
                 runs {
+                    val lobbies = LobbyManager.listLobbies()
+
+                    if (lobbies.isEmpty()) {
+                        player.sendMessage(CraftanNotification.LIST_LOBBIES_EMPTY.resolve(player))
+                        return@runs
+                    }
 
 
                 }

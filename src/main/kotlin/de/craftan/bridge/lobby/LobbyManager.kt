@@ -16,7 +16,7 @@ object LobbyManager {
      * Generates a new map and builds the lobby
      * @return the finished lobby
      */
-    suspend fun createLobby(layout: CraftanMapLayout): CraftanLobby {
+    fun createLobby(layout: CraftanMapLayout): CraftanLobby {
         val world = generateEmptyWorld("craftan-lobby-${lobbies.size}")
         val config = ConfigSystem.config
 
@@ -25,7 +25,7 @@ object LobbyManager {
         return CraftanLobby(board, MutableCraftanSettings(mutableListOf(), config[CraftanConfig.defaultPointsToWin], config[CraftanConfig.defaultDiscardLimit]))
     }
 
-
+    fun listLobbies() = lobbies.toMap()
 
 
 }

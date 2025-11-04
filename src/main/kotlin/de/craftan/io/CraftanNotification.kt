@@ -35,6 +35,10 @@ enum class CraftanNotification(
     COMMAND_SUBCOMMANDS_NONE(MessageNotification("cmd.craftan.info.subcommands_none", "This command has no subcommands", false)),
     COMMAND_SUBCOMMANDS_COUNT(MessageNotification("cmd.craftan.info.subcommands_count", "This command has %count% subcommands", false)),
 
+    LIST_LOBBIES_EMPTY(MessageNotification("cmd.craftan.lobbies.list.empty", "%bc%There are no lobbies yet.")),
+    LIST_LOBBIES_INTRO(MessageNotification("cmd.craftan.lobbies.list.intro", "%bc%<st>⎯⎯⎯</st>%prefix%%bc%<st>⎯⎯⎯</st>")),
+    LIST_LOBBIES_ENTRY(MessageNotification("cmd.craftan.lobbies.list.entry", "%bc%--> %bh%%lobby_id% %bc%- %current_players%%bh%/%bc%%max_players% %bc%- %current_map%")),
+
     LOCALES(MessageNotification("cmd.craftan.locales.list", "%bc%We found the following locales:%bh% %locales%")),
     LOCALES_CREATE_FAILED(MessageNotification("cmd.craftan.locales.create.failed", "%bc%There is already a file for the given localization.")),
     LOCALES_CREATE_SUCCESS(
