@@ -24,6 +24,7 @@ out/
 *.iws
 ## Taskfile Cache
 .task/
+server
 
 # Operating System
 ## MacOS

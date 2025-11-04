@@ -15,7 +15,7 @@ class RollDiceAction(
 ) : CraftanGameAction<DiceNumber> {
     override var result: DiceNumber? = null
 
-    override fun invoke(player: CraftanPlayer, data: CraftanActionData): Boolean {
+    override fun <T : CraftanActionData> invoke(player: CraftanPlayer, data: T): Boolean {
         val dice1 = Random.nextInt(1..6)
         val dice2 = Random.nextInt(1..6)
 

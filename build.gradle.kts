@@ -10,7 +10,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.0"
     id("io.papermc.paperweight.userdev") version "1.7.2"
     id("co.uzzu.dotenv.gradle") version "4.0.0"
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    //id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 group = "de.craftan"
@@ -28,6 +28,7 @@ dependencies {
     paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
 
     implementation("net.axay:kspigot:$kspigotVersion")
+
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.10")
     implementation("com.uchuhimo:konf:1.1.2")
     implementation("net.ormr.eventbus:eventbus-core:0.2.0")
@@ -36,7 +37,7 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
-    api("com.github.StaticFX:kia:1.1.5")
+    implementation("com.github.StaticFX:kia:1.1.5")
 }
 
 paperweight {
@@ -49,7 +50,7 @@ bukkit {
     main = "de.craftan.InternalMain"
     version = rootProject.version.toString()
     description = "The settlers of Catan minecraft edition"
-    authors = listOf("StaticFX")
+    authors = listOf("StaticFX", "Dawitschi")
 
     generateLibrariesJson = true
     apiVersion = "1.21"
