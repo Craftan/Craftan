@@ -2,6 +2,7 @@ package de.craftan.commands
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import de.craftan.Craftan
+import de.craftan.bridge.lobby.LobbyManager
 import de.craftan.bridge.util.sendNotification
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
@@ -11,7 +12,6 @@ import net.axay.kspigot.commands.*
 
 val craftanCommand =
     craftanCommand("craftan", "Manage all configuration and settings of craftan") {
-
         craftanSubCommand("lobby", "manage current craftan lobbies") {
             craftanSubCommand("list", "list all current lobbies") {
                 runs {
@@ -21,8 +21,6 @@ val craftanCommand =
                         player.sendMessage(CraftanNotification.LIST_LOBBIES_EMPTY.resolve(player))
                         return@runs
                     }
-
-
                 }
             }
         }
