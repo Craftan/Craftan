@@ -30,6 +30,11 @@ enum class CraftanPlaceholder(
     LOBBY_ID("%lobby_id%"),
     CURRENT_PLAYERS("%current_players%"),
     MAX_PLAYERS("%max_players%"),
-    CURRENT_MAP("%current_map%")
+    CURRENT_MAP("%current_map%"),
 
+    /**
+     * Used for Config Inventory
+     */
+    DICE_TIME("%time_to_roll_dice%"),
+    OPTION_SELECTED("%option_selected%"),
 }

@@ -2,12 +2,14 @@ package de.craftan.commands
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import de.craftan.Craftan
+import de.craftan.bridge.inventory.config.configureCraftanGameInventory
 import de.craftan.bridge.lobby.LobbyManager
 import de.craftan.bridge.util.sendNotification
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
 import de.craftan.io.commands.craftanSubCommand
 import de.craftan.io.commands.to
+import de.staticred.kia.inventory.extensions.openInventory
 import net.axay.kspigot.commands.*
 
 val craftanCommand =
@@ -21,6 +23,11 @@ val craftanCommand =
                         player.sendMessage(CraftanNotification.LIST_LOBBIES_EMPTY.resolve(player))
                         return@runs
                     }
+                }
+            }
+            craftanSubCommand("create", "Create a new lobby") {
+                runs {
+                    player.openInventory(configureCraftanGameInventory(player))
                 }
             }
         }

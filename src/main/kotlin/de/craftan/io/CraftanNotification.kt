@@ -47,4 +47,15 @@ enum class CraftanNotification(
 
     RELOAD_FILES_START(MessageNotification("cmd.craftan.reload", "%bc%Reloading locale files...")),
     RELOAD_FILES_FINISH(MessageNotification("cmd.craftan.finish", "%bc%Finished loading locale files...")),
+
+    //Lobby Config
+    LOBBY_CONFIG_INVENTORY_TITLE(MessageNotification("lobby.config.inventory.title", "%bh% >> %bc%Lobby Config for new game", false)),
+
+    LOBBY_CONFIG_INVENTORY_OPTION_SELECTED(MessageNotification("lobby.config.inventory.option_selected", "<green>[Selected]", false)),
+
+    LOBBY_CONFIG_INVENTORY_EXTENSION_OPTION(MessageNotification("lobby.config.inventory.extensions_option", "%bc%Extensions", false)),
+    LOBBY_CONFIG_INVENTORY_EXTENSION(MessageNotification("lobby.config.inventory.extension", "%option_selected% %bc%%extension_name%", false)),
+
+    LOBBY_CONFIG_INVENTORY_TIME_DICE_OPTION(MessageNotification("lobby.config.inventory.time_to_roll_dice_option", "%bc%Time to roll the dice", false)),
+    LOBBY_CONFIG_INVENTORY_TIME_DICE(MessageNotification("lobby.config.inventory.time_to_roll_dice", "%option_selected% %bh%>> %bc%%time_to_roll_dice%", false)),
 }
