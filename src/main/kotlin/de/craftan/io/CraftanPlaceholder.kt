@@ -37,4 +37,8 @@ enum class CraftanPlaceholder(
      */
     DICE_TIME("%time_to_roll_dice%"),
     OPTION_SELECTED("%option_selected%"),
+    POINTS_TO_WIN("%points_to_win%"),
+    TURN_TIME("%turn_time%"),
+    CARDS_LIMIT("%card_limit%"),
+
 }

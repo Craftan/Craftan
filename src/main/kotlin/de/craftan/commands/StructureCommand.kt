@@ -9,6 +9,8 @@ import de.craftan.bridge.lobby.CraftanBoard
 import de.craftan.bridge.lobby.CraftanLobby
 import de.craftan.bridge.lobby.craftanDefaultSettings
 import de.craftan.bridge.map.CraftanMap
+import de.craftan.engine.CraftanGameConfig
+import de.craftan.engine.MutableCraftanGameConfig
 import de.craftan.engine.map.maps.DefaultMapLayout
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
@@ -52,7 +54,7 @@ val structureCommand =
                     val location = player.location
                     val world = FaweAPI.getWorld(player.world.name)
                     val center = BlockVector3.at(location.x, location.y, location.z)
-                    val lobby = CraftanLobby(CraftanBoard(world, center, spacing, DefaultMapLayout()), craftanDefaultSettings)
+                    val lobby = CraftanLobby(CraftanBoard(world, center, spacing, DefaultMapLayout()), MutableCraftanGameConfig().toCraftanGameConfig())
                     player.sendMessage("Building map...")
                     CraftanMap(lobby).build()
                 }

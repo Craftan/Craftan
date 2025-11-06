@@ -1,10 +1,13 @@
 package de.craftan.bridge.lobby
 
+import de.craftan.engine.CraftanGameConfig
 import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.implementations.CraftanPlayerImpl
 import de.craftan.io.CraftanNotification
 import de.craftan.io.CraftanPlaceholder
 import de.craftan.io.commands.to
 import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 
 /**
  * Models a lobby which holds the players and the ongoing game.
@@ -12,21 +15,23 @@ import net.kyori.adventure.text.Component
  */
 class CraftanLobby(
     val board: CraftanBoard,
-    val settings: MutableCraftanSettings,
+    val gameConfig: CraftanGameConfig,
     val maxPlayers: Int = 4,
     val minPlayers: Int = 3,
     val status: CraftanLobbyStatus = CraftanLobbyStatus.WAITING
 ) {
     private val players = mutableListOf<CraftanPlayer>()
 
-    fun addPlayer(player: CraftanPlayer) {
-        players += player
-        notifyPlayers(CraftanNotification.JOINED_GAME, mapOf(CraftanPlaceholder.PLAYER to player.bukkitPlayer.name))
+    fun addPlayer(player: Player) {
+        val craftanPlayer = CraftanPlayerImpl(player)
+        players += craftanPlayer
+        notifyPlayers(CraftanNotification.JOINED_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
     }
 
-    fun removePlayer(player: CraftanPlayer) {
-        players -= player
-        notifyPlayers(CraftanNotification.LEFT_GAME, mapOf(CraftanPlaceholder.PLAYER to player.bukkitPlayer.name))
+    fun removePlayer(player: Player) {
+        val craftanPlayer = CraftanPlayerImpl(player)
+        players += craftanPlayer
+        notifyPlayers(CraftanNotification.LEFT_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
     }
 
     fun notifyPlayers(notification: CraftanNotification) {

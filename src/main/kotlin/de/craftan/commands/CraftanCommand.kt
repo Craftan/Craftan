@@ -2,6 +2,7 @@ package de.craftan.commands
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import de.craftan.Craftan
+import de.craftan.bridge.inventory.config.CraftanGameConfigManager
 import de.craftan.bridge.inventory.config.configureCraftanGameInventory
 import de.craftan.bridge.lobby.LobbyManager
 import de.craftan.bridge.util.sendNotification
@@ -28,6 +29,12 @@ val craftanCommand =
             craftanSubCommand("create", "Create a new lobby") {
                 runs {
                     player.openInventory(configureCraftanGameInventory(player))
+                }
+            }
+            craftanSubCommand("clear", "Clear your current lobby configuration") {
+                runs {
+                    CraftanGameConfigManager.clearPlayer(player)
+                    player.sendNotification(CraftanNotification.LOBBY_CONFIG_CLEARED)
                 }
             }
         }

@@ -15,5 +15,9 @@ object CraftanGameConfigManager {
         gameConfigMap[player] = MutableCraftanGameConfig()
     }
 
+    fun clearPlayer(player: Player) {
+        gameConfigMap.remove(player)
+    }
+
     fun getGameConfig(player: Player) = gameConfigMap[player]
 }

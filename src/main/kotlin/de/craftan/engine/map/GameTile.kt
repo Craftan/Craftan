@@ -132,6 +132,6 @@ fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
 fun toCoordinateToGameTileMap(tilesInfo: List<List<TileInfo>>): MutableMap<TileCoordinate, GameTile> {
     val gameTiles = toGameTiles(tilesInfo)
     val map: MutableMap<TileCoordinate, GameTile> = mutableMapOf()
-    gameTiles.forEach { map.put(it.coordinate, it) }
+    gameTiles.forEach { map[it.coordinate] = it }
     return map
 }

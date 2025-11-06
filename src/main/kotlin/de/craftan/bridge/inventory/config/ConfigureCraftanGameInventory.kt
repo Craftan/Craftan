@@ -1,18 +1,16 @@
 package de.craftan.bridge.inventory.config
 
 import de.craftan.bridge.inventory.placeholderItem
-import de.craftan.bridge.inventory.placeholderRow
-import de.craftan.io.CraftanNotification
-import de.craftan.io.CraftanPlaceholder
-import de.craftan.io.MessageAdapter
-import de.craftan.io.resolve
-import de.craftan.io.resolveWithPlaceholder
+import de.craftan.bridge.lobby.LobbyManager
+import de.craftan.bridge.util.sendNotification
+import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.map.maps.DefaultMapLayout
+import de.craftan.io.*
 import de.staticred.kia.inventory.builder.kInventory
 import de.staticred.kia.inventory.builder.kItem
 import de.staticred.kia.inventory.builder.kRow
 import de.staticred.kia.util.rows
 import net.axay.kspigot.chat.literalText
-import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -22,17 +20,22 @@ private val timeToRollOptions = listOf(
     30, 60, 90
 )
 
-fun configureCraftanGameInventory(player: Player) = kInventory(player, 5.rows, InventoryType.CHEST) {
+private val turnTimeOptions = listOf(
+    60, 90, 120
+)
+
+fun configureCraftanGameInventory(player: Player) = kInventory(player, 6.rows, InventoryType.CHEST) {
     val contrastColor = MessageAdapter.resolveMessage("base_highlight", player.locale().toString())
     title = CraftanNotification.LOBBY_CONFIG_INVENTORY_TITLE.resolve(player)
 
     CraftanGameConfigManager.insertPlayerWithDefaultConfigIfNotExisting(player)
     val config = CraftanGameConfigManager.getGameConfig(player)!!
 
+    onClose {
+        player.sendNotification(CraftanNotification.LOBBY_CONFIG_INVENTORY_CLOSED)
+    }
 
-    setRow(0, placeholderRow)
-
-    setRow(1, kRow {
+    setRow(0, kRow {
         setItem(0, placeholderItem)
         setItem(1, kItem(Material.SPRUCE_BOAT) {
             setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_EXTENSION_OPTION.resolve(player))
@@ -43,7 +46,7 @@ fun configureCraftanGameInventory(player: Player) = kInventory(player, 5.rows, I
         })
     })
 
-    setRow(2, kRow {
+    setRow(1, kRow {
         setItem(0, placeholderItem)
         setItem(1, kItem(Material.CLOCK) {
             setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_DICE_OPTION.resolve(player))
@@ -53,7 +56,7 @@ fun configureCraftanGameInventory(player: Player) = kInventory(player, 5.rows, I
         timeToRollOptions.forEachIndexed { index, time ->
             setItem(3 + index, kItem(Material.CLOCK) {
                 val isSelected = time == config.timeToRollDice
-                val timeComponent = getTimeComponent(player, time, isSelected)
+                val timeComponent = getDiceTimeComponent(player, time, isSelected)
 
                 if (isSelected) {
                     toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
@@ -64,12 +67,13 @@ fun configureCraftanGameInventory(player: Player) = kInventory(player, 5.rows, I
                     config.timeToRollDice = time
 
                     getRowFor(2).items.forEach { (index, item) ->
-                        item.setDisplayName(getTimeComponent(player, time, false))
+                        if (index !in 3..5) return@forEach
+                        item.setDisplayName(getDiceTimeComponent(player, time, false))
                         item.toItemStack().removeEnchantments()
                         this@kRow.setItem(index, item)
                     }
 
-                    item.setDisplayName(getTimeComponent(player, time, true))
+                    item.setDisplayName(getDiceTimeComponent(player, time, true))
                     item.toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
                     this@kRow.setItem(3 + index, item)
                 }
@@ -79,48 +83,145 @@ fun configureCraftanGameInventory(player: Player) = kInventory(player, 5.rows, I
         setItem(6..8, placeholderItem)
     })
 
+    setRow(2, kRow {
+        setItem(0, placeholderItem)
+        setItem(1, kItem(Material.CLOCK) {
+            setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_TURN_OPTION.resolve(player))
+        })
+        setItem(2, placeholderItem)
+
+        turnTimeOptions.forEachIndexed { index, time ->
+            setItem(3 + index, kItem(Material.CLOCK) {
+                val isSelected = time == config.timeToFinishTurn
+                val timeComponent = getTurnTimeComponent(player, time, isSelected)
+
+                if (isSelected) {
+                    toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
+                }
+
+                setDisplayName(contrastColor.append(timeComponent))
+                this.onClick { item, _ ->
+                    config.timeToFinishTurn = time
+
+                    getRowFor(2).items.forEach { (index, item) ->
+                        if (index !in 3..5) return@forEach
+                        item.setDisplayName(getTurnTimeComponent(player, time, false))
+                        item.toItemStack().removeEnchantments()
+                        this@kRow.setItem(index, item)
+                    }
+
+                    item.setDisplayName(getTurnTimeComponent(player, time, true))
+                    item.toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
+                    this@kRow.setItem(3 + index, item)
+                }
+            })
+        }
+
+        setItem(6..8, placeholderItem)
+    })
+
+
     setRow(3, kRow {
         setItem(0, placeholderItem)
         setItem(1, kItem(Material.GOLD_INGOT) {
-            setDisplayName(literalText("Points to win"))
+            setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_POINTS_TO_WIN_OPTION.resolve(player))
         })
 
+        setItem(2, placeholderItem)
+
         setItem(3, kItem(Material.GREEN_TERRACOTTA) {
-            setDisplayName(literalText("+1"))
+            setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_POINTS_TO_WIN_PLUS.resolve(player))
 
             onClick { _, _ ->
+                // TODO change this based on extensions configuration
+                if (config.pointsToWin >= 14) return@onClick
                 config.pointsToWin += 1
-                this@kRow.setItem(4, pointsToWinItem(config.pointsToWin))
+                this@kRow.setItem(4, pointsToWinItem(config.pointsToWin, player))
             }
         })
 
-        setItem(4, pointsToWinItem(config.pointsToWin))
+        setItem(4, pointsToWinItem(config.pointsToWin, player))
 
         setItem(5, kItem(Material.RED_TERRACOTTA) {
             setDisplayName(literalText("-1"))
 
             onClick { _, _ ->
+                if (config.pointsToWin <= 7) return@onClick
                 config.pointsToWin -= 1
-                this@kRow.setItem(4, pointsToWinItem(config.pointsToWin))
+                this@kRow.setItem(4, pointsToWinItem(config.pointsToWin, player))
             }
         })
 
-        setItem(7, placeholderItem)
+        setItem(6..8, placeholderItem)
     })
 
     setRow(4, kRow {
+        setItem(0, placeholderItem)
+
+        setItem(1, kItem(Material.BARRIER) {
+            setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_CARDS_LIMIT_OPTION.resolve(player))
+        })
+
+        setItem(2, placeholderItem)
+
+
+        setItem(3, kItem(Material.GREEN_TERRACOTTA) {
+            setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_CARDS_LIMIT_PLUS.resolve(player))
+
+            onClick { _, _ ->
+                // TODO change this based on extensions configuration
+                if (config.cardsLimit >= 14) return@onClick
+                config.cardsLimit += 1
+                this@kRow.setItem(4, cardsLimitItem(config.cardsLimit, player))
+            }
+        })
+
+        setItem(4, cardsLimitItem(config.cardsLimit, player))
+
+        setItem(5, kItem(Material.RED_TERRACOTTA) {
+            setDisplayName(literalText("-1"))
+
+            onClick { _, _ ->
+                if (config.cardsLimit <= 7) return@onClick
+                config.cardsLimit -= 1
+                this@kRow.setItem(4, cardsLimitItem(config.cardsLimit, player))
+            }
+        })
+
+        setItem(6..8, placeholderItem)
+    })
+
+    setRow(5, kRow {
         setItem(0..8, placeholderItem)
         setItem(7, kItem(Material.GREEN_WOOL) {
-            setDisplayName(literalText("Create lobby"))
+            setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_CREATE_LOBBY.resolve(player))
+
+            onClick { _, _ ->
+                val lobby = LobbyManager.createLobby(DefaultMapLayout(), config.toCraftanGameConfig())
+                lobby.addPlayer(player)
+                player.sendNotification(CraftanNotification.LOBBY_CREATED)
+            }
         })
     })
 }
 
-private fun pointsToWinItem(pointsToWin: Int) = kItem(Material.PAPER, pointsToWin) {
-    setDisplayName(literalText("$pointsToWin Points to win")) }
+private fun pointsToWinItem(pointsToWin: Int, player: Player) = kItem(Material.PAPER, pointsToWin) {
+    setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_POINTS_TO_WIN.resolveWithPlaceholder(player, mapOf(
+        CraftanPlaceholder.POINTS_TO_WIN to literalText(pointsToWin.toString())
+    ))) }
+
+private fun cardsLimitItem(cardsLimit: Int, player: Player) = kItem(Material.PAPER, cardsLimit) {
+    setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_CARDS_LIMIT.resolveWithPlaceholder(player, mapOf(
+        CraftanPlaceholder.CARDS_LIMIT to literalText(cardsLimit.toString())
+    ))) }
 
 
-private fun getTimeComponent(player: Player, time: Int, isSelected: Boolean) =  CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_DICE.resolveWithPlaceholder(player, mapOf(
+private fun getDiceTimeComponent(player: Player, time: Int, isSelected: Boolean) =  CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_DICE.resolveWithPlaceholder(player, mapOf(
     CraftanPlaceholder.DICE_TIME to literalText(time.toString()),
+    CraftanPlaceholder.OPTION_SELECTED to if (isSelected) CraftanNotification.LOBBY_CONFIG_INVENTORY_OPTION_SELECTED.resolve(player) else literalText()
+))
+
+private fun getTurnTimeComponent(player: Player, time: Int, isSelected: Boolean) =  CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_TURN.resolveWithPlaceholder(player, mapOf(
+    CraftanPlaceholder.TURN_TIME to literalText(time.toString()),
     CraftanPlaceholder.OPTION_SELECTED to if (isSelected) CraftanNotification.LOBBY_CONFIG_INVENTORY_OPTION_SELECTED.resolve(player) else literalText()
 ))
