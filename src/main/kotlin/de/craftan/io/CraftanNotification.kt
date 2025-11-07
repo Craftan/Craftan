@@ -76,5 +76,8 @@ enum class CraftanNotification(
     LOBBY_CONFIG_INVENTORY_CLOSED(MessageNotification("lobby.config.inventory.back", "%bc%We saved your configuration for the next time. %bh%<click:run_command:'/craftan lobby create'><b>REOPEN</b></click> <red><click:run_command:'/craftan lobby clear'><b>CLEAR</b></click>")),
     LOBBY_CONFIG_CLEARED(MessageNotification("lobby.config.cleared", "%bc%We cleared your configuration.")),
 
-    LOBBY_CREATED(MessageNotification("lobby.created", "%bc%The lobby has been created."))
+    LOBBY_CREATED(MessageNotification("lobby.created", "%bc%The lobby has been created.")),
+    ALREADY_IN_LOBBY(MessageNotification("lobby.already_in_lobby", "<red>You are already in a lobby.")),
+    NOT_IN_LOBBY(MessageNotification("lobby.not_in_lobby", "<red>You are currently not in a lobby.")),
+    LOBBY_LEFT(MessageNotification("lobby.left", "<green>You have left the lobby.")),
 }

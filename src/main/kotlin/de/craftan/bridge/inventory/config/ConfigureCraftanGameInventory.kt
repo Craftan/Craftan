@@ -3,14 +3,17 @@ package de.craftan.bridge.inventory.config
 import de.craftan.bridge.inventory.placeholderItem
 import de.craftan.bridge.lobby.LobbyManager
 import de.craftan.bridge.util.sendNotification
-import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.CraftanGameConfig
+import de.craftan.engine.MutableCraftanGameConfig
 import de.craftan.engine.map.maps.DefaultMapLayout
 import de.craftan.io.*
+import de.staticred.kia.inventory.KRow
 import de.staticred.kia.inventory.builder.kInventory
 import de.staticred.kia.inventory.builder.kItem
 import de.staticred.kia.inventory.builder.kRow
 import de.staticred.kia.util.rows
 import net.axay.kspigot.chat.literalText
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
@@ -32,7 +35,9 @@ fun configureCraftanGameInventory(player: Player) = kInventory(player, 6.rows, I
     val config = CraftanGameConfigManager.getGameConfig(player)!!
 
     onClose {
-        player.sendNotification(CraftanNotification.LOBBY_CONFIG_INVENTORY_CLOSED)
+        if (CraftanGameConfigManager.getGameConfig(player) != null) {
+            player.sendNotification(CraftanNotification.LOBBY_CONFIG_INVENTORY_CLOSED)
+        }
     }
 
     setRow(0, kRow {
@@ -46,80 +51,9 @@ fun configureCraftanGameInventory(player: Player) = kInventory(player, 6.rows, I
         })
     })
 
-    setRow(1, kRow {
-        setItem(0, placeholderItem)
-        setItem(1, kItem(Material.CLOCK) {
-            setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_DICE_OPTION.resolve(player))
-        })
-        setItem(2, placeholderItem)
+    setRow(1, getDiceTimeRow(player, config, contrastColor))
 
-        timeToRollOptions.forEachIndexed { index, time ->
-            setItem(3 + index, kItem(Material.CLOCK) {
-                val isSelected = time == config.timeToRollDice
-                val timeComponent = getDiceTimeComponent(player, time, isSelected)
-
-                if (isSelected) {
-                    toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
-                }
-
-                setDisplayName(contrastColor.append(timeComponent))
-                this.onClick { item, _ ->
-                    config.timeToRollDice = time
-
-                    getRowFor(2).items.forEach { (index, item) ->
-                        if (index !in 3..5) return@forEach
-                        item.setDisplayName(getDiceTimeComponent(player, time, false))
-                        item.toItemStack().removeEnchantments()
-                        this@kRow.setItem(index, item)
-                    }
-
-                    item.setDisplayName(getDiceTimeComponent(player, time, true))
-                    item.toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
-                    this@kRow.setItem(3 + index, item)
-                }
-            })
-        }
-
-        setItem(6..8, placeholderItem)
-    })
-
-    setRow(2, kRow {
-        setItem(0, placeholderItem)
-        setItem(1, kItem(Material.CLOCK) {
-            setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_TURN_OPTION.resolve(player))
-        })
-        setItem(2, placeholderItem)
-
-        turnTimeOptions.forEachIndexed { index, time ->
-            setItem(3 + index, kItem(Material.CLOCK) {
-                val isSelected = time == config.timeToFinishTurn
-                val timeComponent = getTurnTimeComponent(player, time, isSelected)
-
-                if (isSelected) {
-                    toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
-                }
-
-                setDisplayName(contrastColor.append(timeComponent))
-                this.onClick { item, _ ->
-                    config.timeToFinishTurn = time
-
-                    getRowFor(2).items.forEach { (index, item) ->
-                        if (index !in 3..5) return@forEach
-                        item.setDisplayName(getTurnTimeComponent(player, time, false))
-                        item.toItemStack().removeEnchantments()
-                        this@kRow.setItem(index, item)
-                    }
-
-                    item.setDisplayName(getTurnTimeComponent(player, time, true))
-                    item.toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
-                    this@kRow.setItem(3 + index, item)
-                }
-            })
-        }
-
-        setItem(6..8, placeholderItem)
-    })
-
+    setRow(2, getTurnTimeRow(player, config, contrastColor))
 
     setRow(3, kRow {
         setItem(0, placeholderItem)
@@ -193,16 +127,30 @@ fun configureCraftanGameInventory(player: Player) = kInventory(player, 6.rows, I
 
     setRow(5, kRow {
         setItem(0..8, placeholderItem)
-        setItem(7, kItem(Material.GREEN_WOOL) {
+        setItem(8, kItem(Material.GREEN_WOOL) {
             setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_CREATE_LOBBY.resolve(player))
 
             onClick { _, _ ->
-                val lobby = LobbyManager.createLobby(DefaultMapLayout(), config.toCraftanGameConfig())
-                lobby.addPlayer(player)
-                player.sendNotification(CraftanNotification.LOBBY_CREATED)
+                createLobby(player, config.toCraftanGameConfig())
             }
         })
     })
+}
+
+private fun createLobby(player: Player, config: CraftanGameConfig) {
+    if (LobbyManager.isInLobby(player)) {
+        player.closeInventory()
+        player.sendNotification(CraftanNotification.ALREADY_IN_LOBBY)
+        return
+    }
+
+    val lobby = LobbyManager.createLobby(DefaultMapLayout(), config)
+    lobby.addPlayer(player)
+
+    CraftanGameConfigManager.clearPlayer(player)
+
+    player.closeInventory()
+    player.sendNotification(CraftanNotification.LOBBY_CREATED)
 }
 
 private fun pointsToWinItem(pointsToWin: Int, player: Player) = kItem(Material.PAPER, pointsToWin) {
@@ -220,6 +168,71 @@ private fun getDiceTimeComponent(player: Player, time: Int, isSelected: Boolean)
     CraftanPlaceholder.DICE_TIME to literalText(time.toString()),
     CraftanPlaceholder.OPTION_SELECTED to if (isSelected) CraftanNotification.LOBBY_CONFIG_INVENTORY_OPTION_SELECTED.resolve(player) else literalText()
 ))
+
+private fun getDiceTimeRow(player: Player, config: MutableCraftanGameConfig, contrastColor: Component): KRow = kRow {
+    setItem(0, placeholderItem)
+    setItem(1, kItem(Material.CLOCK) {
+        setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_DICE_OPTION.resolve(player))
+    })
+    setItem(2, placeholderItem)
+
+    timeToRollOptions.forEachIndexed { index, time ->
+        setItem(3 + index, kItem(Material.CLOCK) {
+            val isSelected = time == config.timeToRollDice
+            val timeComponent = getDiceTimeComponent(player, time, isSelected)
+
+            if (isSelected) {
+                toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
+            }
+
+            setDisplayName(contrastColor.append(timeComponent))
+            this.onClick { item, _ ->
+                config.timeToRollDice = time
+
+                setRow(1, getDiceTimeRow(player, config, contrastColor))
+
+                item.setDisplayName(getDiceTimeComponent(player, time, true))
+                item.toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
+                this@kRow.setItem(3 + index, item)
+            }
+        })
+    }
+
+    setItem(6..8, placeholderItem)
+
+}
+
+private fun getTurnTimeRow(player: Player, config: MutableCraftanGameConfig, contrastColor: Component): KRow = kRow {
+    setItem(0, placeholderItem)
+    setItem(1, kItem(Material.CLOCK) {
+        setDisplayName(CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_TURN_OPTION.resolve(player))
+    })
+    setItem(2, placeholderItem)
+
+    turnTimeOptions.forEachIndexed { index, time ->
+        setItem(3 + index, kItem(Material.CLOCK) {
+            val isSelected = time == config.timeToFinishTurn
+            val timeComponent = getTurnTimeComponent(player, time, isSelected)
+
+            if (isSelected) {
+                toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
+            }
+
+            setDisplayName(contrastColor.append(timeComponent))
+            this.onClick { item, _ ->
+                config.timeToFinishTurn = time
+
+                setRow(2, getTurnTimeRow(player, config, contrastColor))
+
+                item.setDisplayName(getTurnTimeComponent(player, time, true))
+                item.toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
+                this@kRow.setItem(3 + index, item)
+            }
+        })
+    }
+
+    setItem(6..8, placeholderItem)
+}
 
 private fun getTurnTimeComponent(player: Player, time: Int, isSelected: Boolean) =  CraftanNotification.LOBBY_CONFIG_INVENTORY_TIME_TURN.resolveWithPlaceholder(player, mapOf(
     CraftanPlaceholder.TURN_TIME to literalText(time.toString()),

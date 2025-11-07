@@ -3,12 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val kspigotVersion: String by project
 val paperVersion: String by project
+val scoreboardLibraryVersion: String by project
 
 plugins {
-    kotlin("jvm") version "1.9.21"
+    kotlin("jvm") version "2.2.0"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
-    id("com.gradleup.shadow") version "8.3.0"
-    id("io.papermc.paperweight.userdev") version "1.7.2"
+    id("com.gradleup.shadow") version "9.2.2"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
     id("co.uzzu.dotenv.gradle") version "4.0.0"
     //id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
@@ -25,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 
     implementation("net.axay:kspigot:$kspigotVersion")
 
@@ -38,12 +39,9 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
     implementation("com.github.StaticFX:kia:1.1.5")
-}
 
-paperweight {
-    reobfArtifactConfiguration =
-        io.papermc.paperweight.userdev
-            .ReobfArtifactConfiguration.MOJANG_PRODUCTION
+    compileOnly("net.megavex:scoreboard-library-api:$scoreboardLibraryVersion")
+    compileOnly("net.megavex:scoreboard-library-extra-kotlin:$scoreboardLibraryVersion")
 }
 
 bukkit {
@@ -55,7 +53,12 @@ bukkit {
     generateLibrariesJson = true
     apiVersion = "1.21"
 
-    libraries = listOf("net.axay:kspigot:$kspigotVersion")
+    libraries = listOf(
+        "net.axay:kspigot:$kspigotVersion",
+        "net.megavex:scoreboard-library-api:$scoreboardLibraryVersion",
+        "net.megavex:scoreboard-library-implementation:$scoreboardLibraryVersion",
+        "net.megavex:scoreboard-library-modern:$scoreboardLibraryVersion",
+    )
     depend = listOf("FastAsyncWorldEdit")
 }
 
@@ -74,6 +77,7 @@ tasks {
     }
 
     shadowJar {
+        //relocate("net.megavex.scoreboardlibrary", "de.craftan.libs.scoreboardlibrary")
     }
 
     build {

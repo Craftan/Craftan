@@ -3,6 +3,7 @@ package de.craftan
 import de.craftan.util.SystemManager
 import de.staticred.kia.KIA
 import net.axay.kspigot.main.KSpigot
+import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
 
 class InternalMain : KSpigot() {
     companion object {
@@ -15,9 +16,15 @@ class InternalMain : KSpigot() {
     }
 
     override fun startup() {
+        Craftan.scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(this)
+
         KIA.create(this, true)
         Craftan.configure()
         SystemManager.loadSystems()
+    }
+
+    override fun shutdown() {
+        Craftan.scoreboardLibrary.close();
     }
 }
 
