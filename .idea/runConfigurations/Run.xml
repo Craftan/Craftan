@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run" type="Multirun" separateTabs="false" reuseTabsWithFailures="false" startOneByOne="true" markFailedProcess="true" hideSuccessProcess="false" delayTime="0.0">
+    <runConfiguration name="Paper" type="JAR Application" />
+    <method v="2">
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks="clean build" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Copy Build to server" run_configuration_type="ShConfigurationType" />
+    </method>
+  </configuration>
+</component>

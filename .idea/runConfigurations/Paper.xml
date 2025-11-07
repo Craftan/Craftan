@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Paper" type="JarApplication">
+    <option name="JAR_PATH" value="$PROJECT_DIR$/server/paper-1.21.8-60.jar" />
+    <option name="VM_PARAMETERS" value="-XX:+AllowEnhancedClassRedefinition -XX:HotswapAgent=fatjar " />
+    <option name="PROGRAM_PARAMETERS" value="--nogui" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/server" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <module name="Craftan" />
+    <method v="2" />
+  </configuration>
+</component>
