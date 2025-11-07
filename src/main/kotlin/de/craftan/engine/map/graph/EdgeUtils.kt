@@ -12,9 +12,10 @@ fun generateEdges(
     nodes: MutableMap<TileCoordinate, MutableMap<NodeDirection, Node>>,
 ): MutableMap<TileCoordinate, MutableMap<EdgeDirection, Edge>> {
     val cordToEdgeMap = mutableMapOf<TileCoordinate, MutableMap<EdgeDirection, Edge>>()
+    tiles.forEach { cordToEdgeMap[it] = mutableMapOf() }
 
     for (tile in tiles) {
-        var previousNodeDirection = NodeDirection.NORTH_WEST
+        var previousNodeDirection = NodeDirection.SOUTH_WEST
         var previousNode = nodes[tile]!![previousNodeDirection]!!
         for (nodeDirection in NodeDirection.entries) {
             val node = nodes[tile]!![nodeDirection]!!
