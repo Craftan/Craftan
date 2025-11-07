@@ -7,10 +7,14 @@ import de.craftan.io.MessageAdapter
 import de.craftan.io.permissions.PermissionsAdapter
 import de.craftan.util.CraftanSystem
 import de.craftan.util.SystemManager
+import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
+import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary
 import java.io.File
 import java.nio.file.Files
 
 object Craftan {
+    lateinit var scoreboardLibrary: ScoreboardLibrary
+
     val schematicsFolder = File("${PluginManager.dataFolder.absolutePath}/schematics")
 
     /**

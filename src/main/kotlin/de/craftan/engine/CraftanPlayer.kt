@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
  * @see CraftanGame
  */
 interface CraftanPlayer {
-    val game: CraftanGame
+    val game: CraftanGame?
 
     /**
      * The actual online player
@@ -73,19 +73,19 @@ interface CraftanPlayer {
 /**
  * Models the inventory of resources, structures and cards a player current possesses
  */
-interface CraftanPlayerInventory {
+data class CraftanPlayerInventory(
     /**
      * Maps the resource to the amount
      */
-    val resources: Map<CraftanResource, Int>
+    val resources: Map<CraftanResource, Int> = emptyMap(),
 
     /**
      * Maps the structure to the amount
      */
-    val structures: Map<CraftanStructure, Int>
+    val structures: Map<CraftanStructure, Int> = emptyMap(),
 
     /**
      * Maps the action card to the amount
      */
-    val actionCards: Map<CraftanActionCard, Int>
-}
+    val actionCards: Map<CraftanActionCard, Int> = emptyMap(),
+)

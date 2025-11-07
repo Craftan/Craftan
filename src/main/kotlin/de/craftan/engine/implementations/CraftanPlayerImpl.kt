@@ -1,0 +1,17 @@
+package de.craftan.engine.implementations
+
+import de.craftan.engine.CraftanGame
+import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.CraftanPlayerInventory
+import org.bukkit.entity.Player
+
+class CraftanPlayerImpl(
+    override val bukkitPlayer: Player,
+    override val game: CraftanGame? = null,
+    override val inventory: CraftanPlayerInventory = CraftanPlayerInventory(),
+    override val victoryPoints: Int = 0
+): CraftanPlayer {
+
+
+
+}

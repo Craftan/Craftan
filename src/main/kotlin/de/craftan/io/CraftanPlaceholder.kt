@@ -23,4 +23,22 @@ enum class CraftanPlaceholder(
     COMMAND_DESCRIPTION("%command_description%"),
     COMMAND_SUBCOMMAND_INFO("%command_subcommands_info%"),
     COMMAND_SUBCOMMANDS("%command_subcommands%"),
+
+    /**
+     * Used for /craftan lobby list
+     */
+    LOBBY_ID("%lobby_id%"),
+    CURRENT_PLAYERS("%current_players%"),
+    MAX_PLAYERS("%max_players%"),
+    CURRENT_MAP("%current_map%"),
+
+    /**
+     * Used for Config Inventory
+     */
+    DICE_TIME("%time_to_roll_dice%"),
+    OPTION_SELECTED("%option_selected%"),
+    POINTS_TO_WIN("%points_to_win%"),
+    TURN_TIME("%turn_time%"),
+    CARDS_LIMIT("%card_limit%"),
+
 }

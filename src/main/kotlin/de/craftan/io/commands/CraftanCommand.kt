@@ -61,7 +61,7 @@ inline fun ArgumentBuilder<CommandSourceStack, *>.craftanSubCommand(
     description: String,
     builder: LiteralArgumentBuilder<CommandSourceStack>.() -> Unit = {},
 ) {
-    val initParent = CommandPermissionUtil.commandPermissions[this] ?: error("Parent command not found. Use <craftanCommand()> to build a craftan sub command!")
+    val initParent = CommandPermissionUtil.commandPermissions[this] ?: error("Parent command for $name not found. Use <craftanCommand()> to build a craftan sub command!")
 
     var currParent = initParent
     var parentCommandName = currParent.name
@@ -73,21 +73,21 @@ inline fun ArgumentBuilder<CommandSourceStack, *>.craftanSubCommand(
 
     val computedName = "$parentCommandName $name"
 
-    val permission = initParent.permission + ".$name"
+    val permission = currParent.permission + ".$name"
+
+    val cc = CraftanCommand(name, computedName, description, permission, initParent)
 
     val subCommand =
         command(name, false) {
             requiresPermission(CraftanPermission(permission, "Require for command $name"))
+            infoSubCommand(cc)
         }
 
-    val cc = CraftanCommand(name, computedName, description, permission, initParent)
     initParent.subCommands += cc
-
     CommandPermissionUtil.commandPermissions[subCommand] = cc
 
     subCommand.apply(builder)
-    subCommand.apply { infoSubCommand(cc) }
-    then(subCommand)
+    this.then(subCommand)
 }
 
 /**
