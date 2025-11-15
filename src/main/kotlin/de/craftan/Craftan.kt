@@ -1,14 +1,16 @@
 package de.craftan
 
+import de.craftan.bridge.listener.PlayerJoinedLobbyListener
 import de.craftan.commands.craftanCommand
 import de.craftan.commands.structureCommand
 import de.craftan.config.ConfigSystem
+import de.craftan.io.CraftanEventBus
 import de.craftan.io.MessageAdapter
 import de.craftan.io.permissions.PermissionsAdapter
 import de.craftan.util.CraftanSystem
 import de.craftan.util.SystemManager
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
-import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary
+import net.ormr.eventbus.EventBus
 import java.io.File
 import java.nio.file.Files
 
@@ -16,6 +18,14 @@ object Craftan {
     lateinit var scoreboardLibrary: ScoreboardLibrary
 
     val schematicsFolder = File("${PluginManager.dataFolder.absolutePath}/schematics")
+
+    val logger = InternalMain.INSTANCE.logger
+
+    /**
+     * Craftans global event bus.
+     * All events get passed through here.
+     */
+    val eventBus: CraftanEventBus = EventBus()
 
     /**
      * Configures the Craftan plugin
@@ -25,6 +35,8 @@ object Craftan {
         loadFiles()
         loadSystems()
         loadCommands()
+
+        PlayerJoinedLobbyListener()
     }
 
     private fun loadFiles() {

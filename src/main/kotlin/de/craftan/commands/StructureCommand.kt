@@ -51,12 +51,12 @@ val structureCommand =
                 runs {
                     val spacing = getArgument<Int>("spacing")
 
-                    val location = player.location
-                    val world = FaweAPI.getWorld(player.world.name)
-                    val center = BlockVector3.at(location.x, location.y, location.z)
-                    val lobby = CraftanLobby(CraftanBoard(world, center, spacing, DefaultMapLayout()), MutableCraftanGameConfig().toCraftanGameConfig())
-                    player.sendMessage("Building map...")
-                    CraftanMap(lobby).build()
+//                    val location = player.location
+//                    val world = FaweAPI.getWorld(player.world.name)
+//                    val center = BlockVector3.at(location.x, location.y, location.z)
+//                    val lobby = CraftanLobby(CraftanBoard(world, center, spacing, DefaultMapLayout()), MutableCraftanGameConfig().toCraftanGameConfig())
+//                    player.sendMessage("Building map...")
+//                    CraftanMap(lobby).build()
                 }
             }
         }

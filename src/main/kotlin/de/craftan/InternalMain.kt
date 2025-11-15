@@ -1,5 +1,6 @@
 package de.craftan
 
+import de.craftan.bridge.lobby.CraftanLobbyManager
 import de.craftan.util.SystemManager
 import de.staticred.kia.KIA
 import net.axay.kspigot.main.KSpigot
@@ -23,8 +24,10 @@ class InternalMain : KSpigot() {
         SystemManager.loadSystems()
     }
 
+
     override fun shutdown() {
         Craftan.scoreboardLibrary.close();
+        CraftanLobbyManager.closeAllLobbies()
     }
 }
 

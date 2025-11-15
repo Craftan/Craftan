@@ -60,7 +60,6 @@ bukkit {
 
     libraries = listOf(
         "net.axay:kspigot:$kspigotVersion",
-        "net.megavex:scoreboard-library-api:$scoreboardLibraryVersion",
         "net.megavex:scoreboard-library-implementation:$scoreboardLibraryVersion",
         "net.megavex:scoreboard-library-modern:$scoreboardLibraryVersion",
     )

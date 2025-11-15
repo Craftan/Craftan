@@ -4,7 +4,7 @@ import de.craftan.engine.CraftanGameAction
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.gameflow.RoundState
 import de.craftan.engine.gameflow.actions.RollDiceAction
-import de.craftan.engine.gameflow.events.actions.RolledDiceEvent
+import de.craftan.engine.gameflow.events.actions.RolledDiceGameEvent
 
 class AwaitingPlayerDiceRoundState(
     game: CraftanGame,
@@ -20,7 +20,7 @@ class AwaitingPlayerDiceRoundState(
     }
 
     override fun setup() {
-        rollDiceAction.eventBus.on<RolledDiceEvent> {
+        rollDiceAction.eventBus.on<RolledDiceGameEvent> {
             eventBus.fire(this)
         }
     }

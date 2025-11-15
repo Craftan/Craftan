@@ -7,7 +7,7 @@ import net.ormr.eventbus.Event
  * Models an event from a game instance
  * @param game the game
  */
-abstract class CraftanEvent(
+abstract class CraftanGameEvent(
     open val game: CraftanGame,
 ) : Event
 
@@ -15,9 +15,9 @@ abstract class CraftanEvent(
  * Models an event which can be cancelled from a game isntance
  * @param game the game
  */
-abstract class CancelableCraftanEvent(
+abstract class CancelableCraftanGameEvent(
     override val game: CraftanGame,
-) : CraftanEvent(game),
+) : CraftanGameEvent(game),
     CancellableEvent {
     override var isCancelled: Boolean = false
 

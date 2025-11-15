@@ -1,7 +1,7 @@
 package de.craftan.bridge.inventory.config
 
 import de.craftan.bridge.inventory.placeholderItem
-import de.craftan.bridge.lobby.LobbyManager
+import de.craftan.bridge.lobby.CraftanLobbyManager
 import de.craftan.bridge.util.sendNotification
 import de.craftan.engine.CraftanGameConfig
 import de.craftan.engine.MutableCraftanGameConfig
@@ -138,18 +138,16 @@ fun configureCraftanGameInventory(player: Player) = kInventory(player, 6.rows, I
 }
 
 private fun createLobby(player: Player, config: CraftanGameConfig) {
-    if (LobbyManager.isInLobby(player)) {
+    if (CraftanLobbyManager.isInLobby(player)) {
         player.closeInventory()
         player.sendNotification(CraftanNotification.ALREADY_IN_LOBBY)
         return
     }
 
-    val lobby = LobbyManager.createLobby(DefaultMapLayout(), config)
-    lobby.addPlayer(player)
-
     CraftanGameConfigManager.clearPlayer(player)
-
     player.closeInventory()
+
+    CraftanLobbyManager.createLobbyWithPlayer(config, player)
     player.sendNotification(CraftanNotification.LOBBY_CREATED)
 }
 
@@ -193,7 +191,7 @@ private fun getDiceTimeRow(player: Player, config: MutableCraftanGameConfig, con
 
                 item.setDisplayName(getDiceTimeComponent(player, time, true))
                 item.toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
-                this@kRow.setItem(3 + index, item)
+                this.setItem(1, 3 + index, item)
             }
         })
     }
@@ -226,7 +224,7 @@ private fun getTurnTimeRow(player: Player, config: MutableCraftanGameConfig, con
 
                 item.setDisplayName(getTurnTimeComponent(player, time, true))
                 item.toItemStack().addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1)
-                this@kRow.setItem(3 + index, item)
+                this.setItem(2, 3 + index, item)
             }
         })
     }

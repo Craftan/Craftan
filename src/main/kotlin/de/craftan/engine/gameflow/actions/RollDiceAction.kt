@@ -4,7 +4,7 @@ import de.craftan.engine.CraftanGameAction
 import de.craftan.engine.*
 import de.craftan.engine.gameflow.CraftanActionItem
 import de.craftan.engine.gameflow.craftanActionItem
-import de.craftan.engine.gameflow.events.actions.RolledDiceEvent
+import de.craftan.engine.gameflow.events.actions.RolledDiceGameEvent
 import de.craftan.engine.map.DiceNumber
 import org.bukkit.Material
 import kotlin.random.Random
@@ -23,7 +23,7 @@ class RollDiceAction(
         val diceNumber = DiceNumber.entries.first { it.value == diceResult }
         result = diceNumber
 
-        eventBus.fire(RolledDiceEvent(game, diceNumber, player))
+        eventBus.fire(RolledDiceGameEvent(game, diceNumber, player))
 
         return true
     }

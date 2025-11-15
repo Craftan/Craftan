@@ -3,7 +3,7 @@ package de.craftan.engine.implementations
 import de.craftan.bridge.lobby.CraftanSettings
 import de.craftan.engine.*
 import de.craftan.engine.gameflow.GameRound
-import de.craftan.engine.gameflow.events.GameStartEvent
+import de.craftan.engine.gameflow.events.GameStartGameEvent
 import de.craftan.engine.gameflow.rounds.PreGameGlobalRound
 
 class CraftanGameImpl(
@@ -23,7 +23,7 @@ class CraftanGameImpl(
             error("Game must be waiting to be started")
         }
 
-        eventBus.fire(GameStartEvent(this))
+        eventBus.fire(GameStartGameEvent(this))
 
         state = CraftanGameState.PRE_GAME
     }
