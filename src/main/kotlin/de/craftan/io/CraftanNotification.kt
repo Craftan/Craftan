@@ -77,7 +77,14 @@ enum class CraftanNotification(
     LOBBY_CONFIG_CLEARED(MessageNotification("lobby.config.cleared", "%bc%We cleared your configuration.")),
 
     LOBBY_CREATED(MessageNotification("lobby.created", "%bc%The lobby has been created.")),
+    LOBBY_WORLD_BUILDING(MessageNotification("lobby.world_building", "<color:#ff7b00>Building the world...</color>")),
     ALREADY_IN_LOBBY(MessageNotification("lobby.already_in_lobby", "<red>You are already in a lobby.")),
     NOT_IN_LOBBY(MessageNotification("lobby.not_in_lobby", "<red>You are currently not in a lobby.")),
     LOBBY_LEFT(MessageNotification("lobby.left", "<green>You have left the lobby.")),
+    LOBBY_CLOSED(MessageNotification("lobby.closed", "<red>The lobby has been closed, you will be kicked soon.")),
+    EXTERNAL_LOBBY_CLOSED(MessageNotification("lobby.externally_closed", "<red>The lobby has been closed.")),
+    LOBBY_NOT_FOUND(MessageNotification("lobby.not_found", "<red>The lobby was not found.")),
+
+    LOBBY_STARTED(MessageNotification("lobby.started", "<green>The game will start soon.")),
+    LOBBY_STARTS_IN(MessageNotification("lobby.starts_in", "<green>The game will start in %time_to_start% seconds.")),
 }

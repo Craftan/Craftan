@@ -1,7 +1,7 @@
 package de.craftan.engine.gameflow
 
 import de.craftan.engine.CraftanGameAction
-import de.craftan.engine.CraftanEvent
+import de.craftan.engine.CraftanGameEvent
 import de.craftan.engine.CraftanGame
 import net.ormr.eventbus.EventBus
 
@@ -17,7 +17,7 @@ import net.ormr.eventbus.EventBus
 abstract class RoundState(
     val game: CraftanGame,
 ) {
-    val eventBus: EventBus<CraftanEvent, Any> = EventBus()
+    val eventBus: EventBus<CraftanGameEvent, Any> = EventBus()
 
     /**
      * Abstract name of the state

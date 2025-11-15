@@ -1,10 +1,10 @@
 package de.craftan.commands
 
+import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
-import de.craftan.Craftan
 import de.craftan.bridge.inventory.config.CraftanGameConfigManager
 import de.craftan.bridge.inventory.config.configureCraftanGameInventory
-import de.craftan.bridge.lobby.LobbyManager
+import de.craftan.bridge.lobby.CraftanLobbyManager
 import de.craftan.bridge.util.sendNotification
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
@@ -19,7 +19,7 @@ val craftanCommand =
         craftanSubCommand("lobby", "manage current craftan lobbies") {
             craftanSubCommand("list", "list all current lobbies") {
                 runs {
-                    val lobbies = LobbyManager.listLobbies()
+                    val lobbies = CraftanLobbyManager.listLobbies()
 
                     if (lobbies.isEmpty()) {
                         player.sendNotification(CraftanNotification.LIST_LOBBIES_EMPTY)
@@ -41,7 +41,7 @@ val craftanCommand =
             }
             craftanSubCommand("create", "Create a new lobby") {
                 runs {
-                    if (LobbyManager.isInLobby(player)) {
+                    if (CraftanLobbyManager.isInLobby(player)) {
                         player.sendNotification(CraftanNotification.ALREADY_IN_LOBBY)
                         return@runs
                     }
@@ -56,14 +56,42 @@ val craftanCommand =
             }
             craftanSubCommand("leave", "Leave your current lobby") {
                 runs {
-                    val lobby = LobbyManager.getLobbyForPlayer(player)
+                    val lobby = CraftanLobbyManager.getLobbyForPlayer(player)
                     if (lobby == null) {
                         player.sendNotification(CraftanNotification.NOT_IN_LOBBY)
                         return@runs
                     }
 
-                    LobbyManager.removePlayerFromLobby(player)
+                    CraftanLobbyManager.removePlayerFromLobby(player)
                     player.sendNotification(CraftanNotification.LOBBY_LEFT)
+                }
+            }
+            craftanSubCommand("start", "starts the game") {
+                runs {
+                    val lobby = CraftanLobbyManager.getLobbyForPlayer(player)
+                    if (lobby == null) {
+                        player.sendNotification(CraftanNotification.NOT_IN_LOBBY)
+                        return@runs
+                    }
+
+                    lobby.startCountdown()
+                }
+            }
+            craftanSubCommand("stop", "stops the game") {
+                argument<Int>("lobby_id", IntegerArgumentType.integer(0)) {
+                    suggestList {
+                        CraftanLobbyManager.listLobbies().keys.toList()
+                    }
+                    runs {
+                        val lobby = CraftanLobbyManager.getLobbyById(getArgument("lobby_id"))
+                        if (lobby == null) {
+                            player.sendNotification(CraftanNotification.LOBBY_NOT_FOUND)
+                            return@runs
+                        }
+
+                        lobby.close()
+                        player.sendNotification(CraftanNotification.EXTERNAL_LOBBY_CLOSED)
+                    }
                 }
             }
         }

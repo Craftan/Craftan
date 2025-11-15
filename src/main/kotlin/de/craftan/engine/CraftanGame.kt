@@ -11,7 +11,7 @@ import net.ormr.eventbus.EventBus
 abstract class CraftanGame(
     open val settings: CraftanSettings,
 ) {
-    val eventBus: EventBus<Any, CraftanEvent> = EventBus()
+    val eventBus: EventBus<Any, CraftanGameEvent> = EventBus()
 
     // TODO() We need the map to be here
 

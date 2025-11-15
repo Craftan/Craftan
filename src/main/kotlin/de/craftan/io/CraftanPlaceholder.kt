@@ -41,4 +41,9 @@ enum class CraftanPlaceholder(
     TURN_TIME("%turn_time%"),
     CARDS_LIMIT("%card_limit%"),
 
+    /**
+     * Used for lobby notifications
+     */
+    TIME_TO_START("%time_to_start%"),
+
 }
