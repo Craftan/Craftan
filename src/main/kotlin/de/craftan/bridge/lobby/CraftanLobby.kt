@@ -5,6 +5,7 @@ import de.craftan.Craftan
 import de.craftan.bridge.events.lobby.LobbyStatusChangedEvent
 import de.craftan.bridge.events.lobby.PlayerJoinedLobbyEvent
 import de.craftan.bridge.events.lobby.PlayerLeftLobbyEvent
+import de.craftan.bridge.map.CraftanMap
 import de.craftan.engine.CraftanGameConfig
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.implementations.CraftanPlayerImpl
@@ -25,6 +26,7 @@ import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
+import org.bukkit.util.BlockVector
 
 /**
  * Models a lobby which holds the players and the ongoing game.
@@ -38,8 +40,11 @@ class CraftanLobby(
     val minPlayers: Int = 3,
     status: CraftanLobbyStatus = CraftanLobbyStatus.WAITING
 ) {
+    private val center = BlockVector3.at(100_000.0, 100.0, 0.0)
+
     //TODO add layout spacing config option, add map layout through config
-    val board = CraftanBoard(world.toWorldEditWorld(), BlockVector3.ZERO, 3, DefaultMapLayout())
+    val board = CraftanBoard(world.toWorldEditWorld(), center, 3, DefaultMapLayout())
+    val map = CraftanMap(this)
 
     private var countingDown = false
 
@@ -147,10 +152,13 @@ class CraftanLobby(
 
             if (currentCountdown <= 0) {
                 players.forEach { it.bukkitPlayer.level = 0 }
+                players.forEach { teleportToMap(it.bukkitPlayer) }
                 countingDown = false
             }
         }
     }
+
+    private fun teleportToMap(player: Player) = player.teleport(Location(world, center.x() + 0.5, center.y() + 50.0, center.z() + 0.5))
 
     private fun teleportToLobby(player: Player) = player.teleport(Location(world, 0.0, 100.0, 0.0))
 
