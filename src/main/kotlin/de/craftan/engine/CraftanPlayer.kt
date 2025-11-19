@@ -1,9 +1,13 @@
 package de.craftan.engine
 
 import de.craftan.engine.structures.CraftanStructure
-import de.craftan.io.*
-import de.craftan.util.*
+import de.craftan.io.CraftanNotification
+import de.craftan.io.CraftanPlaceholder
+import de.craftan.io.resolve
+import de.craftan.io.resolveWithPlaceholder
+import de.craftan.util.CraftanPermissions
 import net.kyori.adventure.text.Component
+import org.bukkit.Location
 import org.bukkit.entity.Player
 
 /**
@@ -22,6 +26,11 @@ interface CraftanPlayer {
      * Amount of victory the player has
      */
     val victoryPoints: Int
+
+    /**
+     * World the player is joining from
+     */
+    val origin: Location
 
     /**
      * Contains the inventory the player currently has

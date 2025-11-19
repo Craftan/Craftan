@@ -15,6 +15,7 @@ import org.bukkit.World
 import org.bukkit.entity.Display
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Interaction
+import org.bukkit.entity.Shulker
 import org.bukkit.entity.TextDisplay
 import org.bukkit.util.Transformation
 import org.joml.AxisAngle4f
@@ -43,6 +44,7 @@ class CraftanMap(
     private val worldEditWorld: com.sk89q.worldedit.world.World = FaweAPI.getWorld(bukkitWorld.name)!!
     private val hexagonSize: HexagonSize = HexagonSize()
     private val spacing = lobby.board.spacing
+    private val hitBoxes = mutableListOf<CraftanHitbox>()
 
     /**
      * Builds the map
@@ -115,16 +117,7 @@ class CraftanMap(
     }
 
     private fun spawnHitBox(location: Location) {
-        val world = location.world
-
-        println("Spawning hitbox at $location")
-
-        val hitBox = world.spawnEntity(location, EntityType.INTERACTION) as Interaction
-        hitBox.setNoPhysics(true)
-        hitBox.setGravity(false)
-
-        hitBox.interactionWidth = 3.0f
-        hitBox.interactionHeight = 1.0f
+        hitBoxes += CraftanHitbox(lobby, location)
     }
 }
 

@@ -12,7 +12,6 @@ import de.craftan.io.globalEventBus
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
 import de.craftan.util.toWorldEditWorld
-import net.axay.kspigot.runnables.async
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -35,6 +34,7 @@ object CraftanLobbyManager {
         val world = generateEmptyWorld("lobby-$id")
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
+        world.setGameRule(GameRule.FALL_DAMAGE, false)
 
         world.time = 12000
         world.weatherDuration = 0
@@ -44,9 +44,7 @@ object CraftanLobbyManager {
         val lobby = CraftanLobby(id, world, config)
         lobbies[lobbies.size] = lobby
 
-        async {
-            lobby.map.build()
-        }
+        lobby.map.build()
 
         eventBus.fire(LobbyCreatedEvent(lobby))
         return lobby

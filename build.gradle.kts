@@ -14,6 +14,7 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
     id("co.uzzu.dotenv.gradle") version "4.0.0"
     //id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 group = "de.craftan"
@@ -41,6 +42,7 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
     implementation("com.github.StaticFX:kia:1.1.5")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     compileOnly("net.megavex:scoreboard-library-api:$scoreboardLibraryVersion")
     compileOnly("net.megavex:scoreboard-library-extra-kotlin:$scoreboardLibraryVersion")

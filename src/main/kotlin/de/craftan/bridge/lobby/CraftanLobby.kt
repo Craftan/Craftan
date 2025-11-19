@@ -23,10 +23,11 @@ import net.axay.kspigot.runnables.task
 import net.kyori.adventure.text.Component
 import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent
+import org.apache.commons.io.FileUtils
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
-import org.bukkit.util.BlockVector
 
 /**
  * Models a lobby which holds the players and the ongoing game.
@@ -40,7 +41,7 @@ class CraftanLobby(
     val minPlayers: Int = 3,
     status: CraftanLobbyStatus = CraftanLobbyStatus.WAITING
 ) {
-    private val center = BlockVector3.at(100_000.0, 100.0, 0.0)
+    private val center = BlockVector3.at(10_000.0, 100.0, 0.0)
 
     //TODO add layout spacing config option, add map layout through config
     val board = CraftanBoard(world.toWorldEditWorld(), center, 3, DefaultMapLayout())
@@ -75,20 +76,28 @@ class CraftanLobby(
 
         notifyPlayers(CraftanNotification.JOINED_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
 
-        teleportToLobby(player)
-
-        players += CraftanPlayerImpl(player)
+        players += CraftanPlayerImpl(player, origin = player.location)
         sidebar.addPlayer(player)
+
+        teleportToLobby(player)
+        player.gameMode = GameMode.ADVENTURE
+        player.inventory.clear()
 
         sidebar.refreshLines()
     }
 
     fun removePlayer(player: Player) {
-        val craftanPlayer = CraftanPlayerImpl(player)
-        players -= craftanPlayer
-        notifyPlayers(CraftanNotification.LEFT_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
-        sidebar.removePlayer(player)
+        val craftanPlayer = players.find { it.bukkitPlayer == player } ?: return
+        players.remove(craftanPlayer)
 
+        if (!sidebar.closed()) {
+            sidebar.removePlayer(player)
+        }
+
+
+        player.teleport(craftanPlayer.origin)
+
+        notifyPlayers(CraftanNotification.LEFT_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
         globalEventBus.fire(PlayerLeftLobbyEvent(this, player))
     }
 
@@ -101,13 +110,28 @@ class CraftanLobby(
 
         notifyPlayers(CraftanNotification.LOBBY_CLOSED)
 
+        players.toList().forEach { removePlayer(it.bukkitPlayer) }
+
         //TODO add cleanup on boot as well
         if (!server.isStopping) {
-            sync {
-                server.unloadWorld(world, false)
-                val deleted = world.worldFolder.delete()
-                if (!deleted) {
-                    Craftan.logger.warning("Failed to delete world ${world.name}")
+            task(
+                true,
+                40L,
+                ) {
+
+                Craftan.logger.info("Unloading world ${world.name}")
+
+                val result = server.unloadWorld(world, false)
+
+                if (!result) {
+                    Craftan.logger.warning("Failed to save world ${world.name}")
+                    return@task
+                }
+
+                Craftan.logger.info("Deleting world ${world.name}")
+                runCatching { FileUtils.deleteDirectory(world.worldFolder) }.onFailure {
+                    Craftan.logger.info("Failed deleting world ${world.name}")
+                    it.printStackTrace()
                 }
             }
         }
@@ -129,15 +153,14 @@ class CraftanLobby(
 
         countingDown = true
 
-        var currentCountdown = 60
+        var currentCountdown = 20
 
         notifyPlayers(CraftanNotification.LOBBY_STARTED)
 
         task(
-            false,
+            true,
             0,
             20L,
-            currentCountdown.toLong()
         ) {
             currentCountdown--
             countdown = currentCountdown
@@ -151,9 +174,15 @@ class CraftanLobby(
             }
 
             if (currentCountdown <= 0) {
-                players.forEach { it.bukkitPlayer.level = 0 }
-                players.forEach { teleportToMap(it.bukkitPlayer) }
+                it.cancel()
+                status = CraftanLobbyStatus.IN_GAME
                 countingDown = false
+                players.forEach { player ->  run {
+                        player.bukkitPlayer.gameMode = GameMode.CREATIVE
+                        player.bukkitPlayer.isFlying = true
+                        teleportToMap(player.bukkitPlayer)
+                    }
+                }
             }
         }
     }
