@@ -1,23 +1,27 @@
 package de.craftan.engine
 
-enum class CraftanGameState {
-    /**
-     * Game is in lobby and waiting to be started
-     */
-    WAITING,
+import de.craftan.bridge.map.CraftanMap
+import net.ormr.eventbus.Event
+import net.ormr.eventbus.EventBus
 
-    /**
-     * Before the actual game runs in its usual rounds, to determine the sequence of players
-     */
-    PRE_GAME,
+abstract class CraftanGameState(
+    val game: CraftanGame,
+) {
+    // The Map should not be in Bridge yo
+    val map: CraftanMap? = null
 
-    /**
-     * Game is currently running
-     */
-    RUNNING,
+    val ressources: Map<CraftanPlayer, Map<CraftanResource, Int>> = emptyMap() // innit gameressources with some like registered ressources in the config or sth like dat
 
-    /**
-     * Game is finished, either by a leaver, or somebody won
-     */
-    FINISHED,
+    val cards: Map<CraftanPlayer, Map<CraftanActionCard, Int>> = emptyMap()
+
+    val winPoints: Map<CraftanPlayer, Int> = emptyMap()
+
+    // react to events here that should like alter these things DIRECTLY
+    val eventBus: EventBus<Any, CraftanEvent> = EventBus()
 }
+
+abstract class CraftanGameStateEvent(
+    game: CraftanGame
+) : CraftanEvent(game)
+
+// Register the events here
