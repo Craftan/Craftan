@@ -9,6 +9,7 @@ import de.craftan.util.CraftanPermissions
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import java.awt.Color
 
 /**
  * Model a player inside a CraftanGame
@@ -37,6 +38,8 @@ interface CraftanPlayer {
      */
     val inventory: CraftanPlayerInventory
 
+
+    val teamColor: Color
     /**
      * Send the given component to the ingame player
      * @param component the text

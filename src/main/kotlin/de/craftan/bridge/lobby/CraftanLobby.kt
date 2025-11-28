@@ -2,6 +2,8 @@ package de.craftan.bridge.lobby
 
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
+import de.craftan.bridge.events.lobby.LobbyCountdownEvent
+import de.craftan.bridge.events.lobby.LobbyStartedEvent
 import de.craftan.bridge.events.lobby.LobbyStatusChangedEvent
 import de.craftan.bridge.events.lobby.PlayerJoinedLobbyEvent
 import de.craftan.bridge.events.lobby.PlayerLeftLobbyEvent
@@ -167,6 +169,8 @@ class CraftanLobby(
             buildSidebar()
             players.forEach { it.bukkitPlayer.level = currentCountdown }
 
+            globalEventBus.fire(LobbyCountdownEvent(this, currentCountdown))
+
             if (currentCountdown <= 5) {
                 notifyPlayers(CraftanNotification.LOBBY_STARTS_IN, mapOf(
                     CraftanPlaceholder.TIME_TO_START to literalText(currentCountdown.toString())
@@ -175,16 +179,23 @@ class CraftanLobby(
 
             if (currentCountdown <= 0) {
                 it.cancel()
-                status = CraftanLobbyStatus.IN_GAME
                 countingDown = false
-                players.forEach { player ->  run {
-                        player.bukkitPlayer.gameMode = GameMode.CREATIVE
-                        player.bukkitPlayer.isFlying = true
-                        teleportToMap(player.bukkitPlayer)
-                    }
-                }
+                start()
             }
         }
+    }
+
+    private fun start() {
+        status = CraftanLobbyStatus.IN_GAME
+
+        players.forEach { player ->  run {
+                player.bukkitPlayer.gameMode = GameMode.CREATIVE
+                player.bukkitPlayer.isFlying = true
+                teleportToMap(player.bukkitPlayer)
+            }
+        }
+
+        globalEventBus.fire(LobbyStartedEvent(this))
     }
 
     private fun teleportToMap(player: Player) = player.teleport(Location(world, center.x() + 0.5, center.y() + 50.0, center.z() + 0.5))

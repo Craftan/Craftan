@@ -1,5 +1,6 @@
 package de.craftan
 
+import de.craftan.bridge.items.behaviors.DiceBehavior
 import de.craftan.bridge.listeners.PlayerInteractedEntityEvent
 import de.craftan.commands.craftanCommand
 import de.craftan.commands.structureCommand
@@ -9,6 +10,7 @@ import de.craftan.io.MessageAdapter
 import de.craftan.io.permissions.PermissionsAdapter
 import de.craftan.util.CraftanSystem
 import de.craftan.util.SystemManager
+import de.staticred.kia.behaviour.registerBehaviors
 import kotlinx.serialization.json.Json
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
 import net.ormr.eventbus.EventBus
@@ -42,8 +44,15 @@ object Craftan {
         loadFiles()
         loadSystems()
         loadCommands()
+        registerItemBehaviors()
 
         PlayerInteractedEntityEvent().register()
+    }
+
+    private fun registerItemBehaviors() {
+        registerBehaviors {
+            +DiceBehavior.behavior
+        }
     }
 
     private fun loadFiles() {

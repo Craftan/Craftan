@@ -26,6 +26,7 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven { url = uri("https://maven.enginehub.org/repo/") }
     maven("https://jitpack.io")
+    mavenLocal()
 }
 
 dependencies {
@@ -41,7 +42,7 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
-    implementation("com.github.StaticFX:kia:1.1.5")
+    implementation("io.github.staticfx:kia:1.1.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     compileOnly("net.megavex:scoreboard-library-api:$scoreboardLibraryVersion")
