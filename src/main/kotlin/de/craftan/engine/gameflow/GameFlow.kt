@@ -1,24 +1,15 @@
 package de.craftan.engine.gameflow
 
 import de.craftan.engine.CraftanPlayer
-import de.craftan.engine.gameflow.flows.TurnFlow
 
 abstract class GameFlow {
 
-    /**
-     * The current round index
-     * 0 => Before first round
-     * 1 => First round
-     * 2 => Second round
-     * etc.
-     */
     var roundIndex = 0
 
     /**
      * The current round of the game
      */
-    // Todo Why the fuck is this nullable
-    var round: GameRound? = null
+    abstract var round: GameRound
 
     /**
      * All participating players
@@ -31,9 +22,9 @@ abstract class GameFlow {
     abstract fun nextRound()
 
     /**
-     * Init the GameFlow
+     * Sequence of players in the rounds
+     * e.g. player2 -> player1 -> player4 -> player3 -> loop
      */
-    abstract fun init()
+    lateinit var playerSequence: TurnSequence
 
-    fun turnFlow(): TurnFlow = round?.turnSequence[round!!.turnIndex]?.second!!
 }

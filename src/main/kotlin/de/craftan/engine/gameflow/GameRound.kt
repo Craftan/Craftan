@@ -1,26 +1,32 @@
 package de.craftan.engine.gameflow
 
 import de.craftan.engine.CraftanGame
-import de.craftan.bridge.CraftanBridgePlayer
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.gameflow.flows.TurnFlow
 
 /**
  * Models a round of a CraftanGame
  */
-abstract class GameRound {
+interface GameRound {
     /**
      * Abstract name to be rendered ingame
      */
-    abstract val name: String
+    val name: String
+
+    /**
+     * The number of round from the beginning of the game
+     */
+    val roundNumber: Int
     
-    var turnIndex: Int = 0
+    var turnIndex: Int
 
-    abstract val turnSequence: MutableList<Pair<CraftanPlayer, TurnFlow>>
+    val turnSequence:List<Pair<CraftanPlayer, TurnFlow>>
 
-    fun currentTurn(): Pair<CraftanPlayer, TurnFlow> = turnSequence[turnIndex]
+    /**
+     * The game the round is inside of
+     */
+    val game: CraftanGame
 
-    // TODO should listen to turn end event and then call this
     fun nextTurn() {
         turnIndex++
         if (turnIndex >= turnSequence.size) {

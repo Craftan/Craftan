@@ -1,6 +1,6 @@
 package de.craftan.engine.gameflow.flows
 
-import de.craftan.engine.CraftanGameEvent
+import de.craftan.engine.CraftanEvent
 import de.craftan.engine.gameflow.TurnState
 import net.ormr.eventbus.EventBus
 
@@ -17,17 +17,17 @@ import net.ormr.eventbus.EventBus
 abstract class TurnFlow(
     val startState: TurnState,
 ) {
-    val eventBus: EventBus<Any, CraftanGameEvent> = EventBus()
+    val eventBus: EventBus<Any, CraftanEvent> = EventBus()
 
     /**
      * Shows the current state of this flow
      */
-    var state = startState
+    var currentState = startState
         private set
 
     val graph = Graph()
 
-    fun putStateTransition(from: TurnState, to: MutableList<TurnState>, chooser: (CraftanGameEvent) -> TurnState) {
+    fun putStateTransition(from: TurnState, to: MutableList<TurnState>, chooser: (CraftanEvent) -> TurnState) {
         graph.put(from, to, chooser)
     }
 
@@ -35,15 +35,15 @@ abstract class TurnFlow(
      * Goes to the next state of this flow, or finishes the flow if the last state was reached
      */
     // Listen to a Endstate eventbus
-    fun nextState(event: CraftanGameEvent) {
-        val neighbors = graph.neighbors(state)
+    fun nextState(event: CraftanEvent) {
+        val neighbors = graph.neighbors(currentState)
         if (neighbors.isEmpty()) {
             finishFlow()
             return
         }
 
-        val nextState = graph.getChooser(state).invoke(event)
-        state = nextState
+        val nextState= graph.getChooser(currentState).invoke(event)
+        currentState = nextState
         // Event
     }
 
@@ -56,9 +56,9 @@ abstract class TurnFlow(
 }
 
 data class Graph(
-    val adjacency: MutableMap<TurnState, Pair<MutableList<TurnState>, (CraftanGameEvent) -> TurnState>> = mutableMapOf()
+    val adjacency: MutableMap<TurnState, Pair<MutableList<TurnState>, (CraftanEvent) -> TurnState>> = mutableMapOf()
 ) {
-    fun put(from: TurnState, to: MutableList<TurnState>, chooser: (CraftanGameEvent) -> TurnState) {
+    fun put(from: TurnState, to: MutableList<TurnState>, chooser: (CraftanEvent) -> TurnState) {
         if (adjacency.containsKey(from)) {
             throw IllegalArgumentException("Node $from already exists")
         }
@@ -69,7 +69,7 @@ data class Graph(
     fun neighbors(node: TurnState): List<TurnState> =
         adjacency[node]?.first ?: emptyList()
 
-    fun getChooser(node: TurnState):(CraftanGameEvent) -> TurnState {
+    fun getChooser(node: TurnState):(CraftanEvent) -> TurnState {
         return adjacency[node]!!.second
     }
 }

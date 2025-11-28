@@ -1,7 +1,6 @@
 package de.craftan.engine.gameflow
 
-import de.craftan.engine.gameflow.action.CraftanActionData
-import de.craftan.engine.gameflow.action.CraftanGameAction
+import de.craftan.engine.CraftanGameAction
 
 /**
  * Models the current state a round is at
@@ -20,5 +19,5 @@ abstract class TurnState {
     /**
      * A list of all possible actions for a player
      */
-    abstract val actions: List<CraftanGameAction<out CraftanActionData>>
+    abstract val actions: List<CraftanGameAction<*>>
 }
