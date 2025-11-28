@@ -2,6 +2,7 @@ package de.craftan.engine.gameflow
 
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.gameflow.flows.TurnFlow
 
 /**
  * Models a round of a CraftanGame
@@ -15,35 +16,27 @@ interface GameRound {
     /**
      * The number of round from the beginning of the game
      */
-    val index: Int
+    val roundNumber: Int
+    
+    var turnIndex: Int
 
-    /**
-     * the flow of this round
-     */
-    val flow: RoundFlow
+    val turnSequence:List<Pair<CraftanPlayer, TurnFlow>>
 
     /**
      * The game the round is inside of
      */
     val game: CraftanGame
 
-    /**
-     * Used before this round actually starts
-     */
-    fun prepare() {}
-}
+    fun nextTurn() {
+        turnIndex++
+        if (turnIndex >= turnSequence.size) {
+            finish()
+        }
+        val (player, flow) = turnSequence[turnIndex]
+        // TODO Start the turn of the player
+    }
 
-/**
- * Models a global round, which takes all players into consideration, and each player can make their turn
- */
-interface GlobalGameRound : GameRound
-
-/**
- * A round which is focused around a single player
- */
-interface PlayerGameRound : GameRound {
-    /**
-     * The player to focus
-     */
-    val player: CraftanPlayer
+    fun finish() {
+        // Fire finish round event
+    }
 }
