@@ -4,43 +4,20 @@ import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import de.craftan.bridge.inventory.config.CraftanGameConfigManager
 import de.craftan.bridge.inventory.config.configureCraftanGameInventory
-import de.craftan.bridge.items.behaviors.DiceBehavior
 import de.craftan.bridge.lobby.CraftanLobbyManager
 import de.craftan.bridge.util.sendNotification
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
 import de.craftan.io.commands.craftanSubCommand
 import de.craftan.io.commands.to
-import de.staticred.kia.inventory.builder.kItem
 import de.staticred.kia.inventory.extensions.openInventory
-import io.papermc.paper.datacomponent.DataComponentTypes
 import net.axay.kspigot.chat.literalText
 import net.axay.kspigot.commands.argument
 import net.axay.kspigot.commands.runs
 import net.axay.kspigot.commands.suggestList
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextColor
-import org.bukkit.Material
 
 val craftanCommand =
     craftanCommand("craftan", "Manage all configuration and settings of craftan") {
-
-        craftanSubCommand("item", "get an item with the given model") {
-            argument<String>("model", StringArgumentType.string()) {
-                runs {
-                    val item = kItem(Material.WHITE_CONCRETE) {
-                        model = Key.key(getArgument<String>("model"))
-                        setDisplayName(Component.text("Dice").color(TextColor.color(0x00F0FF)))
-
-                        addBehavior(DiceBehavior.behavior)
-                    }.toItemStack()
-
-                    player.inventory.addItem(item)
-                }
-            }
-        }
-
         craftanSubCommand("lobby", "manage current craftan lobbies") {
             craftanSubCommand("list", "list all current lobbies") {
                 runs {
@@ -55,15 +32,15 @@ val craftanCommand =
 
                     lobbies.forEach {
                         player.sendMessage(CraftanNotification.LIST_LOBBIES_ENTRY.resolveWithPlaceholder(player, mapOf(
-                            CraftanPlaceholder.LOBBY_ID to literalText { it.key },
-                            CraftanPlaceholder.CURRENT_PLAYERS to literalText { it.value.players().size },
-                            CraftanPlaceholder.MAX_PLAYERS to literalText("4"),
-                            CraftanPlaceholder.CURRENT_MAP to literalText("Default")
+                            CraftanPlaceholder.LOBBY_ID to literalText(it.value.id.toString()),
+                            CraftanPlaceholder.CURRENT_PLAYERS to literalText(it.value.players().size.toString()),
+                            CraftanPlaceholder.MAX_PLAYERS to literalText(it.value.maxPlayers.toString()),
+                            CraftanPlaceholder.CURRENT_MAP to literalText(it.value.board.layout.name)
                         )))
                     }
-
                 }
             }
+
             craftanSubCommand("create", "Create a new lobby") {
                 runs {
                     if (CraftanLobbyManager.isInLobby(player)) {
