@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val kspigotVersion: String by project
 val paperVersion: String by project
 val scoreboardLibraryVersion: String by project
+val jupiterVersion: String by project
+val kotlinVersion = "2.2.0"
 
 plugins {
     kotlin("jvm") version "2.2.0"
@@ -42,6 +44,9 @@ dependencies {
 
     compileOnly("net.megavex:scoreboard-library-api:$scoreboardLibraryVersion")
     compileOnly("net.megavex:scoreboard-library-extra-kotlin:$scoreboardLibraryVersion")
+
+    //tests
+    testImplementation(kotlin("test"))
 }
 
 bukkit {
@@ -64,6 +69,23 @@ bukkit {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events = setOf(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR
+        )
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        showStandardStreams = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
 }
 
 tasks {
