@@ -6,14 +6,19 @@ import de.craftan.bridge.events.lobby.*
 import de.craftan.bridge.inventory.config.colorSelectorInventory
 import de.craftan.bridge.items.LobbyItems
 import de.craftan.bridge.map.CraftanMap
+import de.craftan.engine.CraftanGameAction
+import de.craftan.engine.CraftanGameActionEvent
 import de.craftan.engine.CraftanGameConfig
+import de.craftan.engine.CraftanGameEvent
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.implementations.CraftanPlayerImpl
 import de.craftan.engine.map.maps.DefaultMapLayout
+import de.craftan.io.CraftanEvent
 import de.craftan.io.CraftanNotification
 import de.craftan.io.CraftanPlaceholder
 import de.craftan.io.commands.to
 import de.craftan.io.globalEventBus
+import de.craftan.io.unloadAndDelete
 import de.craftan.util.toWorldEditWorld
 import de.staticred.kia.inventory.KInventory
 import de.staticred.kia.inventory.extensions.setHotbarItem
@@ -23,6 +28,7 @@ import net.axay.kspigot.runnables.task
 import net.kyori.adventure.text.Component
 import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent
+import net.ormr.eventbus.EventBus
 import org.apache.commons.io.FileUtils
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -88,6 +94,7 @@ class CraftanLobby(
         notifyPlayers(CraftanNotification.JOINED_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
 
         players.add(CraftanPlayerImpl(player, origin = player.location))
+        CraftanPlayerStateManager.saveState(player)
         sidebar.addPlayer(player)
 
         if (colorSelectorOwner == null) {
@@ -128,6 +135,8 @@ class CraftanLobby(
         }
 
         notifyPlayers(CraftanNotification.LEFT_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
+        CraftanPlayerStateManager.applyState(player)
+
         globalEventBus.fire(PlayerLeftLobbyEvent(this, player))
     }
 
@@ -142,29 +151,7 @@ class CraftanLobby(
 
         players.toList().forEach { removePlayer(it.bukkitPlayer) }
 
-        //TODO add cleanup on boot as well
-        if (!server.isStopping) {
-            task(
-                true,
-                40L,
-                ) {
-
-                Craftan.logger.info("Unloading world ${world.name}")
-
-                val result = server.unloadWorld(world, false)
-
-                if (!result) {
-                    Craftan.logger.warning("Failed to save world ${world.name}")
-                    return@task
-                }
-
-                Craftan.logger.info("Deleting world ${world.name}")
-                runCatching { FileUtils.deleteDirectory(world.worldFolder) }.onFailure {
-                    Craftan.logger.info("Failed deleting world ${world.name}")
-                    it.printStackTrace()
-                }
-            }
-        }
+        world.unloadAndDelete()
         CraftanLobbyManager.removeLobby(id)
     }
 

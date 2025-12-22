@@ -9,9 +9,11 @@ import de.craftan.engine.CraftanGameConfig
 import de.craftan.io.CraftanEventBus
 import de.craftan.io.CraftanNotification
 import de.craftan.io.globalEventBus
+import de.craftan.io.unloadAndDelete
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
 import de.craftan.util.toWorldEditWorld
+import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -22,6 +24,8 @@ object CraftanLobbyManager {
     private val lobbies = mutableMapOf<Int, CraftanLobby>()
     private val eventBus: CraftanEventBus = globalEventBus
 
+    const val LOBBY_WORLD_PREFIX = "craftan-lobby-"
+
     /**
      * Generates a new map and builds the lobby
      * @return the finished lobby
@@ -30,11 +34,13 @@ object CraftanLobbyManager {
     fun createLobby(config: CraftanGameConfig): CraftanLobby {
         val id = lobbies.size + 1
 
-        //TODO add logger for world building
-        val world = generateEmptyWorld("lobby-$id")
+        Craftan.logger.info("Creating lobby id $id")
+        val world = generateEmptyWorld("$LOBBY_WORLD_PREFIX$id")
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
         world.setGameRule(GameRule.FALL_DAMAGE, false)
+
+        Craftan.logger.info("Finished building world for $id")
 
         world.time = 12000
         world.weatherDuration = 0
@@ -89,4 +95,12 @@ object CraftanLobbyManager {
     fun closeAllLobbies() {
         lobbies.values.forEach { it.close() }
     }
+
+    fun removeOldLobbies() {
+        val oldLobbies = Bukkit.getWorlds().filter { it.name.startsWith(LOBBY_WORLD_PREFIX) }
+        oldLobbies.forEach {
+            it.unloadAndDelete()
+        }
+    }
+
 }

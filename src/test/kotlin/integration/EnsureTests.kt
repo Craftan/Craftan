@@ -9,5 +9,4 @@ class EnsureTests {
     fun ensureTest() {
         assertTrue(true)
     }
-
 }
