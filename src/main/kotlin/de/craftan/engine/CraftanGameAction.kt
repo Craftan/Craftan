@@ -1,7 +1,7 @@
 package de.craftan.engine
 
-import de.craftan.config.CraftanConfig
 import de.craftan.engine.gameflow.CraftanActionItem
+import de.craftan.io.CraftanEvent
 import de.staticred.kia.inventory.item.KItem
 import net.ormr.eventbus.EventBus
 
@@ -10,10 +10,16 @@ import net.ormr.eventbus.EventBus
  * @param R is the expected result of the action
  */
 interface CraftanGameAction<R> {
-    val eventBus: EventBus<Any, CraftanEvent>
+    val eventBus: EventBus<Any, CraftanGameEvent>
         get() = EventBus()
 
     val game: CraftanGame
+
+    companion object {
+        fun test() {
+
+        }
+    }
 
     /**
      * Outcome of the action
@@ -37,6 +43,9 @@ interface CraftanGameAction<R> {
      */
     fun asItem(): CraftanActionItem<R>
 }
+
+class CraftanGameActionEvent<A: CraftanGameAction<*>>(): CraftanEvent
+
 
 /**
  * Models a data object to be shared between the ingame and the engine

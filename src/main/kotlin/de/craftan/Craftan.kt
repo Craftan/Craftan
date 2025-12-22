@@ -1,14 +1,19 @@
 package de.craftan
 
+import de.craftan.bridge.items.behaviors.DiceBehavior
+import de.craftan.bridge.listeners.PlayerInteractedEntityEvent
 import de.craftan.commands.craftanCommand
 import de.craftan.commands.structureCommand
 import de.craftan.config.ConfigSystem
+import de.craftan.io.CraftanEventBus
 import de.craftan.io.MessageAdapter
 import de.craftan.io.permissions.PermissionsAdapter
 import de.craftan.util.CraftanSystem
 import de.craftan.util.SystemManager
+import de.staticred.kia.behaviour.registerBehaviors
+import kotlinx.serialization.json.Json
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary
-import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary
+import net.ormr.eventbus.EventBus
 import java.io.File
 import java.nio.file.Files
 
@@ -16,6 +21,20 @@ object Craftan {
     lateinit var scoreboardLibrary: ScoreboardLibrary
 
     val schematicsFolder = File("${PluginManager.dataFolder.absolutePath}/schematics")
+
+    val logger = InternalMain.INSTANCE.logger
+
+    val json = Json {
+        ignoreUnknownKeys = true
+        prettyPrint = false
+        encodeDefaults = true
+    }
+
+    /**
+     * Craftans global event bus.
+     * All events get passed through here.
+     */
+    val eventBus: CraftanEventBus = EventBus()
 
     /**
      * Configures the Craftan plugin
@@ -25,6 +44,15 @@ object Craftan {
         loadFiles()
         loadSystems()
         loadCommands()
+        registerItemBehaviors()
+
+        PlayerInteractedEntityEvent().register()
+    }
+
+    private fun registerItemBehaviors() {
+        registerBehaviors {
+            +DiceBehavior.behavior
+        }
     }
 
     private fun loadFiles() {

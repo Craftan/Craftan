@@ -3,13 +3,17 @@ package de.craftan.engine.implementations
 import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.CraftanPlayerInventory
+import org.bukkit.Location
 import org.bukkit.entity.Player
+import java.awt.Color
 
 class CraftanPlayerImpl(
     override val bukkitPlayer: Player,
     override val game: CraftanGame? = null,
     override val inventory: CraftanPlayerInventory = CraftanPlayerInventory(),
-    override val victoryPoints: Int = 0
+    override val victoryPoints: Int = 0,
+    override val origin: Location,
+    override val teamColor: Color = Color.RED,
 ): CraftanPlayer {
 
 

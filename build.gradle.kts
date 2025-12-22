@@ -14,6 +14,7 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
     id("co.uzzu.dotenv.gradle") version "4.0.0"
     //id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 group = "de.craftan"
@@ -25,6 +26,7 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven { url = uri("https://maven.enginehub.org/repo/") }
     maven("https://jitpack.io")
+    mavenLocal()
 }
 
 dependencies {
@@ -40,7 +42,8 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
 
-    implementation("com.github.StaticFX:kia:1.1.5")
+    implementation("io.github.staticfx:kia:1.1.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     compileOnly("net.megavex:scoreboard-library-api:$scoreboardLibraryVersion")
     compileOnly("net.megavex:scoreboard-library-extra-kotlin:$scoreboardLibraryVersion")
@@ -60,7 +63,6 @@ bukkit {
 
     libraries = listOf(
         "net.axay:kspigot:$kspigotVersion",
-        "net.megavex:scoreboard-library-api:$scoreboardLibraryVersion",
         "net.megavex:scoreboard-library-implementation:$scoreboardLibraryVersion",
         "net.megavex:scoreboard-library-modern:$scoreboardLibraryVersion",
     )
@@ -105,4 +107,8 @@ tasks {
     build {
         dependsOn(shadowJar)
     }
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+    freeCompilerArgs.set(listOf("-Xcontext-parameters"))
 }

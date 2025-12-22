@@ -1,10 +1,15 @@
 package de.craftan.engine
 
 import de.craftan.engine.structures.CraftanStructure
-import de.craftan.io.*
-import de.craftan.util.*
+import de.craftan.io.CraftanNotification
+import de.craftan.io.CraftanPlaceholder
+import de.craftan.io.resolve
+import de.craftan.io.resolveWithPlaceholder
+import de.craftan.util.CraftanPermissions
 import net.kyori.adventure.text.Component
+import org.bukkit.Location
 import org.bukkit.entity.Player
+import java.awt.Color
 
 /**
  * Model a player inside a CraftanGame
@@ -24,10 +29,17 @@ interface CraftanPlayer {
     val victoryPoints: Int
 
     /**
+     * World the player is joining from
+     */
+    val origin: Location
+
+    /**
      * Contains the inventory the player currently has
      */
     val inventory: CraftanPlayerInventory
 
+
+    val teamColor: Color
     /**
      * Send the given component to the ingame player
      * @param component the text
