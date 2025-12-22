@@ -3,6 +3,7 @@ package de.craftan.io
 import de.craftan.PluginManager
 import de.craftan.bridge.util.resolveMiniMessage
 import de.craftan.bridge.util.toComponent
+import de.craftan.io.config.LanguageYamlAdapter
 import net.kyori.adventure.text.Component
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -20,6 +21,7 @@ object MessageAdapter : FileAdapter {
     private const val DEFAULT_LOCALE = "en_US"
     private lateinit var defaultConfiguration: FileConfiguration
 
+    // Keep Bukkit configurations to preserve current resolve behavior
     private val localeConfigs: MutableMap<String, FileConfiguration> = mutableMapOf()
 
     /**
@@ -32,9 +34,17 @@ object MessageAdapter : FileAdapter {
      * @see LANGUAGE_FILE_LOCATION
      */
     override fun load() {
-        loadDefault()
-        loadLocales()
-        updatesLocalesFiles()
+        // Build default map from CraftanNotification
+        val defaultMessages = CraftanNotification.entries.associate { it.notification.configLocation to it.notification.default }
+
+        // Ensure default locale exists and is auto-updated
+        val defaultFile = File(PluginManager.dataFolder, "$LANGUAGE_FILE_LOCATION$DEFAULT_LOCALE.yml")
+        val defaultLayout = LanguageFile(locale = DEFAULT_LOCALE, messages = defaultMessages)
+        LanguageYamlAdapter(defaultFile, defaultLayout).loadAndUpdate()
+        defaultConfiguration = YamlConfiguration.loadConfiguration(defaultFile)
+
+        // Load and auto-update other locales found in the language folder
+        loadLocales(defaultMessages)
     }
 
     /**
@@ -59,6 +69,7 @@ object MessageAdapter : FileAdapter {
             Files.copy(defaultLocation.toPath(), location.toPath())
             val config = YamlConfiguration.loadConfiguration(location)
             config.set("locale", locale)
+            config.save(location)
         }
     }
 
@@ -99,60 +110,13 @@ object MessageAdapter : FileAdapter {
         return resolvedMessage
     }
 
-    private fun updatesLocalesFiles() {
-        val localeFiles = localeConfigs.values.toMutableList()
-        localeFiles += defaultConfiguration
+    // Auto-update and reload locales using the generic YAML adapter
+    private fun updatesLocalesFiles() { /* no-op: handled by load() */ }
 
-        for (localeFile in localeFiles) {
-            val keys = CraftanNotification.entries
-
-            keys.forEach {
-                if (!localeFile.contains(it.notification.configLocation)) {
-                    localeFile.set(it.notification.configLocation, it.notification.default)
-                    // TODO add notification that this key has been added
-                }
-            }
-
-            localeFile.getKeys(true).forEach { localeKey ->
-                if (keys.none { it.notification.configLocation == localeKey || it.notification.configLocation.startsWith(localeKey) }) {
-                    localeFile.set(localeKey, null)
-                    // TODO add notification that this key has been removed
-                }
-            }
-
-            val localeFileName = localeFile.get(LOCALE_LOCATION) ?: return
-            val file = File(PluginManager.dataFolder, "$LANGUAGE_FILE_LOCATION$localeFileName.yml")
-            localeFile.save(file)
-        }
-    }
-
-    private fun loadDefault() {
-        val location = File(PluginManager.dataFolder, "$LANGUAGE_FILE_LOCATION$DEFAULT_LOCALE.yml")
-
-        if (!location.exists()) {
-            location.parentFile.mkdirs()
-            location.createNewFile()
-
-            defaultConfiguration = YamlConfiguration.loadConfiguration(location)
-
-            defaultConfiguration.set(LOCALE_LOCATION, DEFAULT_LOCALE)
-
-            CraftanNotification.entries.forEach {
-                defaultConfiguration.set(it.notification.configLocation, it.notification.default)
-            }
-
-            defaultConfiguration.save(location)
-        } else {
-            defaultConfiguration = YamlConfiguration.loadConfiguration(location)
-
-            if (!validateConfig(defaultConfiguration)) {
-                val error = findConfigError(defaultConfiguration)
-                error("Error while validating config for locale $DEFAULT_LOCALE because ${error.configLocation} was not set but is required!")
-            }
-        }
-    }
+    private fun loadDefault() { /* deprecated by generic adapter */ }
 
     private fun validateConfig(configuration: FileConfiguration): Boolean {
+        // Kept for compatibility but not used anymore
         if (!configuration.contains(LOCALE_LOCATION)) return false
         return !CraftanNotification.entries.any { !configuration.contains(it.notification.configLocation) }
     }
@@ -162,29 +126,36 @@ object MessageAdapter : FileAdapter {
         return CraftanNotification.entries.first { !configuration.contains(it.notification.configLocation) }.notification
     }
 
-    private fun loadLocales() {
+    private fun loadLocales(defaultMessages: Map<String, String>) {
+        localeConfigs.clear()
         val messagesFolder = File(PluginManager.dataFolder, LANGUAGE_FILE_LOCATION)
-        val localeFiles = messagesFolder.listFiles()?.toList()?.filter { it.extension == "yml" } ?: listOf()
-
-        for (localeFile in localeFiles) {
-            if (localeFile.name == "$DEFAULT_LOCALE.yml") {
-                println("Skipping file $DEFAULT_LOCALE.yml")
-                continue
+        val localeFiles = messagesFolder
+            .listFiles()
+            ?.toList()
+            // Only real locale YAMLs:
+            // - Must have extension exactly "yml"
+            // - Exclude legacy backups like "*.bak-<ts>.yml"
+            // - Exclude new backups like "*.yml.backup" (defensive, even though extension wouldn't be yml)
+            ?.filter { file ->
+                val isYml = file.extension == "yml"
+                val isLegacyBackup = file.name.contains(".bak-") && file.name.endsWith(".yml")
+                val isNewBackup = file.name.endsWith(".yml.backup")
+                isYml && !isLegacyBackup && !isNewBackup
             }
+            ?: listOf()
 
-            val locale = localeFile.nameWithoutExtension
-            val localeConfig = YamlConfiguration.loadConfiguration(localeFile)
+        for (file in localeFiles) {
+            if (file.name == "$DEFAULT_LOCALE.yml") continue
 
-            if (!validateConfig(localeConfig)) {
-                val error = findConfigError(localeConfig)
-                error("Error while validating config for locale $locale because ${error.configLocation} was not set but is required!")
+            val localeCode = file.nameWithoutExtension
+            val layout = LanguageFile(locale = localeCode, messages = defaultMessages)
+            // Auto-update with backup and then reload as Bukkit config for resolve functions
+            LanguageYamlAdapter(file, layout).loadAndUpdate()
+
+            if (localeConfigs.contains(localeCode)) {
+                error("Locale $localeCode is already loaded. Please double check your files!")
             }
-
-            if (localeConfigs.contains(locale)) {
-                error("Locale $locale is already loaded. Please double check your files!")
-            }
-
-            localeConfigs[locale] = localeConfig
+            localeConfigs[localeCode] = YamlConfiguration.loadConfiguration(file)
         }
     }
 }
