@@ -1,5 +1,6 @@
 package de.craftan.io
 
+import de.craftan.io.config.CraftanFileConfig
 import de.craftan.io.config.FlattenToRoot
 
 /**
@@ -10,4 +11,4 @@ import de.craftan.io.config.FlattenToRoot
 data class LanguageFile(
     val locale: String,
     @FlattenToRoot val messages: Map<String, String>,
-)
+) : CraftanFileConfig

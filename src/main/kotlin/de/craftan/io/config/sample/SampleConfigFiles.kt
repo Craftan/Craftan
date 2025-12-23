@@ -1,5 +1,6 @@
 package de.craftan.io.config.sample
 
+import de.craftan.io.config.Configs
 import java.io.File
 
 /**
@@ -8,11 +9,10 @@ import java.io.File
 object SampleConfigFiles {
     /**
      * Writes/updates the sample config file under dataFolder/config/sample.yml.
-     * Creates a timestamped backup if a file already exists.
+     * Creates a .backup alongside when changes are written.
      */
-    fun write(dataFolder: File) {
-        val file = File(dataFolder, "config/sample.yml")
-        file.parentFile.mkdirs()
-        SampleConfigAdapter(file).loadAndUpdate()
+    fun write(@Suppress("UNUSED_PARAMETER") dataFolder: File) {
+        // Use the high-level Configs API for brevity
+        Configs.get<SampleConfig>("config/sample.yml")
     }
 }

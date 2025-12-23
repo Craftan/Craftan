@@ -1,33 +1,15 @@
 package de.craftan.io.config
 
+import de.craftan.Craftan
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.nio.file.Files
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
-/**
- * Annotation to indicate that a Map<String, *> property should be flattened to the root of the YAML file.
- * This is particularly useful for key/value based configuration files like language files.
- */
-@Target(AnnotationTarget.PROPERTY)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class FlattenToRoot
-
-/**
- * Annotation to explicitly place a property at a custom YAML path.
- * Example: `@Location("config.game.here") val gameTime: Int = 60`
- * The annotated property's value will be read/written at that absolute path.
- * If present, this takes precedence over [FlattenToRoot].
- */
-@Target(AnnotationTarget.PROPERTY)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class Location(val value: String)
 
 /**
  * A small, reflection-based YAML adapter that can:
@@ -45,7 +27,7 @@ annotation class Location(val value: String)
  *   map entries are written/read at the root (or current prefix) rather than under the property name.
  * - List of primitives (String, Int, Long, Double, Boolean) and enums. Nested lists of complex objects are not supported.
  */
-abstract class YamlConfigAdapter<T : Any>(
+abstract class YamlConfigAdapter<T : CraftanFileConfig>(
     private val file: File,
     private val defaultLayout: T,
     private val createBackup: Boolean = true,
@@ -56,14 +38,17 @@ abstract class YamlConfigAdapter<T : Any>(
      * Returns the merged instance.
      */
     fun loadAndUpdate(): T {
+        Craftan.logger.fine("[YamlConfigAdapter] Loading config: ${file.absolutePath}")
         val existedBefore = file.exists()
         if (!existedBefore) {
             file.parentFile.mkdirs()
             file.createNewFile()
+            Craftan.logger.info("[YamlConfigAdapter] Created new config file: ${file.absolutePath}")
         }
 
         val existing = YamlConfiguration.loadConfiguration(file)
         val merged = mergeDataClass("", defaultLayout, existing)
+        Craftan.logger.fine("[YamlConfigAdapter] Merged instance of ${defaultLayout::class.simpleName} from YAML")
 
         // Prepare the desired normalized output
         val desired = YamlConfiguration()
@@ -75,14 +60,17 @@ abstract class YamlConfigAdapter<T : Any>(
 
         // Only perform backup + write if there is an actual change or it's a brand new file
         val shouldWrite = !existedBefore || desiredString != currentString
+        Craftan.logger.fine("[YamlConfigAdapter] ${if (shouldWrite) "Changes detected" else "No changes detected"} for ${file.name}")
 
         if (shouldWrite) {
             if (createBackup && existedBefore) {
+                Craftan.logger.fine("[YamlConfigAdapter] Creating backup for ${file.name} -> ${file.name}.backup")
                 onBeforeBackup(file)
                 createBackupFile(file)
             }
 
             desired.save(file)
+            Craftan.logger.info("[YamlConfigAdapter] Wrote updated config to ${file.absolutePath}")
             onAfterWrite(file, merged)
         }
 
@@ -123,7 +111,13 @@ abstract class YamlConfigAdapter<T : Any>(
             val name = param.name ?: continue
             val prop = propsByName[name] ?: continue
             val defaultValue = prop.getter.call(default)
-            val childPrefix = resolvePropertyPath(prefix, name, prop.findAnnotation<Location>()?.value, prop.findAnnotation<FlattenToRoot>() != null)
+            val childPrefix = resolvePropertyPath(
+                prefix,
+                name,
+                prop.findAnnotation<Location>()?.value,
+                prop.findAnnotation<Section>()?.value,
+                prop.findAnnotation<FlattenToRoot>() != null
+            )
             val mergedValue = mergeValue(childPrefix, defaultValue, cfg)
             args[param] = mergedValue
         }
@@ -197,7 +191,18 @@ abstract class YamlConfigAdapter<T : Any>(
         val props = kClass.memberProperties
         for (prop in props) {
             val v = prop.getter.call(value) ?: continue
-            val childPrefix = resolvePropertyPath(prefix, prop.name, prop.findAnnotation<Location>()?.value, prop.findAnnotation<FlattenToRoot>() != null)
+            val sectionAnno = prop.findAnnotation<Section>()
+            val childPrefix = resolvePropertyPath(
+                prefix,
+                prop.name,
+                prop.findAnnotation<Location>()?.value,
+                sectionAnno?.value,
+                prop.findAnnotation<FlattenToRoot>() != null
+            )
+            // If a section with comment is defined, try to attach a comment to that section path.
+            if (sectionAnno != null && sectionAnno.comment.isNotBlank()) {
+                ensureSectionAndComment(out, joinPath(prefix, normalizeLocation(sectionAnno.value) ?: ""), sectionAnno.comment)
+            }
             writeValue(childPrefix, v, out)
         }
     }
@@ -223,29 +228,5 @@ abstract class YamlConfigAdapter<T : Any>(
                 if (k.isData) writeDataClass(prefix, v, out) else out.set(prefix, v)
             }
         }
-    }
-
-    private fun joinPath(prefix: String, child: String): String = when {
-        prefix.isEmpty() -> child
-        child.isEmpty() -> prefix
-        else -> "$prefix.$child"
-    }
-
-    /**
-     * Resolves the effective YAML path for a property, honoring @Location if present, then @FlattenToRoot, else property name.
-     */
-    private fun resolvePropertyPath(prefix: String, propName: String, location: String?, flatten: Boolean): String {
-        val normalizedLocation = normalizeLocation(location)
-        return when {
-            !normalizedLocation.isNullOrEmpty() -> normalizedLocation
-            flatten -> prefix
-            else -> joinPath(prefix, propName)
-        }
-    }
-
-    private fun normalizeLocation(loc: String?): String? {
-        if (loc == null) return null
-        val trimmed = loc.trim().trim('.')
-        return trimmed
     }
 }

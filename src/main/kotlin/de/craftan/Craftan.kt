@@ -5,6 +5,7 @@ import de.craftan.bridge.listeners.PlayerInteractedEntityEvent
 import de.craftan.commands.craftanCommand
 import de.craftan.commands.structureCommand
 import de.craftan.config.ConfigSystem
+import de.craftan.config.CraftanConfig
 import de.craftan.io.CraftanEventBus
 import de.craftan.io.MessageAdapter
 import de.craftan.io.permissions.PermissionsAdapter
@@ -29,6 +30,8 @@ object Craftan {
         prettyPrint = false
         encodeDefaults = true
     }
+
+    lateinit var config: () -> CraftanConfig
 
     /**
      * Craftans global event bus.

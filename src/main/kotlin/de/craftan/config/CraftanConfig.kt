@@ -1,21 +1,20 @@
 package de.craftan.config
 
-import com.uchuhimo.konf.ConfigSpec
+import de.craftan.io.config.CraftanFileConfig
+import de.craftan.io.config.Location
+import de.craftan.io.config.ConfigPath
 
-object CraftanConfig : ConfigSpec("craftan") {
-    val singleLobby by optional<Boolean>(
-        true,
-        description = "Whether craftan should handle this server as a single lobby, or allow multiple lobbies per this server.",
-    )
+@ConfigPath("config/craftan.yml")
+data class CraftanConfig(
+    val singleLobby: Boolean = false,
 
-    val defaultPointsToWin by optional<Int>(
-        default = 10,
-        description = "How many points are required to win a game, by default. This can be changed per game"
-    )
+    @Location("game.defaults")
+    val turnDuration: Int = 60,
 
-    val defaultDiscardLimit by optional<Int>(
-        default = 7,
-        description = "Default limit of how many cards a player can hold max before discarding. This can be changed per game"
-    )
+    @Location("game.defaults")
+    val timeToDice: Int = 60,
 
-}
+    @Location("game.defaults")
+    val pointsToWin: Int = 7,
+
+) : CraftanFileConfig

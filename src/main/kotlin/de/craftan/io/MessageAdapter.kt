@@ -1,76 +1,55 @@
 package de.craftan.io
 
-import de.craftan.PluginManager
+import de.craftan.Craftan
 import de.craftan.bridge.util.resolveMiniMessage
 import de.craftan.bridge.util.toComponent
-import de.craftan.io.config.LanguageYamlAdapter
+import de.craftan.io.config.ConfigFile
 import net.kyori.adventure.text.Component
-import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.configuration.file.YamlConfiguration
-import java.io.File
-import java.nio.file.Files
 
 /**
- * Util class to help load messages from a configuration file, based on localization
+ * Util class to help load messages from a configuration file, based on localization.
+ * Adopted to the generic ConfigFile system for live, auto-updating reads.
  */
 object MessageAdapter : FileAdapter {
-    private const val LANGUAGE_FILE_LOCATION = "/language/"
-
-    private const val LOCALE_LOCATION = "locale"
-
     private const val DEFAULT_LOCALE = "en_US"
-    private lateinit var defaultConfiguration: FileConfiguration
 
-    // Keep Bukkit configurations to preserve current resolve behavior
-    private val localeConfigs: MutableMap<String, FileConfiguration> = mutableMapOf()
+    // Live config handles per locale
+    private val localeHandles: MutableMap<String, ConfigFile<LanguageFile>> = mutableMapOf()
+    private var defaultHandle: ConfigFile<LanguageFile>? = null
 
     /**
-     * Loads all required localization files for craftan based on the entries in
-     * @see CraftanNotification
-     * If no file is provided, the default values from the notifications will be used instead.
-     * The files will be auto updated based on the missing keys.
-     *
-     * Will load every locale file found in the language folder
-     * @see LANGUAGE_FILE_LOCATION
+     * Loads/initializes language files and sets up live handles for each locale.
+     * Uses CraftanNotification defaults to seed/update files.
      */
     override fun load() {
-        // Build default map from CraftanNotification
+        Craftan.logger.info("[MessageAdapter] Loading language files (default=$DEFAULT_LOCALE)...")
         val defaultMessages = CraftanNotification.entries.associate { it.notification.configLocation to it.notification.default }
+        Craftan.logger.fine("[MessageAdapter] Default messages count: ${defaultMessages.size}")
 
         // Ensure default locale exists and is auto-updated
-        val defaultFile = File(PluginManager.dataFolder, "$LANGUAGE_FILE_LOCATION$DEFAULT_LOCALE.yml")
-        val defaultLayout = LanguageFile(locale = DEFAULT_LOCALE, messages = defaultMessages)
-        LanguageYamlAdapter(defaultFile, defaultLayout).loadAndUpdate()
-        defaultConfiguration = YamlConfiguration.loadConfiguration(defaultFile)
+        val def = LanguageFiles.handle(DEFAULT_LOCALE, defaultMessages)
+        def.get() // write/update if needed
+        defaultHandle = def
+        Craftan.logger.info("[MessageAdapter] Default locale '$DEFAULT_LOCALE' initialized")
 
         // Load and auto-update other locales found in the language folder
         loadLocales(defaultMessages)
     }
 
     /**
-     * @return the found files in the langauges folder [LANGUAGE_FILE_LOCATION]
+     * @return the found files in the languages folder including the default locale
      */
-    fun getResolvedLocales(): List<String> = localeConfigs.keys.toMutableList().apply { add(DEFAULT_LOCALE) }
+    fun getResolvedLocales(): List<String> = localeHandles.keys.toMutableList().apply { add(DEFAULT_LOCALE) }
 
     /**
-     * Creates a new localization file for the given locale.
-     * Will copy the current default locale file, to the new locale
-     * @param locale to create
+     * Creates a new localization file for the given locale from current defaults.
      */
     fun createLocaleFromDefault(locale: String) {
-        val location = File(PluginManager.dataFolder, "$LANGUAGE_FILE_LOCATION/$locale.yml")
-        val defaultLocation = File(PluginManager.dataFolder, "$LANGUAGE_FILE_LOCATION/$DEFAULT_LOCALE.yml")
-
-        if (!defaultLocation.exists()) {
-            error("Default localization file not found!")
-        }
-
-        if (!location.exists()) {
-            Files.copy(defaultLocation.toPath(), location.toPath())
-            val config = YamlConfiguration.loadConfiguration(location)
-            config.set("locale", locale)
-            config.save(location)
-        }
+        Craftan.logger.info("[MessageAdapter] Creating locale '$locale' from defaults")
+        val defaultMessages = CraftanNotification.entries.associate { it.notification.configLocation to it.notification.default }
+        val handle = LanguageFiles.handle(locale, defaultMessages)
+        handle.get() // ensure created and seeded
+        localeHandles[locale] = handle
     }
 
     /**
@@ -100,62 +79,33 @@ object MessageAdapter : FileAdapter {
         configLocation: String,
         locale: String?,
     ): String {
-        if (locale == null) {
-            return defaultConfiguration.getString(configLocation) ?: "N/A Message not found"
+        val effectiveLocale = locale ?: DEFAULT_LOCALE
+        val handle = if (locale == null) defaultHandle else localeHandles[locale]
+        val message = handle?.get()?.messages?.get(configLocation)
+        if (message != null) return message
+        Craftan.logger.fine("[MessageAdapter] Missing message '$configLocation' in locale '$effectiveLocale', falling back to default")
+        // Fallback to default
+        val fallback = defaultHandle?.get()?.messages?.get(configLocation)
+        if (fallback == null) {
+            Craftan.logger.warning("[MessageAdapter] Missing message '$configLocation' in default locale '$DEFAULT_LOCALE'")
         }
-
-        val localeConfig = localeConfigs[locale] ?: return resolveRawMessage(configLocation, null)
-        val resolvedMessage = (localeConfig.getString(configLocation) ?: "N/A Message not found")
-
-        return resolvedMessage
-    }
-
-    // Auto-update and reload locales using the generic YAML adapter
-    private fun updatesLocalesFiles() { /* no-op: handled by load() */ }
-
-    private fun loadDefault() { /* deprecated by generic adapter */ }
-
-    private fun validateConfig(configuration: FileConfiguration): Boolean {
-        // Kept for compatibility but not used anymore
-        if (!configuration.contains(LOCALE_LOCATION)) return false
-        return !CraftanNotification.entries.any { !configuration.contains(it.notification.configLocation) }
-    }
-
-    private fun findConfigError(configuration: FileConfiguration): MessageNotification {
-        if (!configuration.contains(LOCALE_LOCATION)) return MessageNotification(LOCALE_LOCATION, "")
-        return CraftanNotification.entries.first { !configuration.contains(it.notification.configLocation) }.notification
+        return fallback ?: "N/A Message not found"
     }
 
     private fun loadLocales(defaultMessages: Map<String, String>) {
-        localeConfigs.clear()
-        val messagesFolder = File(PluginManager.dataFolder, LANGUAGE_FILE_LOCATION)
-        val localeFiles = messagesFolder
-            .listFiles()
-            ?.toList()
-            // Only real locale YAMLs:
-            // - Must have extension exactly "yml"
-            // - Exclude legacy backups like "*.bak-<ts>.yml"
-            // - Exclude new backups like "*.yml.backup" (defensive, even though extension wouldn't be yml)
-            ?.filter { file ->
-                val isYml = file.extension == "yml"
-                val isLegacyBackup = file.name.contains(".bak-") && file.name.endsWith(".yml")
-                val isNewBackup = file.name.endsWith(".yml.backup")
-                isYml && !isLegacyBackup && !isNewBackup
+        localeHandles.clear()
+        // Discover existing locale files (excluding backups and default)
+        val localeFiles = LanguageFiles.listLocales()
+        Craftan.logger.fine("[MessageAdapter] Found locales: ${localeFiles.joinToString(", ")}")
+        for (locale in localeFiles) {
+            if (locale == DEFAULT_LOCALE) continue
+            val handle = LanguageFiles.handle(locale, defaultMessages)
+            handle.get() // update if needed
+            if (localeHandles.contains(locale)) {
+                error("Locale $locale is already loaded. Please double check your files!")
             }
-            ?: listOf()
-
-        for (file in localeFiles) {
-            if (file.name == "$DEFAULT_LOCALE.yml") continue
-
-            val localeCode = file.nameWithoutExtension
-            val layout = LanguageFile(locale = localeCode, messages = defaultMessages)
-            // Auto-update with backup and then reload as Bukkit config for resolve functions
-            LanguageYamlAdapter(file, layout).loadAndUpdate()
-
-            if (localeConfigs.contains(localeCode)) {
-                error("Locale $localeCode is already loaded. Please double check your files!")
-            }
-            localeConfigs[localeCode] = YamlConfiguration.loadConfiguration(file)
+            localeHandles[locale] = handle
+            Craftan.logger.info("[MessageAdapter] Loaded locale '$locale'")
         }
     }
 }

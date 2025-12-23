@@ -1,5 +1,6 @@
 package de.craftan.io.config.sample
 
+import de.craftan.io.config.CraftanFileConfig
 import de.craftan.io.config.FlattenToRoot
 import de.craftan.io.config.Location
 
@@ -18,7 +19,7 @@ data class SampleConfig(
 
     @Location("config.game.timers")
     val gameTime: Int = 60
-) {
+) : CraftanFileConfig {
     data class Nested(
         val retries: Int = 3,
         val timeoutSeconds: Long = 15,
