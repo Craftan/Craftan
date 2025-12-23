@@ -21,7 +21,10 @@ internal fun resolvePropertyPath(
     flatten: Boolean,
 ): String {
     val normalizedLocation = normalizeLocation(location)
-    if (!normalizedLocation.isNullOrEmpty()) return normalizedLocation
+    if (!normalizedLocation.isNullOrEmpty()) {
+        // @Location defines a parent path; place the property under it
+        return joinPath(normalizedLocation, propName)
+    }
     if (flatten) return prefix
     val normalizedSection = normalizeLocation(section)
     val base = if (!normalizedSection.isNullOrEmpty()) joinPath(prefix, normalizedSection) else prefix
