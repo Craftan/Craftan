@@ -1,6 +1,6 @@
 package de.craftan.io.config
 
-import de.craftan.io.LanguageFile
+import de.craftan.config.schema.LanguageFile
 import java.io.File
 
 /**

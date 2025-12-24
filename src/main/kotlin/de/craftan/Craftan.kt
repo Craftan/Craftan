@@ -5,9 +5,8 @@ import de.craftan.bridge.listeners.PlayerInteractedEntityEvent
 import de.craftan.commands.craftanCommand
 import de.craftan.commands.structureCommand
 import de.craftan.config.ConfigSystem
-import de.craftan.config.CraftanConfig
+import de.craftan.config.schema.CraftanConfig
 import de.craftan.io.CraftanEventBus
-import de.craftan.io.MessageAdapter
 import de.craftan.io.permissions.PermissionsAdapter
 import de.craftan.util.CraftanSystem
 import de.craftan.util.SystemManager
@@ -43,8 +42,8 @@ object Craftan {
      * Configures the Craftan plugin
      */
     fun configure() {
-        createSchematicFolder()
         loadFiles()
+        createSchematicFolder()
         loadSystems()
         loadCommands()
         registerItemBehaviors()
@@ -59,7 +58,6 @@ object Craftan {
     }
 
     private fun loadFiles() {
-        MessageAdapter.load()
         PermissionsAdapter.load()
     }
 

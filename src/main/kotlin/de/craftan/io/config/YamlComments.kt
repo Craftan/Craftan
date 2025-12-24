@@ -3,19 +3,11 @@ package de.craftan.io.config
 import org.bukkit.configuration.file.FileConfiguration
 
 /**
- * Ensures that a YAML section exists at the given path and attaches a single-line comment to it
- * if the underlying FileConfiguration implementation supports comments.
- * This uses reflection to avoid hard dependency on newer Bukkit APIs.
+ * Attaches a single-line comment to the given YAML path if supported by the underlying implementation.
+ * Uses reflection to call setComments(String, List<String>) when available.
  */
-internal fun ensureSectionAndComment(out: FileConfiguration, sectionPath: String, comment: String) {
-    val normalized = normalizeLocation(sectionPath) ?: return
-    if (!out.contains(normalized)) {
-        try {
-            out.createSection(normalized)
-        } catch (_: Exception) {
-            // ignore
-        }
-    }
+internal fun setComment(out: FileConfiguration, path: String, comment: String) {
+    val normalized = normalizeLocation(path) ?: return
     try {
         val m = out.javaClass.methods.firstOrNull {
             it.name == "setComments" && it.parameterTypes.size == 2 && it.parameterTypes[0] == String::class.java

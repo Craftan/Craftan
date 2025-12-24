@@ -3,13 +3,16 @@ package de.craftan.io
 import de.craftan.Craftan
 import de.craftan.bridge.util.resolveMiniMessage
 import de.craftan.bridge.util.toComponent
+import de.craftan.config.schema.LanguageFile
 import de.craftan.io.config.ConfigFile
+import de.craftan.io.config.annotations.LiveConfigRead
 import net.kyori.adventure.text.Component
 
 /**
  * Util class to help load messages from a configuration file, based on localization.
  * Adopted to the generic ConfigFile system for live, auto-updating reads.
  */
+@OptIn(LiveConfigRead::class)
 object MessageAdapter : FileAdapter {
     private const val DEFAULT_LOCALE = "en_US"
 

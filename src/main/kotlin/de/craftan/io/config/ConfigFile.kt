@@ -1,10 +1,14 @@
 package de.craftan.io.config
 
 import de.craftan.Craftan
+import de.craftan.io.config.annotations.LiveConfigRead
 import java.io.File
 
 /**
  * Small helper wrapper around YamlConfigAdapter to make loading configs dead simple.
+ *
+ * Important: get() performs a full disk read & merge on every call (live values). You must opt in via
+ * @OptIn(LiveConfigRead::class) to acknowledge the I/O. Use cachedOrNull() if you need a quick, in-memory check.
  *
  * Usage:
  * val cfg = ConfigFile({ File(dataFolder, "config/craftan.yml") }, { CraftanConfig() }).get()
@@ -21,8 +25,9 @@ class ConfigFile<T : CraftanFileConfig>(
     private var cached: T? = null
 
     /**
-     * Loads and returns the hydrated config. Also caches the instance in-memory.
+     * Loads and returns the hydrated config from disk every call. Also caches the instance in-memory.
      */
+    @LiveConfigRead
     fun get(): T = synchronized(this) {
         val file = fileProvider()
         Craftan.logger.fine("[ConfigFile] Loading ${file.absolutePath}")

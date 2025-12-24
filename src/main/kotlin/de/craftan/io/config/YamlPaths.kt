@@ -7,28 +7,37 @@ internal fun joinPath(prefix: String, child: String): String = when {
 }
 
 /**
- * Resolves the effective YAML path for a property, honoring precedence:
- * 1) @Location absolute path if present
- * 2) @FlattenToRoot keeps current prefix
- * 3) @Section joins its path with current prefix and then the property name
- * 4) default: prefix + property name
+ * Resolves the effective YAML path for a property, honoring precedence and @MapKey:
+ * 1) @Location defines a parent path
+ * 2) @FlattenToRoot keeps current prefix (property appears directly under the prefix)
+ * 3) default: prefix + property name
+ *
+ * If [mapKey] is provided, the final path becomes `<parent>.<mapKey>` and the property name is not used.
  */
 internal fun resolvePropertyPath(
     prefix: String,
     propName: String,
     location: String?,
-    section: String?,
     flatten: Boolean,
+    mapKey: String?
 ): String {
-    val normalizedLocation = normalizeLocation(location)
-    if (!normalizedLocation.isNullOrEmpty()) {
-        // @Location defines a parent path; place the property under it
-        return joinPath(normalizedLocation, propName)
+    val loc = normalizeLocation(location)
+    val key = normalizeLocation(mapKey)
+
+    // Base parent path resolution
+    val base = when {
+        !loc.isNullOrEmpty() -> loc
+        flatten -> prefix
+        else -> joinPath(prefix, propName)
     }
-    if (flatten) return prefix
-    val normalizedSection = normalizeLocation(section)
-    val base = if (!normalizedSection.isNullOrEmpty()) joinPath(prefix, normalizedSection) else prefix
-    return joinPath(base, propName)
+
+    // If @Location is present and no @MapKey, we must append the property name
+    if (!loc.isNullOrEmpty() && key.isNullOrEmpty()) {
+        return joinPath(loc, propName)
+    }
+
+    // If @MapKey is provided, append it to the base
+    return if (!key.isNullOrEmpty()) joinPath(base, key) else base
 }
 
 internal fun normalizeLocation(loc: String?): String? {

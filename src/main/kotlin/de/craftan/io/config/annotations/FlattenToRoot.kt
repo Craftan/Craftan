@@ -1,4 +1,4 @@
-package de.craftan.io.config
+package de.craftan.io.config.annotations
 
 /**
  * Annotation to indicate that a Map<String, *> property should be flattened to the root of the YAML file.

@@ -2,12 +2,18 @@ package de.craftan.io.config
 
 import de.craftan.Craftan
 import de.craftan.PluginManager
+import de.craftan.io.config.annotations.LiveConfigRead
 import java.io.File
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.primaryConstructor
 
 /**
  * High-level convenience API to load YAML-backed config data classes.
+ *
+ * Notes about get():
+ * - get() always reads from disk and merges with defaults on every call (live values).
+ * - Because this implies I/O, callers must explicitly opt in using @OptIn(LiveConfigRead::class).
+ * - If you need a reusable handle, prefer Configs.of<T>(). The handle's get() has the same opt-in requirement.
  *
  * Usage examples:
  * - val cfg = Configs.get<CraftanConfig>() // requires @ConfigPath on class
@@ -41,14 +47,16 @@ object Configs {
         return ConfigFile.of(file, defaults, createBackup)
     }
 
-    /** Loads and returns the hydrated config using the provided relative path. */
+    /** Loads and returns the hydrated config using the provided relative path. Performs disk I/O. */
+    @LiveConfigRead
     inline fun <reified T : CraftanFileConfig> get(relativePath: String, createBackup: Boolean = true): T =
         of<T>(relativePath, createBackup).get()
 
     /**
      * Loads and returns the hydrated config using @ConfigPath on the config class to resolve its file location.
-     * The config data class must provide defaults for all constructor parameters.
+     * The config data class must provide defaults for all constructor parameters. Performs disk I/O.
      */
+    @LiveConfigRead
     inline fun <reified T : CraftanFileConfig> get(createBackup: Boolean = true): T {
         val k = T::class
         val path = k.findAnnotation<ConfigPath>()?.value

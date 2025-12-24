@@ -2,6 +2,7 @@ package de.craftan.io
 
 import de.craftan.Craftan
 import de.craftan.PluginManager
+import de.craftan.config.schema.LanguageFile
 import de.craftan.io.config.ConfigFile
 import java.io.File
 

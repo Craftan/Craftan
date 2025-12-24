@@ -1,6 +1,10 @@
 package de.craftan.io.config
 
 import de.craftan.Craftan
+import de.craftan.io.config.annotations.Description
+import de.craftan.io.config.annotations.FlattenToRoot
+import de.craftan.io.config.annotations.Location
+import de.craftan.io.config.annotations.MapKey
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -23,7 +27,7 @@ import kotlin.reflect.full.primaryConstructor
  * - Primitives (String, Int, Long, Double, Boolean)
  * - Enums (stored as name)
  * - Nested data classes
- * - Map<String, V> (V can be another supported shape). If the property is annotated with [FlattenToRoot],
+ * - Map<String, V> (V can be another supported shape). If the property is annotated with [de.craftan.io.config.annotations.FlattenToRoot],
  *   map entries are written/read at the root (or current prefix) rather than under the property name.
  * - List of primitives (String, Int, Long, Double, Boolean) and enums. Nested lists of complex objects are not supported.
  */
@@ -99,8 +103,8 @@ abstract class YamlConfigAdapter<T : CraftanFileConfig>(
     }
 
     // ------------ Merge (read existing -> instance) ------------
-    private fun <R : Any> mergeDataClass(prefix: String, default: R, cfg: FileConfiguration): R {
-        val kClass = default::class
+    private fun <R : Any> mergeDataClass(prefix: String, defaultInstance: R, configuration: FileConfiguration): R {
+        val kClass = defaultInstance::class
         val ctor = kClass.primaryConstructor
             ?: error("YamlConfigAdapter requires a primary constructor for data class ${kClass.qualifiedName}")
 
@@ -110,54 +114,91 @@ abstract class YamlConfigAdapter<T : CraftanFileConfig>(
         for (param in ctor.parameters) {
             val name = param.name ?: continue
             val prop = propsByName[name] ?: continue
-            val defaultValue = prop.getter.call(default)
+            val defaultValue = prop.getter.call(defaultInstance)
             val childPrefix = resolvePropertyPath(
                 prefix,
                 name,
                 prop.findAnnotation<Location>()?.value,
-                prop.findAnnotation<Section>()?.value,
-                prop.findAnnotation<FlattenToRoot>() != null
+                prop.findAnnotation<FlattenToRoot>() != null,
+                prop.findAnnotation<MapKey>()?.value ?: prop.findAnnotation<de.craftan.io.config.annotations.Map>()?.value
             )
-            val mergedValue = mergeValue(childPrefix, defaultValue, cfg)
-            args[param] = mergedValue
+            // Schema-driven merge: if this is a Map and defaults are empty, derive entries from the declared value type
+            val mergedValue = if (defaultValue is Map<*, *> && defaultValue.isEmpty()) {
+                mergeMapWithSchema(childPrefix, prop, configuration)
+            } else {
+                mergeValue(childPrefix, defaultValue, configuration)
+            }
+            val validated = validateProperty(
+                property = prop,
+                value = mergedValue,
+                defaultValue = defaultValue,
+                yamlPath = childPrefix,
+                sourceFile = file,
+                ownerName = kClass.simpleName ?: "<anonymous>"
+            )
+            args[param] = validated
         }
 
         return ctor.callBy(args)
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun mergeValue(prefix: String, defaultValue: Any?, cfg: FileConfiguration): Any? {
+    private fun mergeValue(prefix: String, defaultValue: Any?, configuration: FileConfiguration): Any? {
         if (defaultValue == null) return null
 
         return when (defaultValue) {
-            is String -> if (cfg.contains(prefix)) cfg.getString(prefix) else defaultValue
-            is Int -> if (cfg.contains(prefix)) cfg.getInt(prefix) else defaultValue
-            is Long -> if (cfg.contains(prefix)) cfg.getLong(prefix) else defaultValue
-            is Double -> if (cfg.contains(prefix)) cfg.getDouble(prefix) else defaultValue
-            is Boolean -> if (cfg.contains(prefix)) cfg.getBoolean(prefix) else defaultValue
+            is String -> if (configuration.contains(prefix)) configuration.getString(prefix) else defaultValue
+            is Int -> if (configuration.contains(prefix)) configuration.getInt(prefix) else defaultValue
+            is Long -> if (configuration.contains(prefix)) configuration.getLong(prefix) else defaultValue
+            is Double -> if (configuration.contains(prefix)) configuration.getDouble(prefix) else defaultValue
+            is Boolean -> if (configuration.contains(prefix)) configuration.getBoolean(prefix) else defaultValue
             is Enum<*> -> {
-                if (cfg.contains(prefix)) {
-                    val raw = cfg.getString(prefix)
-                    if (raw != null) {
+                if (configuration.contains(prefix)) {
+                    val rawValue = configuration.getString(prefix)
+                    if (rawValue != null) {
                         val constants = defaultValue.javaClass.enumConstants as Array<out Enum<*>>
-                        constants.firstOrNull { it.name == raw } ?: defaultValue
+                        constants.firstOrNull { it.name == rawValue } ?: defaultValue
                     } else defaultValue
                 } else defaultValue
             }
             is Map<*, *> -> {
-                // Only Map<String, V> supported
-                val defMap = defaultValue as Map<String, Any?>
+                // Only Map<String, V> supported. Merge YAML section keys dynamically.
+                val defaultMap = defaultValue as Map<String, Any?>
                 val result = LinkedHashMap<String, Any?>()
-                for ((k, v) in defMap) {
-                    val childPrefix = joinPath(prefix, k)
-                    result[k] = mergeValue(childPrefix, v, cfg)
+                val section = configuration.getConfigurationSection(prefix)
+                val sampleDefault: Any? = defaultMap.values.firstOrNull()
+                if (section != null) {
+                    for (key in section.getKeys(false)) {
+                        val childPrefix = joinPath(prefix, key)
+                        val defaultForKey = defaultMap[key] ?: sampleDefault
+                        // If we have any default sample (primitive, list, data class, etc.), merge using it to ensure proper typing and validation.
+                        result[key] = if (defaultForKey != null) {
+                            mergeValue(childPrefix, defaultForKey, configuration)
+                        } else {
+                            // No sample available (empty defaults). Try to coerce to common primitives for better validator coverage.
+                            when {
+                                configuration.isString(childPrefix) -> configuration.getString(childPrefix)
+                                configuration.isInt(childPrefix) -> configuration.getInt(childPrefix)
+                                configuration.isLong(childPrefix) -> configuration.getLong(childPrefix)
+                                configuration.isDouble(childPrefix) -> configuration.getDouble(childPrefix)
+                                configuration.isBoolean(childPrefix) -> configuration.getBoolean(childPrefix)
+                                else -> configuration.get(childPrefix)
+                            }
+                        }
+                    }
+                } else {
+                    // No YAML section present; fall back to defaults
+                    for ((key, mapValue) in defaultMap) {
+                        val childPrefix = joinPath(prefix, key)
+                        result[key] = mergeValue(childPrefix, mapValue, configuration)
+                    }
                 }
                 result
             }
             is List<*> -> {
                 // Support lists of primitives/enums only
-                if (cfg.contains(prefix)) {
-                    val list = cfg.getList(prefix)
+                if (configuration.contains(prefix)) {
+                    val list = configuration.getList(prefix)
                     if (list != null) {
                         val coerced = coerceList(list, defaultValue)
                         coerced ?: defaultValue
@@ -166,22 +207,97 @@ abstract class YamlConfigAdapter<T : CraftanFileConfig>(
             }
             else -> {
                 // Nested data class
-                val kClass = defaultValue::class
-                if (kClass.isData) mergeDataClass(prefix, defaultValue, cfg) else defaultValue
+                val valueClass = defaultValue::class
+                if (valueClass.isData) mergeDataClass(prefix, defaultValue, configuration) else defaultValue
             }
         }
     }
 
-    private fun coerceList(raw: List<*>, defaultValue: List<*>): List<*>? {
-        val sample = defaultValue.firstOrNull() ?: return raw
-        return when (sample) {
-            is String -> raw.filterIsInstance<String>()
-            is Int -> raw.mapNotNull { (it as? Number)?.toInt() }
-            is Long -> raw.mapNotNull { (it as? Number)?.toLong() }
-            is Double -> raw.mapNotNull { (it as? Number)?.toDouble() }
-            is Boolean -> raw.mapNotNull { it as? Boolean }
-            is Enum<*> -> raw.mapNotNull { it as? String } // we keep as strings and will write back as strings
+    /**
+     * Attempts to coerce a raw list read from YAML to the type of the default list's element.
+     * Only primitives and enums are supported for list elements.
+     */
+    private fun coerceList(rawList: List<*>, defaultValue: List<*>): List<*>? {
+        val sampleElement = defaultValue.firstOrNull() ?: return rawList
+        return when (sampleElement) {
+            is String -> rawList.filterIsInstance<String>()
+            is Int -> rawList.mapNotNull { (it as? Number)?.toInt() }
+            is Long -> rawList.mapNotNull { (it as? Number)?.toLong() }
+            is Double -> rawList.mapNotNull { (it as? Number)?.toDouble() }
+            is Boolean -> rawList.mapNotNull { it as? Boolean }
+            is Enum<*> -> rawList.mapNotNull { it as? String } // we keep as strings and will write back as strings
             else -> null
+        }
+    }
+
+    // -------- Schema-driven helpers --------
+    /**
+     * Merges a Map<String, V> section using the declared value type V as schema, when no defaults are provided.
+     */
+    private fun mergeMapWithSchema(prefix: String, prop: kotlin.reflect.KProperty1<out Any, *>, configuration: FileConfiguration): Map<String, Any?> {
+        val section = configuration.getConfigurationSection(prefix)
+        val result = LinkedHashMap<String, Any?>()
+        if (section == null) return result
+        val valueSample = createSchemaSampleForMapValue(prop) ?: return result
+        for (key in section.getKeys(false)) {
+            val childPrefix = joinPath(prefix, key)
+            result[key] = mergeValue(childPrefix, valueSample, configuration)
+        }
+        return result
+    }
+
+    /**
+     * Finds the declared generic type for the map value and creates a default sample instance.
+     */
+    private fun createSchemaSampleForMapValue(prop: kotlin.reflect.KProperty1<out Any, *>): Any? {
+        val returnType = prop.returnType
+        if (returnType.classifier != Map::class || returnType.arguments.size != 2) return null
+        val valueType = returnType.arguments[1].type ?: return null
+        return createDefaultForKType(valueType)
+    }
+
+    /**
+     * Creates a default instance for a given KType, supporting primitives, enums, and data classes.
+     */
+    private fun createDefaultForKType(kType: kotlin.reflect.KType): Any? {
+        val classifier = kType.classifier
+        if (classifier !is kotlin.reflect.KClass<*>) return null
+        val kClass = classifier
+        return when (kClass) {
+            String::class -> ""
+            Int::class -> 0
+            Long::class -> 0L
+            Double::class -> 0.0
+            Float::class -> 0.0f
+            Boolean::class -> false
+            else -> {
+                if (kClass.java.isEnum) {
+                    val constants = kClass.java.enumConstants
+                    if (constants != null && constants.isNotEmpty()) constants[0] else null
+                } else if (kClass.isData) {
+                    instantiateDataClassDefault(kClass)
+                } else null
+            }
+        }
+    }
+
+    /**
+     * Attempts to instantiate a data class using default parameters; falls back to best-effort primitives.
+     */
+    private fun instantiateDataClassDefault(kClass: kotlin.reflect.KClass<*>): Any? {
+        val ctor = kClass.primaryConstructor ?: return null
+        // Try to call with default arguments (all parameters optional with defaults)
+        return try {
+            ctor.callBy(emptyMap())
+        } catch (_: Throwable) {
+            // Fallback: attempt to build args from parameter defaults of common primitives
+            val args = mutableMapOf<kotlin.reflect.KParameter, Any?>()
+            for (parameter in ctor.parameters) {
+                val paramType = parameter.type
+                val paramDefault = createDefaultForKType(paramType) ?: continue
+                args[parameter] = paramDefault
+            }
+            runCatching { ctor.callBy(args) }.getOrNull()
         }
     }
 
@@ -190,42 +306,41 @@ abstract class YamlConfigAdapter<T : CraftanFileConfig>(
         val kClass = value::class
         val props = kClass.memberProperties
         for (prop in props) {
-            val v = prop.getter.call(value) ?: continue
-            val sectionAnno = prop.findAnnotation<Section>()
+            val propertyValue = prop.getter.call(value) ?: continue
+            val description = prop.findAnnotation<Description>()
             val childPrefix = resolvePropertyPath(
                 prefix,
                 prop.name,
                 prop.findAnnotation<Location>()?.value,
-                sectionAnno?.value,
-                prop.findAnnotation<FlattenToRoot>() != null
+                prop.findAnnotation<FlattenToRoot>() != null,
+                prop.findAnnotation<MapKey>()?.value ?: prop.findAnnotation<de.craftan.io.config.annotations.Map>()?.value
             )
-            // If a section with comment is defined, try to attach a comment to that section path.
-            if (sectionAnno != null && sectionAnno.comment.isNotBlank()) {
-                ensureSectionAndComment(out, joinPath(prefix, normalizeLocation(sectionAnno.value) ?: ""), sectionAnno.comment)
+            writeValue(childPrefix, propertyValue, out)
+            if (description != null && description.value.isNotBlank()) {
+                setComment(out, childPrefix, description.value)
             }
-            writeValue(childPrefix, v, out)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun writeValue(prefix: String, v: Any?, out: FileConfiguration) {
-        if (v == null) return
-        when (v) {
-            is String, is Int, is Long, is Double, is Boolean -> out.set(prefix, v)
-            is Enum<*> -> out.set(prefix, v.name)
+    private fun writeValue(prefix: String, value: Any?, out: FileConfiguration) {
+        if (value == null) return
+        when (value) {
+            is String, is Int, is Long, is Double, is Boolean -> out.set(prefix, value)
+            is Enum<*> -> out.set(prefix, value.name)
             is Map<*, *> -> {
-                val map = v as Map<String, Any?>
-                for ((k, mv) in map) {
-                    writeValue(joinPath(prefix, k), mv, out)
+                val stringKeyedMap = value as Map<String, Any?>
+                for ((entryKey, entryValue) in stringKeyedMap) {
+                    writeValue(joinPath(prefix, entryKey), entryValue, out)
                 }
             }
             is List<*> -> {
-                val normalized = v.map { if (it is Enum<*>) it.name else it }
+                val normalized = value.map { if (it is Enum<*>) it.name else it }
                 out.set(prefix, normalized)
             }
             else -> {
-                val k = v::class
-                if (k.isData) writeDataClass(prefix, v, out) else out.set(prefix, v)
+                val valueClass = value::class
+                if (valueClass.isData) writeDataClass(prefix, value, out) else out.set(prefix, value)
             }
         }
     }
