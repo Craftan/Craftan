@@ -26,7 +26,7 @@ private val colorsToItems = mapOf(
     Color.BLUE to Material.BLUE_WOOL,
 )
 
-fun colorSelectorInventory(player: Player, lobby: CraftanLobby) = kInventory(player, 3.rows, InventoryType.CHEST, false) {
+fun colorSelectorInventory(player: Player, lobby: CraftanLobby) = kInventory(player, 3.rows, InventoryType.CHEST) {
     title = CraftanNotification.LOBBY_COLOR_SELECTOR_INVENTORY_TITLE.resolve(player)
     setRow(0, placeholderRow)
     setRow(1, colorRow(player, lobby))

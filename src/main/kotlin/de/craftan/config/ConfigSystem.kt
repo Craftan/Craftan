@@ -1,29 +1,37 @@
 package de.craftan.config
 
-import com.uchuhimo.konf.Config
-import com.uchuhimo.konf.source.toml
-import com.uchuhimo.konf.source.toml.toToml
-import de.craftan.PluginManager
+import de.craftan.Craftan
+import de.craftan.config.schema.CraftanConfig
+import de.craftan.io.MessageAdapter
+import de.craftan.io.config.ConfigFile
+import de.craftan.io.config.Configs
+import de.craftan.io.config.CraftanFileConfig
+import de.craftan.io.config.annotations.LiveConfigRead
 import de.craftan.util.CraftanSystem
-import java.io.File
 
 object ConfigSystem : CraftanSystem {
+
+    val configs = mutableListOf<ConfigFile<out CraftanFileConfig>>()
+
+    @OptIn(LiveConfigRead::class)
+    private inline fun <reified T: CraftanFileConfig> addConfig(): () -> T {
+        val handle = Configs.of<T>()
+        configs += handle
+        handle.get()
+        return { handle.cachedOrNull() ?: throw IllegalStateException("Failed to load config ${T::class.simpleName}") }
+    }
+
+    @OptIn(LiveConfigRead::class)
     /**
-     * Use this as global config for craftan
+     * Loads all registered config files and updates them
+     * @see de.craftan.io.config.YamlConfigAdapter
      */
-    lateinit var config: Config
-
     override fun load() {
-        val file = File(PluginManager.dataFolder, "config.toml")
+        Craftan.logger.info("[ConfigSystem] Initializing CraftanConfig live provider via Configs")
+        Craftan.config = addConfig<CraftanConfig>()
 
-        if (!file.exists()) {
-            file.parentFile.mkdirs()
-            val defaultConfig = Config { addSpec(CraftanConfig) }
-            file.createNewFile()
-
-            defaultConfig.toToml.toFile(file)
-        }
-
-        config = Config { addSpec(CraftanConfig) }.from.toml.watchFile(file)
+        // Initialize language system via MessageAdapter
+        Craftan.logger.info("[ConfigSystem] Loading MessageAdapter (languages)")
+        MessageAdapter.load()
     }
 }
