@@ -4,7 +4,7 @@ import de.craftan.Craftan
 import java.util.logging.Logger
 
 fun Logger.debug(message: Any) {
-    if (Craftan.config().debug) {
+    if (Craftan.configs.craftan().debug) {
         this.fine("[DEBUG] $message")
     }
 }

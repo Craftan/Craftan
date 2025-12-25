@@ -29,11 +29,6 @@ interface CraftanPlayer {
     val victoryPoints: Int
 
     /**
-     * World the player is joining from
-     */
-    val origin: Location
-
-    /**
      * Contains the inventory the player currently has
      */
     val inventory: CraftanPlayerInventory

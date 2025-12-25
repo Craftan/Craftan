@@ -1,11 +1,11 @@
 package de.craftan.bridge.inventory.config
 
+import de.craftan.Craftan
 import de.craftan.bridge.inventory.placeholderItem
 import de.craftan.bridge.lobby.CraftanLobbyManager
 import de.craftan.bridge.util.sendNotification
 import de.craftan.engine.CraftanGameConfig
 import de.craftan.engine.MutableCraftanGameConfig
-import de.craftan.engine.map.maps.DefaultMapLayout
 import de.craftan.io.*
 import de.staticred.kia.inventory.KRow
 import de.staticred.kia.inventory.builder.kInventory
@@ -19,13 +19,9 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 
-private val timeToRollOptions = listOf(
-    30, 60, 90
-)
+private val timeToRollOptions = Craftan.configs.gameSettings().timeToRollOptions
 
-private val turnTimeOptions = listOf(
-    60, 90, 120
-)
+private val turnTimeOptions = Craftan.configs.gameSettings().turnTimeOptions
 
 fun configureCraftanGameInventory(player: Player) = kInventory(player, 6.rows, InventoryType.CHEST) {
     val contrastColor = MessageAdapter.resolveMessage("base_highlight", player.locale().toString())

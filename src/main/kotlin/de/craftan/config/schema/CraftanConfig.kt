@@ -3,11 +3,9 @@ package de.craftan.config.schema
 import de.craftan.io.config.ConfigPath
 import de.craftan.io.config.CraftanFileConfig
 import de.craftan.io.config.annotations.Description
-import de.craftan.io.config.annotations.Length
 import de.craftan.io.config.annotations.Location
 import de.craftan.io.config.annotations.Max
 import de.craftan.io.config.annotations.Min
-import de.craftan.io.config.annotations.Resource
 
 @ConfigPath("config/craftan.yml")
 data class CraftanConfig(
@@ -31,9 +29,4 @@ data class CraftanConfig(
     @Location("game.defaults")
     @Min(1.0)
     val cardsLimit: Int = 7,
-
-    @Description("Defines color name to resource mapping. Example: colors.red = RED_WOOL")
-    val colors: Map<String, ColorConfig> = mapOf("Red" to ColorConfig("0xFF0000", "RED_WOOL")),
 ) : CraftanFileConfig
-
-data class ColorConfig(val color: String, @Resource val resource: String)

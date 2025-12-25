@@ -47,6 +47,9 @@ enum class CraftanNotification(
     RELOAD_FILES_START(MessageNotification("cmd.craftan.reload", "%bc%Reloading locale files...")),
     RELOAD_FILES_FINISH(MessageNotification("cmd.craftan.finish", "%bc%Finished loading locale files...")),
 
+    CONFIG_NO_VALUE_FOUND(MessageNotification("config.no_value_found", "<red>No value found for key '%key%' in config '%config%'.")),
+    CONFIG_VALUE(MessageNotification("config.no_value_found", "<green>Value for key '%key%' in config '%config%':<grey> '%value%'.")),
+
     //Lobby Config
     LOBBY_CONFIG_INVENTORY_TITLE(MessageNotification("lobby.config.inventory.title", "%bh% >> %bc%Lobby Config for new game", false)),
 

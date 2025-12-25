@@ -1,4 +1,4 @@
-package de.craftan.commands
+package de.craftan.bridge.commands
 
 import com.fastasyncworldedit.core.FaweAPI
 import com.mojang.brigadier.arguments.IntegerArgumentType

@@ -12,7 +12,6 @@ class CraftanPlayerImpl(
     override val game: CraftanGame? = null,
     override val inventory: CraftanPlayerInventory = CraftanPlayerInventory(),
     override val victoryPoints: Int = 0,
-    override val origin: Location,
     override val teamColor: Color = Color.RED,
 ): CraftanPlayer {
 

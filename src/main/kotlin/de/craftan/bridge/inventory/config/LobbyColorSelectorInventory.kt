@@ -1,5 +1,6 @@
 package de.craftan.bridge.inventory.config
 
+import de.craftan.Craftan
 import de.craftan.bridge.inventory.placeholderRow
 import de.craftan.bridge.lobby.CraftanLobby
 import de.craftan.bridge.lobby.CraftanLobbyManager
@@ -19,12 +20,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import java.awt.Color
 
-private val colorsToItems = mapOf(
-    Color.RED to Material.RED_WOOL,
-    Color.YELLOW to Material.YELLOW_WOOL,
-    Color.GREEN to Material.GREEN_WOOL,
-    Color.BLUE to Material.BLUE_WOOL,
-)
+private val colorsToItems = Craftan.configs.gameSettings()
+    .colors
+    .mapValues { ColorItem(Color(it.value.color), Material.valueOf(it.value.resource)) }
 
 fun colorSelectorInventory(player: Player, lobby: CraftanLobby) = kInventory(player, 3.rows, InventoryType.CHEST) {
     title = CraftanNotification.LOBBY_COLOR_SELECTOR_INVENTORY_TITLE.resolve(player)
@@ -34,14 +32,15 @@ fun colorSelectorInventory(player: Player, lobby: CraftanLobby) = kInventory(pla
 }
 
 private fun colorRow(player: Player, lobby: CraftanLobby): KRow = kRow {
-    colorsToItems.entries.forEachIndexed { index, (color, material) ->
-        setItem(index, selectColorItem(player, color, material, lobby))
+    colorsToItems.entries.forEachIndexed { index, (colorName, item) ->
+        setItem(index, selectColorItem(player, colorName, item, lobby))
     }
 }
 
-private fun selectColorItem(player: Player, color: Color, material: Material, lobby: CraftanLobby) = kItem(material) {
+private fun selectColorItem(player: Player, colorName: String, colorItem: ColorItem, lobby: CraftanLobby) = kItem(colorItem.material) {
+    val color = colorItem.color
+
     val available = !lobby.hasPlayerColor(color)
-    val colorName = material.name.removeSuffix("_WOOL").replaceFirstChar { it.uppercase() }
     val itemName = if (available) colorName else "USED - $colorName"
     setDisplayName(literalText(itemName).color(TextColor.color(color.rgb)))
 
@@ -66,3 +65,5 @@ private fun selectColorItem(player: Player, color: Color, material: Material, lo
         }
     }
 }
+
+data class ColorItem(val color: Color, val material: Material)

@@ -163,11 +163,20 @@ abstract class YamlConfigAdapter<T : CraftanFileConfig>(
             }
             is Map<*, *> -> {
                 // Only Map<String, V> supported. Merge YAML section keys dynamically.
+                // Special handling for root-prefix (FlattenToRoot): iterate default keys (which may contain dots)
+                // to correctly read nested values like "lobby.joined".
                 val defaultMap = defaultValue as Map<String, Any?>
                 val result = LinkedHashMap<String, Any?>()
                 val section = configuration.getConfigurationSection(prefix)
                 val sampleDefault: Any? = defaultMap.values.firstOrNull()
-                if (section != null) {
+
+                if (prefix.isEmpty()) {
+                    // Flatten-to-root map (e.g., LanguageFile.messages): read values by default keys to support dotted paths
+                    for ((key, mapDefault) in defaultMap) {
+                        val childPrefix = joinPath(prefix, key)
+                        result[key] = mergeValue(childPrefix, mapDefault, configuration)
+                    }
+                } else if (section != null) {
                     for (key in section.getKeys(false)) {
                         val childPrefix = joinPath(prefix, key)
                         val defaultForKey = defaultMap[key] ?: sampleDefault
@@ -176,7 +185,8 @@ abstract class YamlConfigAdapter<T : CraftanFileConfig>(
                             mergeValue(childPrefix, defaultForKey, configuration)
                         } else {
                             // No sample available (empty defaults). Try to coerce to common primitives for better validator coverage.
-                            when {
+                            // Guard against writing ConfigurationSection objects as values later.
+                            val raw = when {
                                 configuration.isString(childPrefix) -> configuration.getString(childPrefix)
                                 configuration.isInt(childPrefix) -> configuration.getInt(childPrefix)
                                 configuration.isLong(childPrefix) -> configuration.getLong(childPrefix)
@@ -184,6 +194,7 @@ abstract class YamlConfigAdapter<T : CraftanFileConfig>(
                                 configuration.isBoolean(childPrefix) -> configuration.getBoolean(childPrefix)
                                 else -> configuration.get(childPrefix)
                             }
+                            if (raw is org.bukkit.configuration.ConfigurationSection) null else raw
                         }
                     }
                 } else {

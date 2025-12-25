@@ -2,6 +2,7 @@ package de.craftan.config
 
 import de.craftan.Craftan
 import de.craftan.config.schema.CraftanConfig
+import de.craftan.config.schema.CraftanGameConfig
 import de.craftan.io.MessageAdapter
 import de.craftan.io.config.ConfigFile
 import de.craftan.io.config.Configs
@@ -28,10 +29,18 @@ object ConfigSystem : CraftanSystem {
      */
     override fun load() {
         Craftan.logger.info("[ConfigSystem] Initializing CraftanConfig live provider via Configs")
-        Craftan.config = addConfig<CraftanConfig>()
+        val craftanConfig = addConfig<CraftanConfig>()
+        val craftanGameConfig = addConfig<CraftanGameConfig>()
+
+        Craftan.configs = CraftanConfigs(craftanConfig, craftanGameConfig)
 
         // Initialize language system via MessageAdapter
         Craftan.logger.info("[ConfigSystem] Loading MessageAdapter (languages)")
         MessageAdapter.load()
+    }
+
+    @OptIn(LiveConfigRead::class)
+    fun reload() {
+        configs.forEach { it.get() }
     }
 }
