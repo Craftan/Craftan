@@ -1,4 +1,4 @@
-package de.craftan.bridge.listeners
+package de.craftan.bridge.lobby.listeners
 
 import de.craftan.Craftan
 import de.craftan.bridge.map.CraftanHitbox

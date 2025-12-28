@@ -22,6 +22,7 @@ class InternalMain : KSpigot() {
         KIA.create(this, true)
         Craftan.configure()
         SystemManager.loadSystems()
+        CraftanLobbyManager.removeOldLobbies()
     }
 
 

@@ -1,11 +1,14 @@
-package de.craftan.commands
+package de.craftan.bridge.commands
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
+import de.craftan.Craftan
 import de.craftan.bridge.inventory.config.CraftanGameConfigManager
 import de.craftan.bridge.inventory.config.configureCraftanGameInventory
 import de.craftan.bridge.lobby.CraftanLobbyManager
 import de.craftan.bridge.util.sendNotification
+import de.craftan.config.ConfigSystem
+import de.craftan.config.CraftanConfigs
 import de.craftan.io.*
 import de.craftan.io.commands.craftanCommand
 import de.craftan.io.commands.craftanSubCommand
@@ -93,6 +96,46 @@ val craftanCommand =
 
                         lobby.close()
                         player.sendNotification(CraftanNotification.EXTERNAL_LOBBY_CLOSED)
+                    }
+                }
+            }
+        }
+
+        craftanSubCommand("config", "Manage all config files of craftan") {
+            craftanSubCommand("reload", "reload all config files from the configuration") {
+                runs {
+                    player.sendMessage(CraftanNotification.RELOAD_FILES_START.resolve(player))
+                    ConfigSystem.reload()
+                    player.sendMessage(CraftanNotification.RELOAD_FILES_FINISH.resolve(player))
+                }
+            }
+            craftanSubCommand("read", "Read a value from the config") {
+                for (config in CraftanConfigs.configs()) {
+                    craftanSubCommand(config, config) {
+                        argument<String>("Path") {
+                            suggestList {
+                                CraftanConfigs.valuesForConfig(config)
+                            }
+
+                            runs {
+                                val path = getArgument<String>("Path")
+
+                                val value = CraftanConfigs.getValueForConfig(config, path)
+
+                                if (value == null) {
+                                    player.sendMessage(CraftanNotification.CONFIG_NO_VALUE_FOUND.resolveWithPlaceholder(player, mapOf(
+                                        CraftanPlaceholder.KEY to literalText(path),
+                                        CraftanPlaceholder.CONFIG to literalText(config)
+                                    )))
+                                    return@runs
+                                }
+                                player.sendMessage(CraftanNotification.CONFIG_VALUE.resolveWithPlaceholder(player, mapOf(
+                                    CraftanPlaceholder.KEY to literalText(path),
+                                    CraftanPlaceholder.CONFIG to literalText(config),
+                                    CraftanPlaceholder.VALUE to literalText(value.toString())
+                                )))
+                            }
+                        }
                     }
                 }
             }

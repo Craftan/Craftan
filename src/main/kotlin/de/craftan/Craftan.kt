@@ -1,11 +1,12 @@
 package de.craftan
 
+import de.craftan.bridge.commands.craftanCommand
+import de.craftan.bridge.commands.structureCommand
 import de.craftan.bridge.items.behaviors.DiceBehavior
-import de.craftan.bridge.listeners.PlayerInteractedEntityEvent
-import de.craftan.commands.craftanCommand
-import de.craftan.commands.structureCommand
+import de.craftan.bridge.lobby.listeners.PlayerInteractedEntityEvent
+import de.craftan.bridge.lobby.listeners.LobbyEventListeners
 import de.craftan.config.ConfigSystem
-import de.craftan.config.schema.CraftanConfig
+import de.craftan.config.CraftanConfigs
 import de.craftan.io.CraftanEventBus
 import de.craftan.io.permissions.PermissionsAdapter
 import de.craftan.util.CraftanSystem
@@ -30,7 +31,7 @@ object Craftan {
         encodeDefaults = true
     }
 
-    lateinit var config: () -> CraftanConfig
+    lateinit var configs: CraftanConfigs
 
     /**
      * Craftans global event bus.
@@ -49,6 +50,7 @@ object Craftan {
         registerItemBehaviors()
 
         PlayerInteractedEntityEvent().register()
+        LobbyEventListeners.register()
     }
 
     private fun registerItemBehaviors() {

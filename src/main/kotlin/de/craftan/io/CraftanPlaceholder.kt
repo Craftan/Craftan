@@ -16,6 +16,13 @@ enum class CraftanPlaceholder(
     COUNT("%count%"),
 
     /**
+     * Config placeholder
+     */
+    KEY("%key%"),
+    CONFIG("%config%"),
+    VALUE("%value%"),
+
+    /**
      * Used for command information formatting
      */
     COMMAND_NAME("%command_name%"),

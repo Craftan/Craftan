@@ -2,6 +2,7 @@ package de.craftan.bridge.lobby
 
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
+import de.craftan.PluginManager
 import de.craftan.bridge.events.lobby.LobbyCreatedEvent
 import de.craftan.bridge.util.sendNotification
 import de.craftan.bridge.world.generateEmptyWorld
@@ -9,11 +10,9 @@ import de.craftan.engine.CraftanGameConfig
 import de.craftan.io.CraftanEventBus
 import de.craftan.io.CraftanNotification
 import de.craftan.io.globalEventBus
-import de.craftan.io.unloadAndDelete
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
 import de.craftan.util.toWorldEditWorld
-import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -97,10 +96,11 @@ object CraftanLobbyManager {
     }
 
     fun removeOldLobbies() {
-        val oldLobbies = Bukkit.getWorlds().filter { it.name.startsWith(LOBBY_WORLD_PREFIX) }
+        val oldLobbies = PluginManager.server.worldContainer.listFiles().filter { it.name.startsWith(LOBBY_WORLD_PREFIX) }
         oldLobbies.forEach {
-            it.unloadAndDelete()
+            if (!it.delete()) {
+                Craftan.logger.warning("Could not delete old lobby world ${it.name}")
+            }
         }
     }
-
 }

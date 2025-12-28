@@ -4,32 +4,23 @@ import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
 import de.craftan.bridge.events.lobby.*
 import de.craftan.bridge.inventory.config.colorSelectorInventory
-import de.craftan.bridge.items.LobbyItems
 import de.craftan.bridge.map.CraftanMap
-import de.craftan.engine.CraftanGameAction
-import de.craftan.engine.CraftanGameActionEvent
 import de.craftan.engine.CraftanGameConfig
-import de.craftan.engine.CraftanGameEvent
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.implementations.CraftanPlayerImpl
 import de.craftan.engine.map.maps.DefaultMapLayout
-import de.craftan.io.CraftanEvent
 import de.craftan.io.CraftanNotification
 import de.craftan.io.CraftanPlaceholder
-import de.craftan.io.commands.to
 import de.craftan.io.globalEventBus
 import de.craftan.io.unloadAndDelete
 import de.craftan.util.toWorldEditWorld
 import de.staticred.kia.inventory.KInventory
-import de.staticred.kia.inventory.extensions.setHotbarItem
+import net.axay.kspigot.chat.col
 import net.axay.kspigot.chat.literalText
-import net.axay.kspigot.extensions.server
 import net.axay.kspigot.runnables.task
 import net.kyori.adventure.text.Component
 import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent
-import net.ormr.eventbus.EventBus
-import org.apache.commons.io.FileUtils
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
@@ -63,13 +54,12 @@ class CraftanLobby(
         }
 
     private val players = mutableListOf<CraftanPlayer>()
-
     private val playerColors = mutableMapOf<Player, Color>()
 
     private var colorSelectorOwner: Player? = null
     private var sharedColorSelectorInventory: KInventory? = null
 
-    private val sidebar = Craftan.scoreboardLibrary.createSidebar()
+    val sidebar = Craftan.scoreboardLibrary.createSidebar()
 
     private var countdown = 0
 
@@ -84,33 +74,15 @@ class CraftanLobby(
     }
 
     fun addPlayer(player: Player) {
-        val event = PlayerJoinedLobbyEvent(this, player)
-        globalEventBus.fire(event)
-
-        if (event.isCancelled) {
-            return
-        }
-
-        notifyPlayers(CraftanNotification.JOINED_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
-
-        players.add(CraftanPlayerImpl(player, origin = player.location))
-        CraftanPlayerStateManager.saveState(player)
-        sidebar.addPlayer(player)
+        players.add(CraftanPlayerImpl(player))
 
         if (colorSelectorOwner == null) {
             colorSelectorOwner = player
         }
 
-        teleportToLobby(player)
-        player.gameMode = GameMode.ADVENTURE
-        player.inventory.clear()
-
         assignMissingColors()
-        buildAndApplySidebar(player)
 
-        player.setHotbarItem(0, LobbyItems.colorSelector(player))
-
-        sidebar.refreshLines()
+        globalEventBus.fire(PlayerJoinedLobbyEvent(this, player))
     }
 
     fun removePlayer(player: Player) {
@@ -118,11 +90,6 @@ class CraftanLobby(
 
         playerColors.remove(player)
 
-        if (!sidebar.closed()) {
-            sidebar.removePlayer(player)
-        }
-
-        player.teleport(craftanPlayer.origin)
         players.remove(craftanPlayer)
 
         if (colorSelectorOwner == player) {
@@ -133,9 +100,6 @@ class CraftanLobby(
             sharedColorSelectorInventory = null
             colorSelectorOwner = null
         }
-
-        notifyPlayers(CraftanNotification.LEFT_GAME, mapOf(CraftanPlaceholder.PLAYER to player.name))
-        CraftanPlayerStateManager.applyState(player)
 
         globalEventBus.fire(PlayerLeftLobbyEvent(this, player))
     }
@@ -157,7 +121,7 @@ class CraftanLobby(
 
     fun players() = players.toList()
 
-    fun allowedColors(): List<Color> = listOf(Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE)
+    fun allowedColors(): List<Color> = Craftan.configs.gameSettings().colors.map { Color(it.value.color) }
 
     fun getPlayerColor(player: Player): Color? = playerColors[player]
 
@@ -168,8 +132,10 @@ class CraftanLobby(
     fun setPlayerColor(player: Player, color: Color): Boolean {
         if (!allowedColors().contains(color)) return false
         if (!isColorAvailable(color)) return false
+        val from = playerColors[player] ?: return false
         playerColors[player] = color
-        buildAndApplySidebar(player)
+
+        globalEventBus.fire(PlayerChangedColorEvent(player, this, from, color))
         return true
     }
 
@@ -215,12 +181,6 @@ class CraftanLobby(
 
             globalEventBus.fire(LobbyCountdownEvent(this, currentCountdown))
 
-            if (currentCountdown <= 5) {
-                notifyPlayers(CraftanNotification.LOBBY_STARTS_IN, mapOf(
-                    CraftanPlaceholder.TIME_TO_START to literalText(currentCountdown.toString())
-                ))
-            }
-
             if (currentCountdown <= 0) {
                 it.cancel()
                 countingDown = false
@@ -234,20 +194,14 @@ class CraftanLobby(
 
         status = CraftanLobbyStatus.IN_GAME
 
-        players.forEach { player ->
-            player.bukkitPlayer.gameMode = GameMode.CREATIVE
-            player.bukkitPlayer.isFlying = true
-            teleportToMap(player.bukkitPlayer)
-        }
-
         globalEventBus.fire(LobbyStartedEvent(this))
     }
 
-    private fun teleportToMap(player: Player) = player.teleport(Location(world, center.x() + 0.5, center.y() + 50.0, center.z() + 0.5))
+    fun teleportToMap(player: Player) = player.teleport(Location(world, center.x() + 0.5, center.y() + 50.0, center.z() + 0.5))
 
-    private fun teleportToLobby(player: Player) = player.teleport(Location(world, 0.0, 100.0, 0.0))
+    fun teleportToLobby(player: Player) = player.teleport(Location(world, 0.0, 100.0, 0.0))
 
-    private fun buildAndApplySidebar(player: Player) {
+    fun buildAndApplySidebar(player: Player) {
         val lines = SidebarComponent.builder()
             .addBlankLine()
             .addStaticLine { literalText("Players: ${players().size}/${maxPlayers}") }
