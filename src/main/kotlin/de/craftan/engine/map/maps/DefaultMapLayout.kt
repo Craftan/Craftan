@@ -6,7 +6,7 @@ import de.craftan.engine.map.CraftanMapLayout
 class DefaultMapLayout(
     override val name: String = "Default",
 ) : CraftanMapLayout {
-    override val coordinatesToTile: MutableMap<TileCoordinate, GameTile> =
+    override val map: CraftanMap = CraftanMap(
         toCoordinateToGameTileMap(
             listOf(
                 listOf(
@@ -42,4 +42,5 @@ class DefaultMapLayout(
                 ),
             ),
         )
+    )
 }

@@ -14,8 +14,6 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Display
 import org.bukkit.entity.EntityType
-import org.bukkit.entity.Interaction
-import org.bukkit.entity.Shulker
 import org.bukkit.entity.TextDisplay
 import org.bukkit.util.Transformation
 import org.joml.AxisAngle4f
@@ -29,7 +27,7 @@ import org.joml.Vector3f
  * @see CraftanMapLayout
 * @see de.craftan.engine.CraftanGame
 */
-class CraftanMap(
+class CraftanBridgeMap(
     val lobby: CraftanLobby,
 ) {
     /**
@@ -50,7 +48,7 @@ class CraftanMap(
      * Builds the map
      */
     fun build() {
-        for (tile in lobby.board.layout.coordinatesToTile.values) {
+        for (tile in lobby.board.layout.map.tiles.values) {
             val position = getPositionFromCoordinates(tile.coordinate)
             buildTile(tile, position)
         }

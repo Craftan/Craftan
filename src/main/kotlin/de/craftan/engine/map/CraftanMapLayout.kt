@@ -7,7 +7,7 @@ interface CraftanMapLayout {
     val name: String
 
     /**
-     * All the Tiles at their coordinates
+     * The map this layout is based on
      */
-    val coordinatesToTile: MutableMap<TileCoordinate, GameTile>
+    val map: CraftanMap
 }

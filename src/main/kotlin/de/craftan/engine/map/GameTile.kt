@@ -1,6 +1,6 @@
 package de.craftan.engine.map
 
-import de.craftan.bridge.map.CraftanMap
+import de.craftan.bridge.map.CraftanBridgeMap
 import de.craftan.engine.map.graph.*
 
 /**
@@ -92,7 +92,7 @@ data class GameTile(
  * Earlier in the outer List means the row is more up in the board.
  * Earlier in the inner List means more to the left on the game board
  * @param tilesInfo a list of rows of TileInformation
- * @see CraftanMap
+ * @see CraftanBridgeMap
  */
 fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
     val gametiles = mutableListOf<GameTile>()
@@ -121,17 +121,4 @@ fun toGameTiles(tilesInfo: List<List<TileInfo>>): List<GameTile> {
     }
 
     return gametiles
-}
-
-/**
- * Converts a list of rows of TileInformation to a map from the coordinate to the corresponding GameTile.
- * Earlier in the outer List means the row is more up in the board.
- * Earlier in the inner List means more to the left on the game board
- * @param tilesInfo list of rows of TileInformation
- */
-fun toCoordinateToGameTileMap(tilesInfo: List<List<TileInfo>>): MutableMap<TileCoordinate, GameTile> {
-    val gameTiles = toGameTiles(tilesInfo)
-    val map: MutableMap<TileCoordinate, GameTile> = mutableMapOf()
-    gameTiles.forEach { map[it.coordinate] = it }
-    return map
 }

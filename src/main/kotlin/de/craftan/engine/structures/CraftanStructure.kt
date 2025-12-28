@@ -1,10 +1,10 @@
 package de.craftan.engine.structures
 
-import de.craftan.engine.CraftanResource
+import de.craftan.engine.resources.CraftanResourceType
 
 interface CraftanStructure {
     /**
      * Cost to build this given structure
      */
-    val cost: Map<CraftanResource, Int>
+    val cost: Map<CraftanResourceType, Int>
 }

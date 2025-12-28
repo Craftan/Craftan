@@ -13,7 +13,7 @@ fun generateNodes(tiles: Set<TileCoordinate>): MutableMap<TileCoordinate, Mutabl
     for (tile in tiles) {
         for (nodeDirection in NodeDirection.entries) {
             if (!cordToNodeMap[tile]!!.contains(nodeDirection)) {
-                val node = Node(StructureInfo())
+                val node = Node()
                 node.tiles.add(tile)
                 cordToNodeMap[tile]!![nodeDirection] = node
                 appendNodeToNeigbours(tile, node, tiles, nodeDirection, cordToNodeMap)

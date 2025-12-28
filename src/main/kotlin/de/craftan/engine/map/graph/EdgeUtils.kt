@@ -49,7 +49,6 @@ private fun appendEdge(
             Edge(
                 setOf(tile, neighbor),
                 edgeNodes,
-                StructureInfo(),
             )
         cordToEdgeMap[neighbor]!![EdgeDirection.entries.find { it.otherNode.tileCoordinate == edgeDirection.otherNode.tileCoordinate * (-1) }!!] = edge
         cordToEdgeMap[tile]!![edgeDirection] = edge
@@ -59,7 +58,6 @@ private fun appendEdge(
         Edge(
             setOf(tile),
             edgeNodes,
-            StructureInfo(),
         )
     cordToEdgeMap[tile]!![edgeDirection] = edge
 }

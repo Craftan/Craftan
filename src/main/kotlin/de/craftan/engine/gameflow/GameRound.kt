@@ -1,49 +1,36 @@
 package de.craftan.engine.gameflow
 
 import de.craftan.engine.CraftanGame
+import de.craftan.bridge.CraftanBridgePlayer
 import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.gameflow.flows.TurnFlow
 
 /**
  * Models a round of a CraftanGame
  */
-interface GameRound {
+abstract class GameRound {
     /**
      * Abstract name to be rendered ingame
      */
-    val name: String
+    abstract val name: String
+    
+    var turnIndex: Int = 0
 
-    /**
-     * The number of round from the beginning of the game
-     */
-    val index: Int
+    abstract val turnSequence: MutableList<Pair<CraftanPlayer, TurnFlow>>
 
-    /**
-     * the flow of this round
-     */
-    val flow: RoundFlow
+    fun currentTurn(): Pair<CraftanPlayer, TurnFlow> = turnSequence[turnIndex]
 
-    /**
-     * The game the round is inside of
-     */
-    val game: CraftanGame
+    // TODO should listen to turn end event and then call this
+    fun nextTurn() {
+        turnIndex++
+        if (turnIndex >= turnSequence.size) {
+            finish()
+        }
+        val (player, flow) = turnSequence[turnIndex]
+        // TODO Start the turn of the player
+    }
 
-    /**
-     * Used before this round actually starts
-     */
-    fun prepare() {}
-}
-
-/**
- * Models a global round, which takes all players into consideration, and each player can make their turn
- */
-interface GlobalGameRound : GameRound
-
-/**
- * A round which is focused around a single player
- */
-interface PlayerGameRound : GameRound {
-    /**
-     * The player to focus
-     */
-    val player: CraftanPlayer
+    fun finish() {
+        // Fire finish round event
+    }
 }
