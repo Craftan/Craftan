@@ -29,7 +29,7 @@ import org.joml.Vector3f
  * @see CraftanMapLayout
 * @see de.craftan.engine.CraftanGame
 */
-class CraftanMap(
+class CraftanMapBridge(
     val lobby: CraftanLobby,
 ) {
     /**
@@ -50,7 +50,7 @@ class CraftanMap(
      * Builds the map
      */
     fun build() {
-        for (tile in lobby.board.layout.coordinatesToTile.values) {
+        for (tile in lobby.board.layout.map.tiles.values) {
             val position = getPositionFromCoordinates(tile.coordinate)
             buildTile(tile, position)
         }

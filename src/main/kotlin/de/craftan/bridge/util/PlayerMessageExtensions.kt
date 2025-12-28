@@ -1,6 +1,6 @@
 package de.craftan.bridge.util
 
-import de.craftan.engine.CraftanPlayer
+import de.craftan.bridge.CraftanBridgePlayer
 import de.craftan.io.CraftanNotification
 import de.craftan.io.resolve
 import de.craftan.util.CraftanPermissions
@@ -9,7 +9,7 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.entity.Player
 
-fun CraftanPlayer.debug(message: String) {
+fun CraftanBridgePlayer.debug(message: String) {
     if (!hasPermission(CraftanPermissions.RECEIVE_DEBUG)) return
     sendMessage("[DEBUG] $message".toComponent())
 }

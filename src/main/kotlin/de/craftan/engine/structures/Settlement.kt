@@ -1,8 +1,7 @@
 package de.craftan.engine.structures
 
-import de.craftan.engine.CraftanResource
-import de.craftan.engine.resources.WoodResource
+import de.craftan.engine.resources.CraftanResourceType
 
 class Settlement : CraftanStructure {
-    override val cost: Map<CraftanResource, Int> = mapOf((WoodResource to 2))
+    override val cost: Map<CraftanResourceType, Int> = mapOf((CraftanResourceType.WOOL to 2))
 }
