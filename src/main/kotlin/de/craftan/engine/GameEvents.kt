@@ -1,5 +1,6 @@
 package de.craftan.engine
 
+import net.ormr.eventbus.CancellableEvent
 import net.ormr.eventbus.Event
 
 /**
