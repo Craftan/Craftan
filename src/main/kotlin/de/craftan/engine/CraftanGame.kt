@@ -13,11 +13,6 @@ abstract class CraftanGame(
 
     abstract val gameFlow: GameFlow
 
-    /**
-     * The state the game is at currently
-     */
-    abstract var state: CraftanGameState
-
     abstract val stateHandler: CraftanGameStateHandler
 
     /**
