@@ -1,5 +1,3 @@
-package de.craftan.bridge
-
 import de.craftan.engine.CraftanGame
 import org.bukkit.entity.Player
 

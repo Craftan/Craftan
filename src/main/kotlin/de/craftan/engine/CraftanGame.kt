@@ -10,7 +10,7 @@ import net.ormr.eventbus.EventBus
 abstract class CraftanGame(
     open val settings: CraftanSettings,
 ) {
-    val eventBus: EventBus<Any, CraftanGameEvent> = EventBus()
+    val eventBus: EventBus<Any, CraftanEvent> = EventBus()
 
     /**
      * The config of this game

@@ -7,7 +7,6 @@ import de.craftan.engine.resources.CraftanResourceType
 class CraftanGameImpl(
     override val config: CraftanGameConfig,
     override val gameFlow: GameFlow,
-) : CraftanGame(config) {
 
     override val stateHandler: CraftanGameStateHandler = CraftanGameStateHandler(
         config.craftanMapLayout.map,
