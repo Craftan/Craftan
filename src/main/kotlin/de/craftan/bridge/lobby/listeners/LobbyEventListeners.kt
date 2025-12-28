@@ -1,6 +1,7 @@
 package de.craftan.bridge.lobby.listeners
 
 import de.craftan.bridge.events.lobby.LobbyCountdownEvent
+import de.craftan.bridge.events.lobby.LobbyStartedEvent
 import de.craftan.bridge.events.lobby.PlayerChangedColorEvent
 import de.craftan.bridge.events.lobby.PlayerJoinedLobbyEvent
 import de.craftan.bridge.events.lobby.PlayerLeftLobbyEvent
@@ -32,6 +33,8 @@ object LobbyEventListeners {
 
             lobby.teleportToLobby(player)
             player.gameMode = GameMode.ADVENTURE
+            player.health = 20.0
+            player.saturation = 20.0f
             player.inventory.clear()
 
             player.setHotbarItem(0, LobbyItems.colorSelector(player))
@@ -72,6 +75,16 @@ object LobbyEventListeners {
 
         globalEventBus.on<PlayerChangedColorEvent> {
             lobby.buildAndApplySidebar(player)
+        }
+
+        globalEventBus.on<LobbyStartedEvent> {
+            lobby.players().forEach { it.bukkitPlayer.inventory.clear() }
+
+            lobby.players().forEach { player ->
+                player.bukkitPlayer.gameMode = GameMode.CREATIVE
+                player.bukkitPlayer.isFlying = true
+                lobby.teleportToMap(player.bukkitPlayer)
+            }
         }
     }
 }

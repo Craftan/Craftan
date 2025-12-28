@@ -194,16 +194,10 @@ class CraftanLobby(
 
         status = CraftanLobbyStatus.IN_GAME
 
-        players.forEach { player ->
-            player.bukkitPlayer.gameMode = GameMode.CREATIVE
-            player.bukkitPlayer.isFlying = true
-            teleportToMap(player.bukkitPlayer)
-        }
-
         globalEventBus.fire(LobbyStartedEvent(this))
     }
 
-    private fun teleportToMap(player: Player) = player.teleport(Location(world, center.x() + 0.5, center.y() + 50.0, center.z() + 0.5))
+    fun teleportToMap(player: Player) = player.teleport(Location(world, center.x() + 0.5, center.y() + 50.0, center.z() + 0.5))
 
     fun teleportToLobby(player: Player) = player.teleport(Location(world, 0.0, 100.0, 0.0))
 
