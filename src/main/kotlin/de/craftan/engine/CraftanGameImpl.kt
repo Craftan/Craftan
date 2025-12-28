@@ -1,12 +1,13 @@
 package de.craftan.engine
 
 import de.craftan.engine.gameflow.GameFlow
+import de.craftan.engine.gameflow.action.CraftanGameActionEvent
 import de.craftan.engine.resources.CraftanResourceType
 
 class CraftanGameImpl(
     override val config: CraftanGameConfig,
     override val gameFlow: GameFlow,
-) : CraftanGame() {
+) : CraftanGame(config) {
 
     override val stateHandler: CraftanGameStateHandler = CraftanGameStateHandler(
         config.craftanMapLayout.map,
@@ -18,5 +19,11 @@ class CraftanGameImpl(
     override fun start() {
         registerListener()
         gameFlow.init()
+    }
+
+    fun registerListener() {
+        eventBus.on<CraftanGameActionEvent<*,*>> {
+            verifyAndInvoke()
+        }
     }
 }
