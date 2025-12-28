@@ -1,10 +1,10 @@
 package de.craftan
 
 import de.craftan.bridge.commands.craftanCommand
-import de.craftan.bridge.commands.structureCommand
 import de.craftan.bridge.items.behaviors.DiceBehavior
 import de.craftan.bridge.lobby.listeners.PlayerInteractedEntityEvent
 import de.craftan.bridge.lobby.listeners.LobbyEventListeners
+import de.craftan.commands.structureCommand
 import de.craftan.config.ConfigSystem
 import de.craftan.config.CraftanConfigs
 import de.craftan.io.CraftanEventBus

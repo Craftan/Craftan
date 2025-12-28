@@ -1,6 +1,5 @@
 package de.craftan.engine
 
-import de.craftan.bridge.lobby.CraftanSettings
 import de.craftan.engine.gameflow.GameFlow
 import net.ormr.eventbus.EventBus
 
@@ -8,14 +7,9 @@ import net.ormr.eventbus.EventBus
  * Models a game and the current game state inside a Craftan lobby
  */
 abstract class CraftanGame(
-    open val settings: CraftanSettings,
+    open val config: CraftanGameConfig,
 ) {
-    val eventBus: EventBus<Any, CraftanEvent> = EventBus()
-
-    /**
-     * The config of this game
-     */
-    abstract val config: CraftanGameConfig
+    val eventBus: EventBus<Any, CraftanGameEvent> = EventBus()
 
     abstract val gameFlow: GameFlow
 
@@ -23,6 +17,8 @@ abstract class CraftanGame(
      * The state the game is at currently
      */
     abstract var state: CraftanGameState
+
+    abstract val stateHandler: CraftanGameStateHandler
 
     /**
      * Starts the game

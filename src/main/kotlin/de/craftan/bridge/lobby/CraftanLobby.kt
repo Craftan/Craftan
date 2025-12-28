@@ -4,10 +4,10 @@ import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
 import de.craftan.bridge.events.lobby.*
 import de.craftan.bridge.inventory.config.colorSelectorInventory
-import de.craftan.bridge.map.CraftanMap
+import de.craftan.bridge.map.CraftanBridgeMap
 import de.craftan.engine.CraftanGameConfig
 import de.craftan.engine.CraftanPlayer
-import de.craftan.engine.implementations.CraftanPlayerImpl
+import de.craftan.engine.implementations.CraftanBridgePlayerImpl
 import de.craftan.engine.map.maps.DefaultMapLayout
 import de.craftan.io.CraftanNotification
 import de.craftan.io.CraftanPlaceholder
@@ -15,13 +15,11 @@ import de.craftan.io.globalEventBus
 import de.craftan.io.unloadAndDelete
 import de.craftan.util.toWorldEditWorld
 import de.staticred.kia.inventory.KInventory
-import net.axay.kspigot.chat.col
 import net.axay.kspigot.chat.literalText
 import net.axay.kspigot.runnables.task
 import net.kyori.adventure.text.Component
 import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent
-import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -43,7 +41,7 @@ class CraftanLobby(
 
     //TODO add layout spacing config option, add map layout through config
     val board = CraftanBoard(world.toWorldEditWorld(), center, 3, DefaultMapLayout())
-    val map = CraftanMap(this)
+    val map = CraftanBridgeMap(this)
 
     private var countingDown = false
 
@@ -53,7 +51,7 @@ class CraftanLobby(
             field = value
         }
 
-    private val players = mutableListOf<CraftanPlayer>()
+    private val players = mutableListOf<CraftanBridgePlayerImpl>()
     private val playerColors = mutableMapOf<Player, Color>()
 
     private var colorSelectorOwner: Player? = null
@@ -74,7 +72,7 @@ class CraftanLobby(
     }
 
     fun addPlayer(player: Player) {
-        players.add(CraftanPlayerImpl(player))
+        players.add(CraftanBridgePlayerImpl(player))
 
         if (colorSelectorOwner == null) {
             colorSelectorOwner = player

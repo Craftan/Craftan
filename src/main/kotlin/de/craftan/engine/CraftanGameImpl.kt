@@ -8,7 +8,7 @@ class CraftanGameImpl(
     override val gameFlow: GameFlow,
 ) : CraftanGame() {
 
-    override var stateHandler: CraftanGameStateHandler = CraftanGameStateHandler(
+    override val stateHandler: CraftanGameStateHandler = CraftanGameStateHandler(
         config.craftanMapLayout.map,
         gameFlow.players.associateWith { config.resources.associateWith { 0 } as MutableMap<CraftanResourceType, Int> },
         gameFlow.players.associateWith { config.cards.associateWith { 0 } },

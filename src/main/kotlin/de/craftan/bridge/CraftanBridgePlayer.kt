@@ -7,6 +7,7 @@ import de.craftan.io.*
 import de.craftan.util.*
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
+import java.awt.Color
 
 /**
  * Model a player inside a CraftanGame
@@ -29,6 +30,8 @@ interface CraftanBridgePlayer {
      * Contains the inventory the player currently has
      */
     val inventory: CraftanPlayerInventory
+
+    val teamColor: Color
 
     /**
      * Send the given component to the ingame player
