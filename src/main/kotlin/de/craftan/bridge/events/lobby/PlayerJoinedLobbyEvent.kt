@@ -5,3 +5,5 @@ import de.craftan.io.CancellableCraftanEvent
 import org.bukkit.entity.Player
 
 class PlayerJoinedLobbyEvent(val lobby: CraftanLobby, val player: Player): CancellableCraftanEvent()
+
+class PlayerRejoinedLobbyEvent(val lobby: CraftanLobby, val player: Player): CancellableCraftanEvent()
