@@ -4,40 +4,42 @@ import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.ItemStack
+import java.util.UUID
 
 object CraftanPlayerStateManager {
 
-    private val playerState = mutableMapOf<Player, PlayerState>()
+    private val playerState = mutableMapOf<UUID, PlayerState>()
 
     fun saveState(player: Player) {
-        playerState[player] = PlayerState(
-            player.inventory,
+        playerState[player.uniqueId] = PlayerState(
+            player.inventory.contents,
             player.health,
-            player.saturation,
+            player.foodLevel,
             player.location,
             player.gameMode
         )
     }
 
     fun applyState(player: Player) {
-        val state = playerState[player] ?: return
+        val state = playerState[player.uniqueId] ?: return
 
         player.apply {
-            inventory.contents = state.inventory.contents
+            inventory.contents = state.inventory
             health = state.health
-            saturation = state.hunger
+            foodLevel = state.foodLevel
             teleport(state.position)
             gameMode = state.gameMode
         }
 
-        playerState.remove(player)
+        playerState.remove(player.uniqueId)
     }
 }
 
 data class PlayerState(
-    val inventory: Inventory,
+    val inventory: Array<out ItemStack?>,
     val health: Double,
-    val hunger: Float,
+    val foodLevel: Int,
     val position: Location,
     val gameMode: GameMode,
 )

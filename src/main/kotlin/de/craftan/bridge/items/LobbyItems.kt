@@ -1,6 +1,7 @@
 package de.craftan.bridge.items
 
 import de.craftan.bridge.lobby.CraftanLobbyManager
+import de.craftan.bridge.lobby.CraftanLobbyStatus
 import de.craftan.io.CraftanNotification
 import de.craftan.io.resolve
 import de.staticred.kia.inventory.builder.kItem
@@ -16,7 +17,7 @@ object LobbyItems {
         setDisplayName(CraftanNotification.LOBBY_ITEMS_COLOR_SELECTOR.resolve(player))
         onRightClick { player, _ ->
             val lobby = CraftanLobbyManager.getLobbyForPlayer(player)
-            if (lobby != null) {
+            if (lobby != null && (lobby.status == CraftanLobbyStatus.WAITING || lobby.status == CraftanLobbyStatus.STARTING)) {
                 val inv = lobby.getSharedColorSelectorInventory(player)
                 player.openInventory(inv)
             }

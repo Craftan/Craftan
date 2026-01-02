@@ -2,17 +2,13 @@ package de.craftan.bridge.lobby
 
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
+import de.craftan.bridge.CraftanBridgePlayerImpl
 import de.craftan.bridge.events.lobby.*
 import de.craftan.bridge.inventory.config.colorSelectorInventory
 import de.craftan.bridge.map.CraftanBridgeMap
 import de.craftan.engine.CraftanGameConfig
-import de.craftan.engine.CraftanPlayer
-import de.craftan.engine.implementations.CraftanBridgePlayerImpl
 import de.craftan.engine.map.maps.DefaultMapLayout
-import de.craftan.io.CraftanNotification
-import de.craftan.io.CraftanPlaceholder
-import de.craftan.io.globalEventBus
-import de.craftan.io.unloadAndDelete
+import de.craftan.io.*
 import de.craftan.util.toWorldEditWorld
 import de.staticred.kia.inventory.KInventory
 import net.axay.kspigot.chat.literalText
@@ -94,12 +90,28 @@ class CraftanLobby(
             colorSelectorOwner = players.firstOrNull()?.bukkitPlayer
             sharedColorSelectorInventory = colorSelectorOwner?.let { colorSelectorInventory(it, this) }
         }
-        if (players.isEmpty()) {
-            sharedColorSelectorInventory = null
-            colorSelectorOwner = null
-        }
 
         globalEventBus.fire(PlayerLeftLobbyEvent(this, player))
+
+        if (players.isEmpty()) {
+            close()
+        }
+    }
+
+    fun softRemovePlayer(player: Player) {
+        Craftan.logger.debug("Soft removing player $player from lobby $id")
+        players.firstOrNull { it.bukkitPlayer == player }?.let { it.left = true }
+        globalEventBus.fire(PlayerSoftLeftLobbyEvent(this, player))
+    }
+
+    fun rejoinGame(player: Player) {
+        Craftan.logger.debug("Rejoining player $player from lobby $id")
+        players.firstOrNull { it.bukkitPlayer.uniqueId == player.uniqueId }?.let {
+            it.left = false
+            it.bukkitPlayer = player
+        }
+
+        globalEventBus.fire(PlayerRejoinedLobbyEvent(this, player))
     }
 
     fun notifyPlayers(notification: CraftanNotification) {
@@ -107,6 +119,7 @@ class CraftanLobby(
     }
 
     fun close() {
+        Craftan.logger.debug("Closing lobby $id")
         sidebar.close()
 
         notifyPlayers(CraftanNotification.LOBBY_CLOSED)
@@ -115,6 +128,7 @@ class CraftanLobby(
 
         world.unloadAndDelete()
         CraftanLobbyManager.removeLobby(id)
+        globalEventBus.fire(LobbyStoppedEvent(this))
     }
 
     fun players() = players.toList()

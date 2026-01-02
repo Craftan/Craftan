@@ -9,6 +9,7 @@ import de.craftan.bridge.world.generateEmptyWorld
 import de.craftan.engine.CraftanGameConfig
 import de.craftan.io.CraftanEventBus
 import de.craftan.io.CraftanNotification
+import de.craftan.io.debug
 import de.craftan.io.globalEventBus
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
@@ -33,16 +34,16 @@ object CraftanLobbyManager {
     fun createLobby(config: CraftanGameConfig): CraftanLobby {
         val id = lobbies.size + 1
 
-        Craftan.logger.info("Creating lobby id $id")
+        Craftan.logger.debug("Creating lobby id $id")
         val world = generateEmptyWorld("$LOBBY_WORLD_PREFIX$id")
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
         world.setGameRule(GameRule.FALL_DAMAGE, false)
-
-        Craftan.logger.info("Finished building world for $id")
-
         world.time = 12000
         world.weatherDuration = 0
+
+
+        Craftan.logger.debug("Finished building world for $id")
 
         placeLobbyInWorld(world = world)
 
@@ -74,11 +75,11 @@ object CraftanLobbyManager {
     fun listLobbies() = lobbies.toMap()
 
     fun isInLobby(player: Player): Boolean {
-        return lobbies.values.any { it.players().map { player -> player.bukkitPlayer }.contains(player) }
+        return lobbies.values.any { it.players().map { player -> player.bukkitPlayer.uniqueId }.contains(player.uniqueId) }
     }
 
     fun getLobbyForPlayer(player: Player): CraftanLobby? {
-        return lobbies.values.firstOrNull { it.players().map { player -> player.bukkitPlayer }.contains(player) }
+        return lobbies.values.firstOrNull { it.players().map { player -> player.bukkitPlayer.uniqueId }.contains(player.uniqueId) }
     }
 
     fun removeLobby(id: Int) {
@@ -97,8 +98,11 @@ object CraftanLobbyManager {
 
     fun removeOldLobbies() {
         val oldLobbies = PluginManager.server.worldContainer.listFiles().filter { it.name.startsWith(LOBBY_WORLD_PREFIX) }
+
+        Craftan.logger.debug("Found ${oldLobbies.size} old lobbies")
+
         oldLobbies.forEach {
-            if (!it.delete()) {
+            if (!it.deleteRecursively()) {
                 Craftan.logger.warning("Could not delete old lobby world ${it.name}")
             }
         }

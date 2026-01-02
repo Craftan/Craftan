@@ -12,8 +12,11 @@ enum class CraftanNotification(
     BASE_COLOR(MessageNotification("base_color", "<grey>", false)),
     BASE_HIGHLIGHT(MessageNotification("base_highlight", "<#00c9a5>", false)),
 
-    JOINED_GAME(MessageNotification("lobby.joined", "%bc%The player %player% just joined the game!")),
-    LEFT_GAME(MessageNotification("lobby.left", "%bc%The player %player% just left the game!")),
+    JOINED_GAME(MessageNotification("lobby.player.joined", "%bc%The player %player% just joined the game!")),
+    LEFT_GAME(MessageNotification("lobby.player.left", "%bc%The player %player% just left the game!")),
+    SOFT_LEFT_GAME(MessageNotification("lobby.player.soft_left", "%bc%The player %player% just left the game, but can rejoin! In the mean time his rounds will be skipped.")),
+    REJOIN_GAME(MessageNotification("lobby.player.rejoin", "It looks like you you have left a lobby recently, and will be reconnected in 3 seconds.")),
+
 
     // CRAFTAN COMMAND
     INFORMATION_FORMATING(
