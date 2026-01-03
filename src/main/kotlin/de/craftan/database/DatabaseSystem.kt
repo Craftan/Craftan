@@ -2,7 +2,7 @@ package de.craftan.database
 
 import de.craftan.Craftan
 import de.craftan.InternalMain
-import de.craftan.config.schema.DatabaseType
+import de.craftan.config.DatabaseType
 import de.craftan.database.dao.PlayerStatsTable
 import de.craftan.util.CraftanSystem
 import org.jetbrains.exposed.sql.Database
@@ -31,10 +31,10 @@ object DatabaseSystem : CraftanSystem {
             }
             DatabaseType.MYSQL -> {
                 Database.connect(
-                    url = "jdbc:mysql://${config.host}:${config.port}/${config.databaseName}",
+                    url = "jdbc:mysql://${config.connection.host}:${config.connection.port}/${config.connection.databaseName}",
                     driver = "com.mysql.cj.jdbc.Driver",
-                    user = config.username,
-                    password = config.password
+                    user = config.connection.username,
+                    password = config.connection.password
                 )
             }
         }

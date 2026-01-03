@@ -2,8 +2,9 @@ package de.craftan.io
 
 import de.craftan.Craftan
 import de.craftan.PluginManager
-import de.craftan.config.schema.LanguageFile
+import de.craftan.config.LanguageFile
 import de.craftan.io.config.ConfigFile
+import de.craftan.io.config.Configs
 import java.io.File
 
 /**
@@ -14,11 +15,11 @@ object LanguageFiles {
 
     fun pathFor(locale: String): String = "$DIR/$locale.yml"
 
-    fun handle(locale: String, defaultMessages: Map<String, String>, createBackup: Boolean = true): ConfigFile<LanguageFile> {
+    fun handle(locale: String, defaultMessages: Map<String, String>): ConfigFile<LanguageFile> {
         val file = File(PluginManager.dataFolder, pathFor(locale))
         Craftan.logger.fine("[LanguageFiles] Creating handle for locale '$locale' at ${file.absolutePath}")
         val defaults = LanguageFile(locale = locale, messages = defaultMessages)
-        return ConfigFile.of(file, defaults, createBackup)
+        return Configs.of(LanguageFile::class, file, defaults)
     }
 
     /**
