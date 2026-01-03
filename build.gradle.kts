@@ -45,6 +45,14 @@ dependencies {
     implementation("io.github.staticfx:kia:1.1.7")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
+    val exposedVersion = "0.57.0"
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+    implementation("com.h2database:h2:2.2.224")
+    implementation("com.mysql:mysql-connector-j:9.1.0")
+
     compileOnly("net.megavex:scoreboard-library-api:$scoreboardLibraryVersion")
     compileOnly("net.megavex:scoreboard-library-extra-kotlin:$scoreboardLibraryVersion")
 
