@@ -8,6 +8,7 @@ import de.craftan.bridge.lobby.listeners.LobbyEventListeners
 import de.craftan.commands.structureCommand
 import de.craftan.config.ConfigSystem
 import de.craftan.config.CraftanConfigs
+import de.craftan.database.DatabaseSystem
 import de.craftan.io.CraftanEventBus
 import de.craftan.io.permissions.PermissionsAdapter
 import de.craftan.util.CraftanSystem
@@ -70,6 +71,7 @@ object Craftan {
 
     private fun loadSystems() {
         addSystem(ConfigSystem)
+        addSystem(DatabaseSystem)
     }
 
     private fun createSchematicFolder() {

@@ -3,6 +3,7 @@ package de.craftan.config
 import de.craftan.Craftan
 import de.craftan.config.schema.CraftanConfig
 import de.craftan.config.schema.CraftanGameConfig
+import de.craftan.config.schema.DatabaseConfig
 import de.craftan.io.MessageAdapter
 import de.craftan.io.config.ConfigFile
 import de.craftan.io.config.Configs
@@ -31,8 +32,9 @@ object ConfigSystem : CraftanSystem {
         Craftan.logger.info("[ConfigSystem] Initializing CraftanConfig live provider via Configs")
         val craftanConfig = addConfig<CraftanConfig>()
         val craftanGameConfig = addConfig<CraftanGameConfig>()
+        val databaseConfig = addConfig<DatabaseConfig>()
 
-        Craftan.configs = CraftanConfigs(craftanConfig, craftanGameConfig)
+        Craftan.configs = CraftanConfigs(craftanConfig, craftanGameConfig, databaseConfig)
 
         // Initialize language system via MessageAdapter
         Craftan.logger.info("[ConfigSystem] Loading MessageAdapter (languages)")

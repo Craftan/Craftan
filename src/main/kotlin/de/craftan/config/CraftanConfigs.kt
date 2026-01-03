@@ -3,13 +3,15 @@ package de.craftan.config
 import de.craftan.Craftan
 import de.craftan.config.schema.CraftanConfig
 import de.craftan.config.schema.CraftanGameConfig
+import de.craftan.config.schema.DatabaseConfig
 import de.craftan.io.config.CraftanFileConfig
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 
 data class CraftanConfigs(
     val craftan: () -> CraftanConfig,
-    val gameSettings: () -> CraftanGameConfig
+    val gameSettings: () -> CraftanGameConfig,
+    val database: () -> DatabaseConfig
 ) {
     companion object {
         fun configs(): List<String> {
