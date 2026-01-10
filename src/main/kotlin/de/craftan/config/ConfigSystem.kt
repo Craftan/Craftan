@@ -32,7 +32,6 @@ object ConfigSystem : CraftanSystem {
 
         Craftan.configs = CraftanConfigs(craftanConfig, craftanGameConfig, databaseConfig)
 
-        // Initialize language system via MessageAdapter
         Craftan.logger.info("[ConfigSystem] Loading MessageAdapter (languages)")
         MessageAdapter.load()
     }

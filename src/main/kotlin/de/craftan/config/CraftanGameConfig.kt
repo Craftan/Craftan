@@ -1,11 +1,12 @@
 package de.craftan.config
 
 import de.craftan.io.config.*
+import de.craftan.io.config.validators.validateResource
 import de.craftan.io.config.CraftanConfig as ConfigBase
 
 data class ColorConfig(
     val color: Int = default(0),
-    val resource: String = default("")
+    val resource: String = PropertyBuilder<String>().validate("Must be minecraft resource!", ::validateResource).default("")
 )
 
 data class CraftanGameConfig(
