@@ -4,6 +4,7 @@ import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanGameEvent
 import de.craftan.engine.CraftanGameStateHandler
 import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.gameflow.GameFlow
 import kotlin.reflect.KClass
 
 /**
@@ -21,7 +22,7 @@ interface CraftanGameAction<T: CraftanActionData> {
      */
     fun invoke(player: CraftanPlayer, data: T, stateHandler: CraftanGameStateHandler): Boolean
 
-    fun verify(player: CraftanPlayer, data: T, stateHandler: CraftanGameStateHandler): Boolean
+    fun verify(player: CraftanPlayer, data: T, stateHandler: CraftanGameStateHandler, gameFlow: GameFlow): Boolean
 }
 
 class CraftanGameActionEvent<T: CraftanActionData, A: CraftanGameAction<T>> (
@@ -45,7 +46,7 @@ class CraftanGameActionEvent<T: CraftanActionData, A: CraftanGameAction<T>> (
                 @Suppress("UNCHECKED_CAST")
                 val typedAction = action as CraftanGameAction<T>
                 
-                if (!typedAction.verify(player, actionData, game.stateHandler)) return false
+                if (!typedAction.verify(player, actionData, game.stateHandler, game.gameFlow)) return false
                 return typedAction.invoke(player, actionData, game.stateHandler)
             }
         }

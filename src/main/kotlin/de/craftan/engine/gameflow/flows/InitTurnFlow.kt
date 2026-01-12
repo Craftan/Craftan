@@ -1,9 +1,12 @@
 package de.craftan.engine.gameflow.flows
 
+import de.craftan.engine.CraftanGame
+import de.craftan.engine.CraftanGameImpl
 import de.craftan.engine.gameflow.turnstates.PlaceRoadState
 import de.craftan.engine.gameflow.turnstates.PlaceSettlementState
 
-class InitTurnFlow : TurnFlow(PlaceSettlementState()) {
+class InitTurnFlow(
+) : TurnFlow(PlaceSettlementState()) {
     init {
         putStateTransition(
             PlaceSettlementState(), mutableListOf(PlaceRoadState()),
