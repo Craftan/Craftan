@@ -17,7 +17,7 @@ class PlaceStructureAction(
     }
 
     override fun verify(player: CraftanPlayer, data: PlaceStructureActionData, stateHandler: CraftanGameStateHandler, gameFlow: GameFlow): Boolean {
-        if (player != gameFlow.round!!.currentTurn().first)
+        if (player != gameFlow.round!!.currentTurn().first) return false
         if (!stateHandler.map.isEmpty(data.tileCoordinate, data.direction)) return false
         if (requireResources && !stateHandler.hasResources(player, data.structure.cost)) return false
         // TODO Check max amount buildings

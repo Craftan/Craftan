@@ -26,13 +26,13 @@ interface CraftanGameAction<T: CraftanActionData> {
 }
 
 class CraftanGameActionEvent<T: CraftanActionData, A: CraftanGameAction<T>> (
-    game: CraftanGame,
+    val game: CraftanGame,
     val actionData: T,
     val player: CraftanPlayer,
     val actionClass: KClass<A>
-) : CraftanGameEvent(game) {
+) : CraftanGameEvent() {
     fun verifyAndInvoke(): Boolean {
-        val currentTurnPair = game.gameFlow.round?.currentTurn() 
+        val currentTurnPair = game.gameFlow.round?.currentTurn()
             ?: throw IllegalStateException("Action $actionClass invoked, but no active round or turn found!")
 
         // Verify it is actually this player's turn

@@ -17,12 +17,13 @@ class CraftanGameImpl(
 
     override fun start() {
         registerListener()
-        gameFlow.init()
+        gameFlow.init(eventBus)
     }
 
     fun registerListener() {
         eventBus.on<CraftanGameActionEvent<*,*>> {
             verifyAndInvoke()
+            gameFlow.round!!.currentTurn().second.nextState(this)
         }
     }
 }

@@ -28,13 +28,13 @@ class E2ETest {
     @Test
     fun placeStructureTest() {
         game.start()
-        assertInitialResourceState()        
+        assertInitialResourceState()
         assertInitialStructurePlacement()
     }
 
     fun assertInitialStructurePlacement() {
         for ((index, player) in players.withIndex()) {
-            print("Index " + index + " Player " + player.name + "\n")
+            println("Index " + index + " Player " + player.name)
             val coords = TileCoordinate(index, -index)
             game.eventBus.fire(
                 CraftanGameActionEvent(
