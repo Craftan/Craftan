@@ -1,8 +1,7 @@
 package de.craftan.engine.gameflow.flows
 
-import de.craftan.engine.CraftanGame
 import de.craftan.engine.CraftanGameEvent
-import de.craftan.engine.gameflow.CraftanGameTurnEndEvent
+import de.craftan.engine.gameflow.GameRound
 import de.craftan.engine.gameflow.TurnState
 import de.craftan.engine.gameflow.action.CraftanGameActionEvent
 import net.ormr.eventbus.EventBus
@@ -19,9 +18,9 @@ import net.ormr.eventbus.EventBus
  */
 abstract class TurnFlow(
     val startState: TurnState,
+    val eventBus: EventBus<Any, CraftanGameEvent>,
+    val round: GameRound
 ) {
-    val eventBus: EventBus<Any, CraftanGameEvent> = EventBus()
-
     /**
      * Shows the current state of this flow
      */
@@ -30,14 +29,8 @@ abstract class TurnFlow(
 
     val graph = Graph()
 
-    fun putStateTransition(from: TurnState, to: MutableList<TurnState>, chooser: (CraftanGameEvent) -> TurnState?) {
+    fun putStateTransition(from: TurnState, to: MutableList<TurnState>, chooser: (CraftanGameEvent, TurnState, List<TurnState>) -> TurnState?) {
         graph.put(from, to, chooser)
-    }
-
-    init {
-        eventBus.on<CraftanGameActionEvent<*,*>> {
-            nextState(this)
-        }
     }
 
     /**
@@ -46,28 +39,29 @@ abstract class TurnFlow(
     // Listen to a Endstate eventbus
     fun nextState(event: CraftanGameEvent) {
         // TODO This means the state shouldn't change just yet
-        val nextState = graph.getChooser(state).invoke(event) ?: return
         val neighbors = graph.neighbors(state)
+        println("${state.name} -> ${neighbors.joinToString()}")
         if (neighbors.isEmpty()) {
             finishFlow()
             return
         }
+        val nextState = graph.getChooser(state).invoke(event, state, neighbors) ?: return
         state = nextState
     }
 
     /**
      * Finished the flow by notifying the game
      */
-    open fun finishFlow() {
-        // Basically fire an Event
-        eventBus.fire(CraftanGameTurnEndEvent())
+    fun finishFlow() {
+        println("Finish Turnflow")
+        round.nextTurn()
     }
 }
 
 data class Graph(
-    val adjacency: MutableMap<TurnState, Pair<MutableList<TurnState>, (CraftanGameEvent) -> TurnState?>> = mutableMapOf()
+    val adjacency: MutableMap<TurnState, Pair<MutableList<TurnState>, (CraftanGameEvent, TurnState, List<TurnState>) -> TurnState?>> = mutableMapOf()
 ) {
-    fun put(from: TurnState, to: MutableList<TurnState>, chooser: (CraftanGameEvent) -> TurnState?) {
+    fun put(from: TurnState, to: MutableList<TurnState>, chooser: (CraftanGameEvent, TurnState, List<TurnState>) -> TurnState?) {
         if (adjacency.containsKey(from)) {
             throw IllegalArgumentException("Node $from already exists")
         }
@@ -78,7 +72,7 @@ data class Graph(
     fun neighbors(node: TurnState): List<TurnState> =
         adjacency[node]?.first ?: emptyList()
 
-    fun getChooser(node: TurnState):(CraftanGameEvent) -> TurnState? {
+    fun getChooser(node: TurnState): (CraftanGameEvent, TurnState, List<TurnState>) -> TurnState? {
         return adjacency[node]!!.second
     }
 }
