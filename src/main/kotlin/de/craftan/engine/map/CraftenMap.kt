@@ -38,7 +38,6 @@ class CraftanMap(
         } else {
             throw IllegalArgumentException("Direction must be of type CraftanDirection")
         }
-        print("Test")
     }
 }
 

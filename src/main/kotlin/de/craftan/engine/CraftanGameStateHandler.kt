@@ -57,9 +57,3 @@ data class CraftanGameState(
     val cards: Map<CraftanPlayer, Map<CraftanActionCard, Int>>,
     val winPoints: Map<CraftanPlayer, Int>
 )
-
-abstract class CraftanGameStateGameEvent(
-    game: CraftanGame
-) : CraftanGameEvent(game)
-
-// Register the events here
