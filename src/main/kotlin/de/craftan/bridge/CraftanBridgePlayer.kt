@@ -31,7 +31,7 @@ interface CraftanBridgePlayer {
      */
     val inventory: CraftanPlayerInventory
 
-    val teamColor: Color
+    var team: CraftanTeam?
 
     /**
      * Send the given component to the ingame player
@@ -74,6 +74,11 @@ interface CraftanBridgePlayer {
      */
     fun hasPermission(permission: CraftanPermissions): Boolean = hasPermission(permission.permission)
 }
+
+data class CraftanTeam(
+    val color: Color,
+    val name: String
+)
 
 /**
  * Models the inventory of resources, structures and cards a player current possesses

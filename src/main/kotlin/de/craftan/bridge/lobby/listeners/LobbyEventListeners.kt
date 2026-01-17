@@ -2,6 +2,7 @@ package de.craftan.bridge.lobby.listeners
 
 import de.craftan.bridge.events.lobby.LobbyCountdownEvent
 import de.craftan.bridge.events.lobby.LobbyStartedEvent
+import de.craftan.bridge.events.lobby.LobbyStatusChangedEvent
 import de.craftan.bridge.events.lobby.PlayerChangedColorEvent
 import de.craftan.bridge.events.lobby.PlayerJoinedLobbyEvent
 import de.craftan.bridge.events.lobby.PlayerLeftLobbyEvent
@@ -95,6 +96,10 @@ object LobbyEventListeners {
 
         globalEventBus.on<PlayerChangedColorEvent> {
             lobby.buildAndApplySidebar(player)
+        }
+
+        globalEventBus.on<LobbyStatusChangedEvent> {
+            lobby.players().forEach { lobby.buildAndApplySidebar(it.bukkitPlayer) }
         }
 
         globalEventBus.on<LobbyStartedEvent> {

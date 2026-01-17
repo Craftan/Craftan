@@ -29,8 +29,9 @@ object ConfigSystem : CraftanSystem {
         val craftanConfig = addConfig(CraftanConfig::class)
         val craftanGameConfig = addConfig(CraftanGameConfig::class)
         val databaseConfig = addConfig(DatabaseConfig::class)
+        val scoreboardConfig = addConfig(ScoreboardConfig::class)
 
-        Craftan.configs = CraftanConfigs(craftanConfig, craftanGameConfig, databaseConfig)
+        Craftan.configs = CraftanConfigs(craftanConfig, craftanGameConfig, databaseConfig, scoreboardConfig)
 
         Craftan.logger.info("[ConfigSystem] Loading MessageAdapter (languages)")
         MessageAdapter.load()

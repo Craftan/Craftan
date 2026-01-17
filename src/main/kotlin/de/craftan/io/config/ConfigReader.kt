@@ -62,12 +62,26 @@ class ConfigReader(private val file: File) {
             ConfigSchemaBuilder.isMap(clazz) -> {
                 val section = value as? ConfigurationSection ?: return metadata?.value
                 val valueType = kType.arguments[1].type ?: return value
+                val valueClass = valueType.classifier as? KClass<*>
                 val result = mutableMapOf<String, Any?>()
-                for (key in section.getKeys(false)) {
-                    if (key in excludedKeys) continue
+                
+                val deep = metadata?.flatten == true || (valueClass != null && ConfigSchemaBuilder.isPrimitive(valueClass))
+                for (key in section.getKeys(deep)) {
+                    if (key.split('.').first() in excludedKeys) continue
+                    val valAtKey = section.get(key)
+                    if (deep && valAtKey is ConfigurationSection) continue
+                    
                     val itemPath = if (fullPath.isEmpty()) key else "$fullPath.$key"
-                    result[key] = readValue(section.get(key), valueType, null, null, emptySet(), itemPath)
+                    result[key] = readValue(valAtKey, valueType, null, null, emptySet(), itemPath)
                 }
+                
+                val defaultMap = metadata?.value as? Map<String, Any?>
+                if (defaultMap != null) {
+                    val merged = defaultMap.toMutableMap()
+                    merged.putAll(result)
+                    return merged
+                }
+                
                 if (result.isEmpty() && metadata?.value is Map<*, *>) return metadata.value
                 result
             }

@@ -3,15 +3,17 @@ package de.craftan.bridge.lobby
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
 import de.craftan.bridge.CraftanBridgePlayerImpl
+import de.craftan.bridge.CraftanTeam
 import de.craftan.bridge.events.lobby.*
 import de.craftan.bridge.inventory.config.colorSelectorInventory
+import de.craftan.bridge.lobby.scoreboard.ConfigurableScoreboard
+import de.craftan.bridge.lobby.scoreboard.ScoreboardProvider
 import de.craftan.bridge.map.CraftanBridgeMap
 import de.craftan.engine.CraftanGameConfig
 import de.craftan.engine.map.maps.DefaultMapLayout
 import de.craftan.io.*
 import de.craftan.util.toWorldEditWorld
 import de.staticred.kia.inventory.KInventory
-import net.axay.kspigot.chat.literalText
 import net.axay.kspigot.runnables.task
 import net.kyori.adventure.text.Component
 import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout
@@ -39,7 +41,8 @@ class CraftanLobby(
     val board = CraftanBoard(world.toWorldEditWorld(), center, 3, DefaultMapLayout())
     val map = CraftanBridgeMap(this)
 
-    private var countingDown = false
+    var countingDown = false
+        private set
 
     var status = status
         private set(value) {
@@ -48,14 +51,16 @@ class CraftanLobby(
         }
 
     private val players = mutableListOf<CraftanBridgePlayerImpl>()
-    private val playerColors = mutableMapOf<Player, Color>()
+
+    private val scoreboardProvider: ScoreboardProvider = ConfigurableScoreboard()
 
     private var colorSelectorOwner: Player? = null
     private var sharedColorSelectorInventory: KInventory? = null
 
     val sidebar = Craftan.scoreboardLibrary.createSidebar()
 
-    private var countdown = 0
+    var countdown = 0
+        private set
 
     fun getSharedColorSelectorInventory(requestingPlayer: Player): KInventory {
         if (sharedColorSelectorInventory == null) {
@@ -68,7 +73,7 @@ class CraftanLobby(
     }
 
     fun addPlayer(player: Player) {
-        players.add(CraftanBridgePlayerImpl(player))
+        players.add(CraftanBridgePlayerImpl(player, team = null))
 
         if (colorSelectorOwner == null) {
             colorSelectorOwner = player
@@ -82,7 +87,7 @@ class CraftanLobby(
     fun removePlayer(player: Player) {
         val craftanPlayer = players.find { it.bukkitPlayer == player } ?: return
 
-        playerColors.remove(player)
+        craftanPlayer.team = null
 
         players.remove(craftanPlayer)
 
@@ -133,31 +138,36 @@ class CraftanLobby(
 
     fun players() = players.toList()
 
-    fun allowedColors(): List<Color> = Craftan.configs.gameSettings().colors.map { Color(it.value.color) }
+    fun allowedTeams(): List<CraftanTeam> = Craftan.configs.gameSettings().colors.map { CraftanTeam(Color(it.value.color), it.value.displayName) }
 
-    fun getPlayerColor(player: Player): Color? = playerColors[player]
+    fun getPlayerColor(player: Player): Color? = craftanPlayer(player)?.team?.color
 
-    fun hasPlayerColor(color: Color): Boolean = playerColors.values.contains(color)
+    fun craftanPlayer(player: Player) = players.find { it.bukkitPlayer == player }
 
-    fun isColorAvailable(color: Color): Boolean = !playerColors.values.contains(color)
+    fun hasPlayerColor(color: Color): Boolean = players.any { it.team?.color == color }
 
-    fun setPlayerColor(player: Player, color: Color): Boolean {
-        if (!allowedColors().contains(color)) return false
+    fun isColorAvailable(color: Color): Boolean = !hasPlayerColor(color)
+
+    fun setPlayerColor(player: Player, color: Color, name: String): Boolean {
+        if (!allowedTeams().map { it.color }.contains(color)) return false
         if (!isColorAvailable(color)) return false
-        val from = playerColors[player] ?: return false
-        playerColors[player] = color
+        val from = getPlayerColor(player) ?: return false
+
+        val team = CraftanTeam(color, name)
+        craftanPlayer(player)?.team = team
 
         globalEventBus.fire(PlayerChangedColorEvent(player, this, from, color))
         return true
     }
 
     fun assignMissingColors() {
-        val available = allowedColors().toMutableList()
+        val available = allowedTeams().toMutableList()
 
-        playerColors.values.forEach { used -> available.remove(used) }
-        players.forEach { cp ->
-            if (playerColors[cp.bukkitPlayer] == null && available.isNotEmpty()) {
-                playerColors[cp.bukkitPlayer] = available.removeAt(0)
+        players.mapNotNull { it.team }.forEach { available.remove(it) }
+
+        players.filter { it.team == null }.forEach { player ->
+            if (available.isNotEmpty()) {
+                 player.team = available.removeAt(0)
             }
         }
     }
@@ -214,17 +224,9 @@ class CraftanLobby(
     fun teleportToLobby(player: Player) = player.teleport(Location(world, 0.0, 100.0, 0.0))
 
     fun buildAndApplySidebar(player: Player) {
-        val lines = SidebarComponent.builder()
-            .addBlankLine()
-            .addStaticLine { literalText("Players: ${players().size}/${maxPlayers}") }
-            .addDynamicLine { literalText("Map: ${board.layout.name}") }
-            .addDynamicLine { literalText("Status: $status") }
-            .addBlankLine()
-            .addDynamicLine { if (countingDown) literalText("Starting in: $countdown") else literalText() }
-            .addStaticLine { literalText("Color: ${playerColors[player]?.toString()}") }
-            .build()
+        val lines = scoreboardProvider.build(player, this)
+        val title = scoreboardProvider.buildTitle(player, this)
 
-        val title = SidebarComponent.staticLine(literalText("Craftan"))
-        ComponentSidebarLayout(title, lines).apply(sidebar)
+        ComponentSidebarLayout(SidebarComponent.staticLine(title), lines).apply(sidebar)
     }
 }

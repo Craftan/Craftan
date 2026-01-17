@@ -7,7 +7,8 @@ import kotlin.reflect.full.memberProperties
 data class CraftanConfigs(
     val craftan: () -> CraftanConfig,
     val gameSettings: () -> CraftanGameConfig,
-    val database: () -> DatabaseConfig
+    val database: () -> DatabaseConfig,
+    val scoreboards: () -> ScoreboardConfig
 ) {
     companion object {
         fun configs(): List<String> {
