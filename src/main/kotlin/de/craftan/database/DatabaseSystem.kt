@@ -2,7 +2,7 @@ package de.craftan.database
 
 import de.craftan.Craftan
 import de.craftan.InternalMain
-import de.craftan.config.DatabaseType
+import de.craftan.config.schema.DatabaseType
 import de.craftan.database.dao.PlayerStatsTable
 import de.craftan.util.CraftanSystem
 import org.jetbrains.exposed.sql.Database

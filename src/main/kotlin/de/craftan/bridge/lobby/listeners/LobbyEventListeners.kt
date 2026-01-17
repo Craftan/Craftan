@@ -10,15 +10,17 @@ import de.craftan.bridge.events.lobby.PlayerRejoinedLobbyEvent
 import de.craftan.bridge.events.lobby.PlayerSoftLeftLobbyEvent
 import de.craftan.bridge.items.LobbyItems
 import de.craftan.bridge.lobby.CraftanLobby
-import de.craftan.bridge.lobby.CraftanLobbyStatus
 import de.craftan.bridge.lobby.CraftanPlayerStateManager
 import de.craftan.io.CraftanNotification
 import de.craftan.io.CraftanPlaceholder
 import de.craftan.io.globalEventBus
 import de.staticred.kia.inventory.extensions.setHotbarItem
 import net.axay.kspigot.chat.literalText
+import net.axay.kspigot.runnables.task
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 /**
  * Collection of listeners that handle side-effects for lobby events.
@@ -104,6 +106,22 @@ object LobbyEventListeners {
 
         globalEventBus.on<LobbyStartedEvent> {
             lobby.players().forEach { teleportPlayerToMap(lobby, it.bukkitPlayer) }
+
+            lobby.players().forEach {
+                with(lobby) {
+                    val team = CraftanTeamManager.assignPlayerToTeam(it.bukkitPlayer)
+
+                    task(delay = 20*5) {
+                        map.hitBoxes.forEach { hitBox ->
+                            hitBox.shulkerEntites.forEach { shulker ->
+                                team.addEntity(shulker)
+                                shulker.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 100000000, 1, true, false))
+                            }
+                            hitBox.glow()
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -115,6 +133,7 @@ object LobbyEventListeners {
         player.inventory.clear()
 
         player.setHotbarItem(0, LobbyItems.colorSelector(player))
+        player.setHotbarItem(8, LobbyItems.startGameItem(player))
     }
 
     private fun teleportPlayerToMap(lobby: CraftanLobby, player: Player) {

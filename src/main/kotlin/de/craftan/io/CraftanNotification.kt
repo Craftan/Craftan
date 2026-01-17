@@ -95,6 +95,7 @@ enum class CraftanNotification(
     LOBBY_STARTS_IN(MessageNotification("lobby.starts_in", "<green>The game will start in %time_to_start% seconds.")),
 
     LOBBY_ITEMS_COLOR_SELECTOR(MessageNotification("lobby.items.color_selector.name", "<color:#ff7b00>Select your color</color>", false)),
+    LOBBY_ITEMS_START_GAME(MessageNotification("lobby.items.start_game.name", "<green>Start the game", false)),
     LOBBY_COLOR_SELECTOR_INVENTORY_TITLE(MessageNotification("lobby.items.color_selector.inventory.title", "<color:#ff7b00>Select your color</color>")),
 
 }

@@ -1,4 +1,4 @@
-package de.craftan.config
+package de.craftan.config.schema
 
 import de.craftan.io.config.*
 import de.craftan.io.config.CraftanConfig as ConfigBase

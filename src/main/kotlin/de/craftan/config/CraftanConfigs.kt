@@ -1,6 +1,10 @@
 package de.craftan.config
 
 import de.craftan.Craftan
+import de.craftan.config.schema.CraftanConfig
+import de.craftan.config.schema.CraftanGameConfig
+import de.craftan.config.schema.DatabaseConfig
+import de.craftan.config.schema.ScoreboardConfig
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 

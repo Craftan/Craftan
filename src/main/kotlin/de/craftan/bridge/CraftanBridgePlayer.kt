@@ -6,6 +6,7 @@ import de.craftan.engine.structures.CraftanStructure
 import de.craftan.io.*
 import de.craftan.util.*
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import java.awt.Color
 
@@ -76,7 +77,7 @@ interface CraftanBridgePlayer {
 }
 
 data class CraftanTeam(
-    val color: Color,
+    val color: NamedTextColor,
     val name: String
 )
 

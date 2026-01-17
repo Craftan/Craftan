@@ -42,7 +42,7 @@ class CraftanBridgeMap(
     private val worldEditWorld: com.sk89q.worldedit.world.World = FaweAPI.getWorld(bukkitWorld.name)!!
     private val hexagonSize: HexagonSize = HexagonSize()
     private val spacing = lobby.board.spacing
-    private val hitBoxes = mutableListOf<CraftanHitbox>()
+    val hitBoxes = mutableListOf<CraftanHitbox>()
 
     /**
      * Builds the map

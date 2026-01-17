@@ -6,7 +6,6 @@ import de.craftan.InternalMain
 import de.craftan.bridge.lobby.CraftanLobby
 import de.craftan.io.commands.UUIDSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
@@ -18,25 +17,26 @@ import java.util.*
 class CraftanHitbox(val lobby: CraftanLobby, val location: Location) {
 
     val id: UUID = UUID.randomUUID()
-    private val hitBox = location.world.spawnEntity(location, EntityType.INTERACTION) as Interaction
+    val hitBoxEntity = location.world.spawnEntity(location, EntityType.INTERACTION) as Interaction
+    val shulkerEntites = mutableListOf<Shulker>()
 
     companion object {
         val hitBoxNameSpace = NamespacedKey(InternalMain.INSTANCE, "craftan_hitbox_data")
     }
 
     init {
-        hitBox.persistentDataContainer.set(hitBoxNameSpace, PersistentDataType.STRING, json.encodeToString(toData()))
+        hitBoxEntity.persistentDataContainer.set(hitBoxNameSpace, PersistentDataType.STRING, json.encodeToString(toData()))
         spawnHitbox()
     }
 
     private fun toData() = CraftanHitboxData(id, lobby.id)
 
     fun glow() {
-        hitBox.isGlowing = true
+        shulkerEntites.forEach { it.isGlowing = true }
     }
 
     fun unglow() {
-        hitBox.isGlowing = false
+        shulkerEntites.forEach { it.isGlowing = false }
     }
 
     private fun spawnHitbox() {
@@ -44,17 +44,18 @@ class CraftanHitbox(val lobby: CraftanLobby, val location: Location) {
 
         Craftan.logger.fine("Spawning hitbox at $location")
 
-        hitBox.setNoPhysics(true)
-        hitBox.setGravity(false)
-        hitBox.isGlowing = true
+        hitBoxEntity.setNoPhysics(true)
+        hitBoxEntity.setGravity(false)
 
-        hitBox.interactionWidth = 3.0f
-        hitBox.interactionHeight = 1.0f
+        hitBoxEntity.interactionWidth = 3.0f
+        hitBoxEntity.interactionHeight = 1.0f
 
         for (dx in -1..1) {
             for (dz in -1..1) {
                 val spawnLoc = Location(world, location.x + dx, location.y, location.z + dz)
                 val entity = world.spawnEntity(spawnLoc, EntityType.SHULKER) as Shulker
+
+                shulkerEntites.add(entity)
 
                 entity.setGravity(false)
                 entity.setNoPhysics(true)

@@ -5,7 +5,7 @@ import de.craftan.bridge.inventory.placeholderRow
 import de.craftan.bridge.lobby.CraftanLobby
 import de.craftan.bridge.lobby.CraftanLobbyManager
 import de.craftan.bridge.lobby.CraftanLobbyStatus
-import de.craftan.config.ColorConfig
+import de.craftan.config.schema.ColorConfig
 import de.craftan.io.CraftanNotification
 import de.craftan.io.resolve
 import de.staticred.kia.inventory.KRow
@@ -14,6 +14,7 @@ import de.staticred.kia.inventory.builder.kItem
 import de.staticred.kia.inventory.builder.kRow
 import de.staticred.kia.util.rows
 import net.axay.kspigot.chat.literalText
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -37,11 +38,11 @@ private fun colorRow(player: Player, lobby: CraftanLobby): KRow = kRow {
 }
 
 private fun selectColorItem(player: Player, colorName: String, colorItem: ColorConfig, lobby: CraftanLobby) = kItem(Material.valueOf(colorItem.resource)) {
-    val color = Color(colorItem.color)
+    val color = NamedTextColor.NAMES.value(colorItem.color)!!
 
     val available = !lobby.hasPlayerColor(color)
     val itemName = if (available) colorName else "USED - $colorName"
-    setDisplayName(literalText(itemName).color(TextColor.color(color.rgb)))
+    setDisplayName(literalText(itemName).color(color))
 
     val isPlayerUsingColor =  lobby.hasPlayerColor(color) && lobby.getPlayerColor(player) == color
 

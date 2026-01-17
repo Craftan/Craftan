@@ -1,6 +1,6 @@
 package de.craftan.io.config
 
-import de.craftan.config.LanguageFile
+import de.craftan.config.schema.LanguageFile
 import org.bukkit.configuration.file.YamlConfiguration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

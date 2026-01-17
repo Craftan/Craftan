@@ -16,6 +16,7 @@ import de.craftan.util.toWorldEditWorld
 import de.staticred.kia.inventory.KInventory
 import net.axay.kspigot.runnables.task
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent
 import org.bukkit.Location
@@ -138,17 +139,17 @@ class CraftanLobby(
 
     fun players() = players.toList()
 
-    fun allowedTeams(): List<CraftanTeam> = Craftan.configs.gameSettings().colors.map { CraftanTeam(Color(it.value.color), it.value.displayName) }
+    fun allowedTeams(): List<CraftanTeam> = Craftan.configs.gameSettings().colors.map { CraftanTeam(NamedTextColor.NAMES.value(it.value.color)!!, it.value.displayName) }
 
-    fun getPlayerColor(player: Player): Color? = craftanPlayer(player)?.team?.color
+    fun getPlayerColor(player: Player): NamedTextColor? = craftanPlayer(player)?.team?.color
 
     fun craftanPlayer(player: Player) = players.find { it.bukkitPlayer == player }
 
-    fun hasPlayerColor(color: Color): Boolean = players.any { it.team?.color == color }
+    fun hasPlayerColor(color: NamedTextColor): Boolean = players.any { it.team?.color == color }
 
-    fun isColorAvailable(color: Color): Boolean = !hasPlayerColor(color)
+    fun isColorAvailable(color: NamedTextColor): Boolean = !hasPlayerColor(color)
 
-    fun setPlayerColor(player: Player, color: Color, name: String): Boolean {
+    fun setPlayerColor(player: Player, color: NamedTextColor, name: String): Boolean {
         if (!allowedTeams().map { it.color }.contains(color)) return false
         if (!isColorAvailable(color)) return false
         val from = getPlayerColor(player) ?: return false
