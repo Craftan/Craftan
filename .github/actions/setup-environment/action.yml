@@ -1,0 +1,24 @@
+---
+name: "setup environment"
+description: "prepare environment"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "setup java"
+      uses: actions/setup-java@v4
+      with:
+        cache: "gradle"
+        distribution: "temurin"
+        java-version: "17"
+    - name: "setup gradle"
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: "8.10"
+    - name: "setup go-task"
+      uses: arduino/setup-task@v2
+      with:
+        version: "3.x"
+    - name: "download dependencies"
+      run: "task ci:setup"
+      shell: "bash"

@@ -1,0 +1,19 @@
+---
+name: "Quality Assurance"
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  guidelines:
+    name: "qa guidelines"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "checkout project code"
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-environment
+      - name: "check code guidelines"
+        run: "task ci:code:guidelines:check"
+        shell: "bash"
+    timeout-minutes: 5

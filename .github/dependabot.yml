@@ -1,0 +1,24 @@
+version: 2
+
+updates:
+  - package-ecosystem: "gradle"
+    commit-message:
+      prefix: "🤖 Dependabot: Gradle "
+    directory: "/"
+    open-pull-requests-limit: 20
+    reviewers:
+      - "craftan/development"
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
+
+  - package-ecosystem: "github-actions"
+    commit-message:
+      prefix: "🤖 Dependabot: GitHub Actions "
+    directory: "/"
+    open-pull-requests-limit: 20
+    reviewers:
+      - "craftan/devops"
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
