@@ -1,13 +1,6 @@
 package de.craftan.bridge.lobby.listeners
 
-import de.craftan.bridge.events.lobby.LobbyCountdownEvent
-import de.craftan.bridge.events.lobby.LobbyStartedEvent
-import de.craftan.bridge.events.lobby.LobbyStatusChangedEvent
-import de.craftan.bridge.events.lobby.PlayerChangedColorEvent
-import de.craftan.bridge.events.lobby.PlayerJoinedLobbyEvent
-import de.craftan.bridge.events.lobby.PlayerLeftLobbyEvent
-import de.craftan.bridge.events.lobby.PlayerRejoinedLobbyEvent
-import de.craftan.bridge.events.lobby.PlayerSoftLeftLobbyEvent
+import de.craftan.bridge.events.lobby.*
 import de.craftan.bridge.items.LobbyItems
 import de.craftan.bridge.lobby.CraftanLobby
 import de.craftan.bridge.lobby.CraftanPlayerStateManager
@@ -16,16 +9,13 @@ import de.craftan.io.CraftanPlaceholder
 import de.craftan.io.globalEventBus
 import de.staticred.kia.inventory.extensions.setHotbarItem
 import net.axay.kspigot.chat.literalText
-import net.axay.kspigot.runnables.task
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
 
 /**
  * Collection of listeners that handle side-effects for lobby events.
  */
-object LobbyEventListeners {
+object CraftanLobbyListeners {
     fun register() {
         globalEventBus.on<PlayerJoinedLobbyEvent> {
             val lobby = this.lobby

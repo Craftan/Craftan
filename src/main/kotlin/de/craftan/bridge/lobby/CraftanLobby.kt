@@ -3,8 +3,10 @@ package de.craftan.bridge.lobby
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
 import de.craftan.bridge.CraftanBridgePlayerImpl
+import de.craftan.bridge.CraftanGameProvider
 import de.craftan.bridge.CraftanTeam
 import de.craftan.bridge.events.lobby.*
+import de.craftan.bridge.integration.CraftanGameListener
 import de.craftan.bridge.inventory.config.colorSelectorInventory
 import de.craftan.bridge.lobby.scoreboard.ConfigurableScoreboard
 import de.craftan.bridge.lobby.scoreboard.ScoreboardProvider
@@ -22,7 +24,6 @@ import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Player
-import java.awt.Color
 
 /**
  * Models a lobby which holds the players and the ongoing game.
@@ -41,6 +42,8 @@ class CraftanLobby(
     //TODO add layout spacing config option, add map layout through config
     val board = CraftanBoard(world.toWorldEditWorld(), center, 3, DefaultMapLayout())
     val map = CraftanBridgeMap(this)
+    val game = CraftanGameProvider.createCraftanGame(gameConfig)
+    private val gameListeners = CraftanGameListener(this)
 
     var countingDown = false
         private set
@@ -216,6 +219,8 @@ class CraftanLobby(
         assignMissingColors()
 
         status = CraftanLobbyStatus.IN_GAME
+
+        game.start()
 
         globalEventBus.fire(LobbyStartedEvent(this))
     }
