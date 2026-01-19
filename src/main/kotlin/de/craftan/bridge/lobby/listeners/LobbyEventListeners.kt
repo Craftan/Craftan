@@ -106,22 +106,6 @@ object LobbyEventListeners {
 
         globalEventBus.on<LobbyStartedEvent> {
             lobby.players().forEach { teleportPlayerToMap(lobby, it.bukkitPlayer) }
-
-            lobby.players().forEach {
-                with(lobby) {
-                    val team = CraftanTeamManager.assignPlayerToTeam(it.bukkitPlayer)
-
-                    task(delay = 20*5) {
-                        map.hitBoxes.forEach { hitBox ->
-                            hitBox.shulkerEntites.forEach { shulker ->
-                                team.addEntity(shulker)
-                                shulker.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 100000000, 1, true, false))
-                            }
-                            hitBox.glow()
-                        }
-                    }
-                }
-            }
         }
     }
 
