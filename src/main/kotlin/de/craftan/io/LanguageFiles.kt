@@ -2,7 +2,7 @@ package de.craftan.io
 
 import de.craftan.Craftan
 import de.craftan.PluginManager
-import de.craftan.config.LanguageFile
+import de.craftan.config.schema.LanguageFile
 import de.craftan.io.config.ConfigFile
 import de.craftan.io.config.Configs
 import java.io.File

@@ -3,7 +3,7 @@ package de.craftan.io
 import de.craftan.Craftan
 import de.craftan.bridge.util.resolveMiniMessage
 import de.craftan.bridge.util.toComponent
-import de.craftan.config.LanguageFile
+import de.craftan.config.schema.LanguageFile
 import de.craftan.io.config.ConfigFile
 import net.kyori.adventure.text.Component
 

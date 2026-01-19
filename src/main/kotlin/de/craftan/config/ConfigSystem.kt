@@ -1,6 +1,10 @@
 package de.craftan.config
 
 import de.craftan.Craftan
+import de.craftan.config.schema.CraftanConfig
+import de.craftan.config.schema.CraftanGameConfig
+import de.craftan.config.schema.DatabaseConfig
+import de.craftan.config.schema.ScoreboardConfig
 import de.craftan.io.MessageAdapter
 import de.craftan.io.config.ConfigFile
 import de.craftan.io.config.Configs
@@ -29,8 +33,9 @@ object ConfigSystem : CraftanSystem {
         val craftanConfig = addConfig(CraftanConfig::class)
         val craftanGameConfig = addConfig(CraftanGameConfig::class)
         val databaseConfig = addConfig(DatabaseConfig::class)
+        val scoreboardConfig = addConfig(ScoreboardConfig::class)
 
-        Craftan.configs = CraftanConfigs(craftanConfig, craftanGameConfig, databaseConfig)
+        Craftan.configs = CraftanConfigs(craftanConfig, craftanGameConfig, databaseConfig, scoreboardConfig)
 
         Craftan.logger.info("[ConfigSystem] Loading MessageAdapter (languages)")
         MessageAdapter.load()

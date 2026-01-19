@@ -1,28 +1,27 @@
-package de.craftan.bridge.lobby
-
+import de.craftan.bridge.lobby.CraftanLobby
 import net.axay.kspigot.extensions.server
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
-import org.bukkit.scoreboard.Scoreboard
+import org.bukkit.scoreboard.Team
 
 object CraftanTeamManager {
 
-    private val lobbyScoreboards = mutableMapOf<CraftanLobby, Scoreboard>()
+    const val TEAM_PREFIX = "craftan-team-"
 
     context(lobby: CraftanLobby)
-    fun assignPlayerToTeam(player: Player) {
-        val color = lobby.getPlayerColor(player) ?: return
+    fun assignPlayerToTeam(player: Player): Team {
+        val color = lobby.getPlayerColor(player) ?: throw IllegalStateException("Player ${player.name} has no color assigned!")
 
-        if (!lobbyScoreboards.containsKey(lobby)) {
-            lobbyScoreboards[lobby] = server.scoreboardManager.newScoreboard
-        }
+        val scoreboard = server.scoreboardManager.mainScoreboard
 
-        val scoreboard = lobbyScoreboards[lobby]!!
-
-        val teamName = "lobby-${lobby.id}-${color.rgb}"
+        val teamName = "${TEAM_PREFIX}lobby-${lobby.id}"
         val team = scoreboard.getTeam(teamName) ?: scoreboard.registerNewTeam(teamName)
 
-        team.addPlayer(player)
-        team.color(NamedTextColor.namedColor(color.rgb))
+        team.color(color)
+
+        return team
+    }
+
+    fun deleteCraftanTeams() {
+        server.scoreboardManager.mainScoreboard.teams.filter { it.name.startsWith(TEAM_PREFIX) }.forEach { it.unregister() }
     }
 }

@@ -56,7 +56,15 @@ object ConfigWriter {
             }
             value is Map<*, *> -> {
                 val targetSection = if (flatten) section else section.createSection(path)
-                value.forEach { (k, v) -> if (v != null) writeValue(targetSection, k.toString(), v) }
+                value.forEach { (k, v) -> 
+                    if (v != null) {
+                        if (v is Map<*, *> || ConfigSchemaBuilder.isDataClass(v::class)) {
+                            writeValue(targetSection, k.toString(), v)
+                        } else {
+                            targetSection.set(k.toString(), if (v is Enum<*>) v.name else v)
+                        }
+                    }
+                }
             }
             value is List<*> -> {
                 section.set(path, value.map { if (it is Enum<*>) it.name else it })

@@ -23,12 +23,14 @@ class InternalMain : KSpigot() {
         Craftan.configure()
         SystemManager.loadSystems()
         CraftanLobbyManager.removeOldLobbies()
+        CraftanTeamManager.deleteCraftanTeams()
     }
 
 
     override fun shutdown() {
         Craftan.scoreboardLibrary.close();
         CraftanLobbyManager.closeAllLobbies()
+        CraftanTeamManager.deleteCraftanTeams()
     }
 }
 

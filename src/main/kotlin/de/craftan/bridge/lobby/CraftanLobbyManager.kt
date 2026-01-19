@@ -14,6 +14,7 @@ import de.craftan.io.globalEventBus
 import de.craftan.structures.loadStructureToClipboard
 import de.craftan.structures.placeStructure
 import de.craftan.util.toWorldEditWorld
+import net.axay.kspigot.runnables.async
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -33,6 +34,10 @@ object CraftanLobbyManager {
     @Synchronized
     fun createLobby(config: CraftanGameConfig): CraftanLobby {
         val id = lobbies.size + 1
+
+        async {
+
+        }
 
         Craftan.logger.debug("Creating lobby id $id")
         val world = generateEmptyWorld("$LOBBY_WORLD_PREFIX$id")

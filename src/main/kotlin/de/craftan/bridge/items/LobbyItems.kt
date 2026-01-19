@@ -23,4 +23,14 @@ object LobbyItems {
             }
         }
     }
+
+    fun startGameItem(player: Player) = kItem(Material.GREEN_TERRACOTTA) {
+        setDisplayName(CraftanNotification.LOBBY_ITEMS_START_GAME.resolve(player))
+        onRightClick { player, _ ->
+            val lobby = CraftanLobbyManager.getLobbyForPlayer(player)
+            if (lobby != null && (lobby.status == CraftanLobbyStatus.WAITING)) {
+                lobby.startCountdown()
+            }
+        }
+    }
 }

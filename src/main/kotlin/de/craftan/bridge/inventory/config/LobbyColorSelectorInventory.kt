@@ -5,6 +5,7 @@ import de.craftan.bridge.inventory.placeholderRow
 import de.craftan.bridge.lobby.CraftanLobby
 import de.craftan.bridge.lobby.CraftanLobbyManager
 import de.craftan.bridge.lobby.CraftanLobbyStatus
+import de.craftan.config.schema.ColorConfig
 import de.craftan.io.CraftanNotification
 import de.craftan.io.resolve
 import de.staticred.kia.inventory.KRow
@@ -13,6 +14,7 @@ import de.staticred.kia.inventory.builder.kItem
 import de.staticred.kia.inventory.builder.kRow
 import de.staticred.kia.util.rows
 import net.axay.kspigot.chat.literalText
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -20,9 +22,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import java.awt.Color
 
-private val colorsToItems = Craftan.configs.gameSettings()
-    .colors
-    .mapValues { ColorItem(Color(it.value.color), Material.valueOf(it.value.resource)) }
+private val colorsToItems = Craftan.configs.gameSettings().colors
 
 fun colorSelectorInventory(player: Player, lobby: CraftanLobby) = kInventory(player, 3.rows, InventoryType.CHEST) {
     title = CraftanNotification.LOBBY_COLOR_SELECTOR_INVENTORY_TITLE.resolve(player)
@@ -37,12 +37,12 @@ private fun colorRow(player: Player, lobby: CraftanLobby): KRow = kRow {
     }
 }
 
-private fun selectColorItem(player: Player, colorName: String, colorItem: ColorItem, lobby: CraftanLobby) = kItem(colorItem.material) {
-    val color = colorItem.color
+private fun selectColorItem(player: Player, colorName: String, colorItem: ColorConfig, lobby: CraftanLobby) = kItem(Material.valueOf(colorItem.resource)) {
+    val color = NamedTextColor.NAMES.value(colorItem.color)!!
 
     val available = !lobby.hasPlayerColor(color)
     val itemName = if (available) colorName else "USED - $colorName"
-    setDisplayName(literalText(itemName).color(TextColor.color(color.rgb)))
+    setDisplayName(literalText(itemName).color(color))
 
     val isPlayerUsingColor =  lobby.hasPlayerColor(color) && lobby.getPlayerColor(player) == color
 
@@ -58,12 +58,10 @@ private fun selectColorItem(player: Player, colorName: String, colorItem: ColorI
             val hasPlayerColor = lobby.hasPlayerColor(color)
 
             if (!hasPlayerColor) {
-                lobby.setPlayerColor(player, color)
+                lobby.setPlayerColor(player, color, colorItem.displayName)
                 player.sendMessage("You selected the $colorName color.")
                 setRow(1, colorRow(player, lobby))
             }
         }
     }
 }
-
-data class ColorItem(val color: Color, val material: Material)

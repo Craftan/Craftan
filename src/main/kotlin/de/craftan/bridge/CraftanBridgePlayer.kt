@@ -6,6 +6,7 @@ import de.craftan.engine.structures.CraftanStructure
 import de.craftan.io.*
 import de.craftan.util.*
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import java.awt.Color
 
@@ -31,7 +32,7 @@ interface CraftanBridgePlayer {
      */
     val inventory: CraftanPlayerInventory
 
-    val teamColor: Color
+    var team: CraftanTeam?
 
     /**
      * Send the given component to the ingame player
@@ -74,6 +75,11 @@ interface CraftanBridgePlayer {
      */
     fun hasPermission(permission: CraftanPermissions): Boolean = hasPermission(permission.permission)
 }
+
+data class CraftanTeam(
+    val color: NamedTextColor,
+    val name: String
+)
 
 /**
  * Models the inventory of resources, structures and cards a player current possesses

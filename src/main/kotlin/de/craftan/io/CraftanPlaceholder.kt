@@ -53,4 +53,21 @@ enum class CraftanPlaceholder(
      */
     TIME_TO_START("%time_to_start%"),
 
+    /**
+     * Scoreboard placeholders
+     */
+    LOBBY_STATUS("%lobby_status%"),
+    STATUS("%status%"),
+    LOBBY_COUNTDOWN("%lobby_countdown%"),
+    PLAYER_COLOR("%player_color%"),
+    VICTORY_POINTS("%victory_points%"),
+    RESOURCES("%resources%"),
+    RESOURCES_LUMBER("%resources_lumber%"),
+    RESOURCES_WOOL("%resources_wool%"),
+    RESOURCES_GRAIN("%resources_grain%"),
+    RESOURCES_BRICK("%resources_brick%"),
+    RESOURCES_ORE("%resources_ore%"),
+    ROUND("%round%"),
+    TURN_PLAYER("%turn_player%"),
+    CURRENT_TURN("%current_turn%"),
 }
