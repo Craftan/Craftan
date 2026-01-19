@@ -20,5 +20,5 @@ abstract class TurnState {
     /**
      * A list of all possible actions for a player
      */
-    abstract val actions: List<CraftanGameAction<out CraftanActionData>>
+    abstract val actions: List<CraftanGameAction<out CraftanActionData, *>>
 }

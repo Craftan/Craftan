@@ -1,15 +1,14 @@
-package de.craftan.engine.gameflow
+package de.craftan.engine.gameflow.rounds
 
-import de.craftan.engine.CraftanGameEvent
 import de.craftan.engine.CraftanPlayer
+import de.craftan.engine.gameflow.GameFlow
 import de.craftan.engine.gameflow.flows.TurnFlow
-import net.ormr.eventbus.EventBus
 
 /**
  * Models a round of a CraftanGame
  */
 abstract class GameRound(
-    val eventBus: EventBus<Any, CraftanGameEvent>
+    val flow: GameFlow
 ) {
     /**
      * Abstract name to be rendered ingame
@@ -22,6 +21,8 @@ abstract class GameRound(
 
     fun currentTurn(): Pair<CraftanPlayer, TurnFlow> = turnSequence[turnIndex]
 
+    fun currentPlayer(): CraftanPlayer = currentTurn().first
+    fun currentFlow(): TurnFlow = currentTurn().second
     // TODO should listen to turn end event and then call this
     fun nextTurn() {
         //println("Current turn: ${currentTurn().first.name} to next turn: ${turnSequence[turnIndex + 1].first.name}")
@@ -35,7 +36,6 @@ abstract class GameRound(
 
     fun finish() {
         println("Round $name finished!")
-        //eventBus.unsubscribe(this)
-        // TODO Fire finish round event
+        flow.nextRound()
     }
 }

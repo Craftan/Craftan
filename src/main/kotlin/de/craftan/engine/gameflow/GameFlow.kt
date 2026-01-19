@@ -3,6 +3,7 @@ package de.craftan.engine.gameflow
 import de.craftan.engine.CraftanGameEvent
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.gameflow.flows.TurnFlow
+import de.craftan.engine.gameflow.rounds.GameRound
 import net.ormr.eventbus.EventBus
 
 abstract class GameFlow {
@@ -16,14 +17,12 @@ abstract class GameFlow {
      */
     var roundIndex = 0
 
-    // TODO Fix this terrible eventbus thing with like an eventbusmanager or sth so I dont have to pass the instance through all my objects
     var eventBus: EventBus<Any, CraftanGameEvent> = EventBus()
 
     /**
      * The current round of the game
      */
-    // Todo Why the fuck is this nullable
-    var round: GameRound? = null
+    lateinit var round: GameRound
 
     /**
      * All participating players

@@ -9,23 +9,20 @@ import de.craftan.engine.structures.CraftanStructure
 
 class PlaceStructureAction(
     val requireResources: Boolean = true,
-): CraftanGameAction<PlaceStructureActionData> {
-
+): CraftanGameAction<PlaceStructureActionData, Boolean> {
     override fun invoke(player: CraftanPlayer, data: PlaceStructureActionData, stateHandler: CraftanGameStateHandler): Boolean {
         stateHandler.placeStructure(player, data.structure, data.tileCoordinate, data.direction, requireResources)
         return true
     }
 
-    override fun verify(player: CraftanPlayer, data: PlaceStructureActionData, stateHandler: CraftanGameStateHandler, gameFlow: GameFlow): Boolean {
-        if (player != gameFlow.round!!.currentTurn().first) return false
-        if (!stateHandler.map.isEmpty(data.tileCoordinate, data.direction)) return false
-        if (requireResources && !stateHandler.hasResources(player, data.structure.cost)) return false
+    override fun verify(player: CraftanPlayer, data: PlaceStructureActionData, stateHandler: CraftanGameStateHandler, gameFlow: GameFlow): VerificationResult {
+        if (!stateHandler.map.isEmpty(data.tileCoordinate, data.direction)) return VerificationResult(false, "Tile is not empty")
+        if (requireResources && !stateHandler.hasResources(player, data.structure.cost)) return VerificationResult(false, "Not enough resources")
         // TODO Check max amount buildings
         // TODO Check distance between settlements
 
-        return true
+        return VerificationResult(true, null)
     }
-
 }
 
 class PlaceStructureActionData (

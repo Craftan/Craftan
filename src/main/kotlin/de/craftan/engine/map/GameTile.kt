@@ -76,7 +76,7 @@ enum class TileDirection(
  * Meaning the type of material you can get and the DiceNumber you get it at
  */
 data class TileInfo(
-    val type: MaterialType,
+    val type: MapMaterialType,
     val chance: DiceNumber,
 )
 

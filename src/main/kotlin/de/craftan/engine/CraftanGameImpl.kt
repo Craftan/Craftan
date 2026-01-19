@@ -21,9 +21,12 @@ class CraftanGameImpl(
     }
 
     fun registerListener() {
-        eventBus.on<CraftanGameActionEvent<*,*>> {
-            verifyAndInvoke()
-            gameFlow.round!!.currentTurn().second.nextState(this)
+        eventBus.on<CraftanGameActionEvent<*,*,*>> {
+            val result = verifyAndInvoke()
+            gameFlow.round.currentTurn().second.nextState(this, result)
+        }
+        eventBus.on<CraftanGameEndTurnEvent> {
+            gameFlow.round.nextTurn()
         }
     }
 }
