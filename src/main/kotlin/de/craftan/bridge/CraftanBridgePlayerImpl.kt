@@ -1,3 +1,6 @@
+import de.craftan.bridge.CraftanBridgePlayer
+import de.craftan.bridge.CraftanPlayerInventory
+import de.craftan.bridge.CraftanTeam
 import de.craftan.engine.CraftanGame
 import org.bukkit.entity.Player
 

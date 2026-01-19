@@ -1,8 +1,8 @@
 package de.craftan.bridge.lobby
 
+import CraftanBridgePlayerImpl
 import com.sk89q.worldedit.math.BlockVector3
 import de.craftan.Craftan
-import de.craftan.bridge.CraftanBridgePlayerImpl
 import de.craftan.bridge.CraftanTeam
 import de.craftan.bridge.events.lobby.*
 import de.craftan.bridge.inventory.config.colorSelectorInventory
