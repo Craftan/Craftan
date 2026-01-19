@@ -1,7 +1,10 @@
 package de.craftan.engine.gameflow
 
+import de.craftan.engine.CraftanGameEvent
 import de.craftan.engine.CraftanPlayer
 import de.craftan.engine.gameflow.flows.TurnFlow
+import de.craftan.engine.gameflow.rounds.GameRound
+import net.ormr.eventbus.EventBus
 
 abstract class GameFlow {
 
@@ -14,11 +17,12 @@ abstract class GameFlow {
      */
     var roundIndex = 0
 
+    var eventBus: EventBus<Any, CraftanGameEvent> = EventBus()
+
     /**
      * The current round of the game
      */
-    // Todo Why the fuck is this nullable
-    var round: GameRound? = null
+    lateinit var round: GameRound
 
     /**
      * All participating players
@@ -33,7 +37,7 @@ abstract class GameFlow {
     /**
      * Init the GameFlow
      */
-    abstract fun init()
+    abstract fun init(eventBus: EventBus<Any, CraftanGameEvent>)
 
     fun turnFlow(): TurnFlow = round?.turnSequence[round!!.turnIndex]?.second!!
 }

@@ -7,5 +7,5 @@ import de.craftan.engine.gameflow.action.PlaceStructureAction
 
 class PlaceRoadState: TurnState() {
     override val name: String = "Place road"
-    override val actions: List<CraftanGameAction<out CraftanActionData>> = listOf(PlaceStructureAction(false)) //TODO
+    override val actions: List<CraftanGameAction<out CraftanActionData, *>> = listOf(PlaceStructureAction(false))
 }

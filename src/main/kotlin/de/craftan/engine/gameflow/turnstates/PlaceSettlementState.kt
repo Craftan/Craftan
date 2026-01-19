@@ -6,5 +6,5 @@ import de.craftan.engine.gameflow.action.PlaceStructureAction
 
 class PlaceSettlementState: TurnState() {
     override val name: String = "Place settlement"
-    override val actions: List<CraftanGameAction<*>> = listOf(PlaceStructureAction(false)) //TODO
+    override val actions: List<CraftanGameAction<*, *>> = listOf(PlaceStructureAction(false))
 }

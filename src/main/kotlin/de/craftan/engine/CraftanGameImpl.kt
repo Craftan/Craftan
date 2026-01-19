@@ -7,7 +7,6 @@ import de.craftan.engine.resources.CraftanResourceType
 class CraftanGameImpl(
     override val config: CraftanGameConfig,
     override val gameFlow: GameFlow,
-) : CraftanGame(config) {
 
     override val stateHandler: CraftanGameStateHandler = CraftanGameStateHandler(
         config.craftanMapLayout.map,
@@ -18,12 +17,16 @@ class CraftanGameImpl(
 
     override fun start() {
         registerListener()
-        gameFlow.init()
+        gameFlow.init(eventBus)
     }
 
     fun registerListener() {
-        eventBus.on<CraftanGameActionEvent<*,*>> {
-            verifyAndInvoke()
+        eventBus.on<CraftanGameActionEvent<*,*,*>> {
+            val result = verifyAndInvoke()
+            gameFlow.round.currentTurn().second.nextState(this, result)
+        }
+        eventBus.on<CraftanGameEndTurnEvent> {
+            gameFlow.round.nextTurn()
         }
     }
 }
